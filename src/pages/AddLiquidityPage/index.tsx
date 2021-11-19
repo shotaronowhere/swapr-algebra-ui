@@ -899,7 +899,7 @@ export default function AddLiquidityPage({
                     >
                       <TokenItem highPrice={usdcAIsGreaterThen10000}>
                         {usdcAIsGreaterThen10000 && (
-                          <HigherPrice>During Alpha limit is $10.000 in one token</HigherPrice>
+                          <HigherPrice>During Alpha limit is $10,000 in one token</HigherPrice>
                         )}
                         {!atMaxAmounts[Field.CURRENCY_A] && !depositADisabled && (
                           <MaxButton
@@ -958,7 +958,7 @@ export default function AddLiquidityPage({
                       </TokenItem>
                       <TokenItem highPrice={usdcBIsGreaterThen10000}>
                         {usdcBIsGreaterThen10000 && (
-                          <HigherPrice>During Alpha limit is $10.000 in one token</HigherPrice>
+                          <HigherPrice>During Alpha limit is $10,000 in one token</HigherPrice>
                         )}
                         {!atMaxAmounts[Field.CURRENCY_B] && !depositBDisabled && (
                           <MaxButton
