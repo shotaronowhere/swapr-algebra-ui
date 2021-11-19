@@ -50,6 +50,7 @@ import { calculateGasMargin } from '../../utils/calculateGasMargin'
 import { currencyId } from '../../utils/currencyId'
 import { ExplorerDataType, getExplorerLink } from '../../utils/getExplorerLink'
 import { BodyWrapper } from '../AppBody'
+import { BigNumber } from '@ethersproject/bignumber'
 
 const ZERO = JSBI.BigInt(0)
 
@@ -239,7 +240,7 @@ function V2PairMigration({
   const { signatureData, gatherPermitSignature } = useV2LiquidityTokenPermit(pairBalance, migrator?.address)
 
   const approve = useCallback(async () => {
-    if (isNotUniswap) {
+    if (true) {
       // sushi has to be manually approved
       await approveManually()
     } else if (gatherPermitSignature) {
@@ -302,21 +303,6 @@ function V2PairMigration({
       )
     }
 
-    console.log(
-      'migrate',
-      pair.address,
-      `0x${pairBalance.quotient.toString(16)}`,
-      percentageToMigrate,
-      token0.address,
-      token1.address,
-      tickLower,
-      tickUpper,
-      `0x${v3Amount0Min.toString(16)}`,
-      `0x${v3Amount1Min.toString(16)}`,
-      account,
-      deadlineToUse,
-      true
-    )
     // TODO could save gas by not doing this in multicall
     data.push(
       migrator.interface.encodeFunctionData('migrate', [
@@ -332,33 +318,29 @@ function V2PairMigration({
           amount1Min: `0x${v3Amount1Min.toString(16)}`,
           recipient: account,
           deadline: deadlineToUse,
-          refundAsETH: true, // hard-code this for now
+          refundAsNative: false, // hard-code this for now
         },
       ])
     )
 
     setConfirmingMigration(true)
 
-    // migrator.estimateGas
-    //   .multicall(data)
-    //   .then((gasEstimate) => {
-    //     return
-    migrator
-      .multicall(data, {})
-      .then((response: TransactionResponse) => {
-        addTransaction(response, {
-          type: TransactionType.MIGRATE_LIQUIDITY_V3,
-          baseCurrencyId: currencyId(currency0),
-          quoteCurrencyId: currencyId(currency1),
-          isFork: isNotUniswap,
+    migrator.estimateGas
+      .multicall(data)
+      .then((gasEstimate) => {
+        return migrator.multicall(data, { gasLimit: 2000000 }).then((response: TransactionResponse) => {
+          addTransaction(response, {
+            type: TransactionType.MIGRATE_LIQUIDITY_V3,
+            baseCurrencyId: currencyId(currency0),
+            quoteCurrencyId: currencyId(currency1),
+            isFork: isNotUniswap,
+          })
+          setPendingMigrationHash(response.hash)
         })
-        setPendingMigrationHash(response.hash)
       })
-      .catch((e) => console.error(e))
-    // )
-    // .catch(() => {
-    //   setConfirmingMigration(false)
-    // })
+      .catch(() => {
+        setConfirmingMigration(false)
+      })
   }, [
     chainId,
     isNotUniswap,

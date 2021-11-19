@@ -416,7 +416,11 @@ export function StakeModal({
                       <NFTPositionIcon name={el.tokenId}></NFTPositionIcon>
                       <NFTPositionDescription>
                         <NFTPositionIndex>{`#${el.tokenId}`}</NFTPositionIndex>
-                        <NFTPositionLink href={`https://algebra.exchange/#/pool/${el.tokenId}`} rel="noopener noreferrer" target="_blank">
+                        <NFTPositionLink
+                          href={`https://app.algebra.finance/#/pool/${el.tokenId}`}
+                          rel="noopener noreferrer"
+                          target="_blank"
+                        >
                           View position
                         </NFTPositionLink>
                       </NFTPositionDescription>

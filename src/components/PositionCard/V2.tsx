@@ -53,8 +53,6 @@ export default function V2PositionCard({ pair, border, stakedBalance }: Position
 
   const userDefaultPoolBalance = useTokenBalance(account ?? undefined, pair.liquidityToken)
 
-  console.log('USER DEF', account ?? undefined, pair.liquidityToken)
-
   const totalPoolTokens = useTotalSupply(pair.liquidityToken)
 
   // if staked balance balance provided, add to standard liquidity amount

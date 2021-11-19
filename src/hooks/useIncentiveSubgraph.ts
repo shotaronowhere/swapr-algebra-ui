@@ -297,7 +297,7 @@ export function useIncentiveSubgraph() {
 
                 if (position.incentive) {
 
-                    const { rewardToken, bonusRewardToken, pool, startTime, endTime, refundee } = await fetchIncentive(position.incentive)
+                    const { rewardToken, bonusRewardToken, pool, startTime, endTime, refundee, id } = await fetchIncentive(position.incentive)
 
                     const rewardContract = new Contract(
                         rewardToken,
