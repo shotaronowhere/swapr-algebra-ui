@@ -3,7 +3,7 @@ import { useMemo } from "react"
 export function useChunkedRows(arr: any[], inRow: number) {
 
     const chunked = useMemo(() => {
-        if (!arr || !inRow) return
+        if (!arr || !inRow || !Array.isArray(arr)) return
 
         if (arr.length === 0) return []
 
