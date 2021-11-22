@@ -147,6 +147,9 @@ export default function App() {
 
               <Route exact strict path="/remove/:tokenId" component={RemoveLiquidityV3} />
 
+              <Route exact strict path="/migrate" component={MigrateV2} />
+              <Route exact strict path="/migrate/:address" component={MigrateV2Pair} />
+
               <Route component={RedirectPathToSwapOnly} />
             </Switch>
             <Marginer />

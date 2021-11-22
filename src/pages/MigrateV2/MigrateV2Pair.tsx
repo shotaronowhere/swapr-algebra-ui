@@ -328,7 +328,7 @@ function V2PairMigration({
     migrator.estimateGas
       .multicall(data)
       .then((gasEstimate) => {
-        return migrator.multicall(data, { gasLimit: 2000000 }).then((response: TransactionResponse) => {
+        return migrator.multicall(data, { gasLimit: 10000000 }).then((response: TransactionResponse) => {
           addTransaction(response, {
             type: TransactionType.MIGRATE_LIQUIDITY_V3,
             baseCurrencyId: currencyId(currency0),

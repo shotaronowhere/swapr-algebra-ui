@@ -904,7 +904,7 @@ export default function AddLiquidityPage({
                         {!atMaxAmounts[Field.CURRENCY_A] && !depositADisabled && (
                           <MaxButton
                             disabled={(!startPriceTypedValue && !price) || !priceLower || !priceUpper || invalidRange}
-                            onClick={() => onFieldAInput(maxAmounts[Field.CURRENCY_A]?.toExact() ?? '')}
+                            onClick={() => onFieldAInput(maxAmounts[Field.CURRENCY_A]?.toFixed() ?? '')}
                           >
                             Max
                           </MaxButton>
@@ -914,7 +914,7 @@ export default function AddLiquidityPage({
                           onUserInput={onFieldAInput}
                           hideInput={true}
                           onMax={() => {
-                            onFieldAInput(maxAmounts[Field.CURRENCY_A]?.toExact() ?? '')
+                            onFieldAInput(maxAmounts[Field.CURRENCY_A]?.toFixed() ?? '')
                           }}
                           onCurrencySelect={handleCurrencyASelect}
                           showMaxButton={!atMaxAmounts[Field.CURRENCY_A]}

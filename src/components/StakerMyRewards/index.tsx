@@ -202,9 +202,9 @@ export function StakerMyRewards({
   }, [claimRewardHash, confirmed])
 
   const chunkedRewards = useMemo(() => {
-    if (!data || !Array.isArray(data)) return
+    if (!data) return
 
-    if (data.length === 0) return []
+    if (!Array.isArray(data) || data.length === 0) return []
 
     const _rewards = [[data[0]]]
 
@@ -262,7 +262,6 @@ export function StakerMyRewards({
         </Rewards>
       ) : chunkedRewards.length !== 0 ? (
         <Rewards>
-          {console.log('CHECNKED RWARDS', chunkedRewards)}
           {chunkedRewards.map((el, i) => (
             <RewardsRow key={i}>
               {el.map((rew, j) => (

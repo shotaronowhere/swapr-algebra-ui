@@ -176,6 +176,7 @@ const BalanceText = styled(Text)`
   ${({ theme }) => theme.mediaWidth.upToExtraSmall`
     display: none;
   `};
+  cursor: default;
 `
 
 const Title = styled.a`
@@ -297,6 +298,9 @@ export default function Header() {
         <StyledNavLink id={`farming-nav-link`} to={'/farming'}>
           Farming
         </StyledNavLink>
+        <StyledNavLink id={`migrate-nav-link`} to={'/migrate'}>
+          Migrate
+        </StyledNavLink>
         <StyledNavLink id={`info-nav-link`} to={'/info'}>
           Info
         </StyledNavLink>
@@ -323,7 +327,14 @@ export default function Header() {
           )} */}
           <AccountElement active={!!account} style={{ pointerEvents: 'auto' }}>
             {chainId === 137 && account && userEthBalance ? (
-              <BalanceText style={{ flexShrink: 0 }} pl="0.75rem" pr="0.5rem" fontWeight={500}>
+              <BalanceText
+                style={{ flexShrink: 0 }}
+                pt="0.75rem"
+                pb="0.75rem"
+                pl="0.75rem"
+                pr="0.5rem"
+                fontWeight={500}
+              >
                 {userEthBalance?.toSignificant(3)} {chainValue}{' '}
               </BalanceText>
             ) : null}

@@ -62,6 +62,7 @@ const TokenIcon = styled.div`
   border: 1px solid ${({ name }) => (name ? stringToColour(name).border : '#3d4a6a')};
   color: ${({ name }) => (name ? stringToColour(name).text : '#3d4a6a')};
   border-radius: 50%;
+  user-select: none;
 
   ${({ skeleton }) => (skeleton ? skeletonGradient : null)}
 
@@ -401,7 +402,6 @@ export function StakerMyStakes({
           <FarmingPositionInfo el={el} />
         </StakeId>
         <StakePool>
-          {/* {JSON.parse(el.pool)} */}
           {staked && (
             <>
               <TokenIcon name={el.pool.token0.symbol}>{el.pool.token0.symbol.slice(0, 2)}</TokenIcon>
@@ -604,7 +604,7 @@ export function StakerMyStakes({
               <PageTitle title={'Inactive NFT-s'}></PageTitle>
               <StakeListHeader>
                 <div style={{ minWidth: '96px' }}>ID</div>
-                <div>Pool</div>
+                <div></div>
                 <div></div>
                 <div></div>
                 <div></div>
