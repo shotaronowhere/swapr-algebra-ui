@@ -32,11 +32,6 @@ export const computePairAddress = ({
     tokenB: Token
 }): string => {
     const [token0, token1] = tokenA.sortsBefore(tokenB) ? [tokenA, tokenB] : [tokenB, tokenA] // does safety checks
-    // console.log('factory address', factoryAddress, token0, token1, getCreate2Address(
-    //     '0x5757371414417b8c6caad45baef941abc7d3ab32',
-    //     keccak256(['bytes'], [pack(['address', 'address'], [token0.address, token1.address])]),
-    //     '0x96e8ac4277198ff8b6f785478aa9a39f403cb768dd02cbee326c3e7da348845f'
-    // ))
     return getCreate2Address(
         factoryAddress,
         keccak256(['bytes'], [pack(['address', 'address'], [token0.address, token1.address])]),
