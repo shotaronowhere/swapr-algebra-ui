@@ -303,6 +303,22 @@ function V2PairMigration({
       )
     }
 
+    console.log({
+      pair: pair.address,
+      liquidityToMigrate: `0x${pairBalance.quotient.toString(16)}`,
+      percentageToMigrate,
+      token0: token0.address,
+      token1: token1.address,
+      tickLower,
+      tickUpper,
+      amount0Min: `0x${v3Amount0Min.toString(16)}`,
+      amount1Min: `0x${v3Amount1Min.toString(16)}`,
+      recipient: account,
+      deadline: deadlineToUse,
+      refundAsNative: false, // hard-code this for now,
+      sqrt: `0x${sqrtPrice.toString(16)}`,
+    })
+
     // TODO could save gas by not doing this in multicall
     data.push(
       migrator.interface.encodeFunctionData('migrate', [
