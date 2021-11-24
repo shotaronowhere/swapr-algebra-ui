@@ -19,7 +19,7 @@ import StakingPage from './Staking/StakingPage'
 import { OpenClaimAddressModalAndRedirectToSwap, RedirectPathToSwapOnly, RedirectToSwap } from './Swap/redirects'
 import { Pool } from 'lib/src'
 import StakingPoolPage from './Staking/StakingPoolPage'
-import { NewIncentivePage } from './Staking/NewIncentivePage'
+// import { NewIncentivePage } from './Staking/NewIncentivePage'
 import { RedirectDuplicateTokenStakingIds } from './Staking/redirects'
 import { CurrentEventsPage } from './CurrentEventsPage'
 import { FutureEventsPage } from './FutureEventsPage'
@@ -34,6 +34,7 @@ import Modal from '../components/Modal'
 import { useEffect, useState } from 'react'
 import CautionModal from '../components/CautionModal'
 import PoolFinder from './PoolFinder'
+import { useInfoSubgraph } from '../hooks/subgraph/useInfoSubgraph'
 
 const AppWrapper = styled.div`
   display: flex;
@@ -56,14 +57,13 @@ const BodyWrapper = styled.div`
 `
 
 const HeaderWrapper = styled.div`
-  ${({ theme }) => theme.flexRowNoWrap}
+  ${({ theme }) => theme.flexRowNoWrap};
   width: 100%;
   justify-content: space-between;
   position: fixed;
   top: 0;
   z-index: 2;
 `
-
 const Marginer = styled.div`
   margin-top: 5rem;
 `
@@ -88,6 +88,14 @@ export default function App() {
       return 60
     },
   })
+
+  const { fetchFees: { feesResult, feesLoading, fetchFeePoolFn } } = useInfoSubgraph()
+
+  useEffect(() => {
+    fetchFeePoolFn('0x0f948f118904289b3995324ba4fdc474980f9ada', 1637672905, 1637672905)
+  }, [])
+
+  useEffect(() => console.log(feesResult), [feesResult])
 
   return (
     <ErrorBoundary>
