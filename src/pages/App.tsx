@@ -35,6 +35,7 @@ import { useEffect, useState } from 'react'
 import CautionModal from '../components/CautionModal'
 import PoolFinder from './PoolFinder'
 import { useInfoSubgraph } from '../hooks/subgraph/useInfoSubgraph'
+import FeeChartRangeInput from '../components/FeeChartRangeInput'
 
 const AppWrapper = styled.div`
   display: flex;
@@ -89,13 +90,6 @@ export default function App() {
     },
   })
 
-  const { fetchFees: { feesResult, feesLoading, fetchFeePoolFn } } = useInfoSubgraph()
-
-  useEffect(() => {
-    fetchFeePoolFn('0x0f948f118904289b3995324ba4fdc474980f9ada', 1637672905, 1637672905)
-  }, [])
-
-  useEffect(() => console.log(feesResult), [feesResult])
 
   return (
     <ErrorBoundary>
@@ -159,6 +153,7 @@ export default function App() {
 
               <Route exact strict path="/migrate" component={MigrateV2} />
               <Route exact strict path="/migrate/:address" component={MigrateV2Pair} />
+
 
               <Route component={RedirectPathToSwapOnly} />
             </Switch>
