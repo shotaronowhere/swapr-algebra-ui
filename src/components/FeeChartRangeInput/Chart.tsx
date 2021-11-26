@@ -1,127 +1,140 @@
-import React, { useEffect, useMemo, useRef } from 'react'
+import React, { useMemo, useRef } from 'react'
 import * as d3 from 'd3'
 import { ChartScale, daysCount } from './index'
 
 
-export default function Chart({
-                                feeData = [],
-                                scale,
-                                dimensions
-                              }: {
+interface ChartInterface {
   feeData: {
     changesCount: number
     fee: number
     id: string
     pool: string
     timestamp: number
-  }[] | undefined,
+  }[] | undefined
+
   dimensions: {
     width: number
     height: number
     margin: { top: number, right: number, bottom: number, left: number }
-  },
+  }
+
   scale: ChartScale
-}) {
+
+  isScale: boolean
+}
+
+export default function Chart({
+                                feeData = [],
+                                scale,
+                                dimensions,
+                                isScale
+                              }: ChartInterface) {
 
   const svgRef = useRef(null)
   const { width, height, margin } = dimensions
-  const svgWidth = width + margin.left + margin.right + 100
+  const svgWidth = width + margin.left + margin.right + 10
   const svgHeight = height + margin.bottom + margin.top
+  const days = feeData[0] !== undefined ? daysCount(new Date(feeData[0].timestamp).getMonth(), new Date(feeData[0].timestamp).getFullYear()) : 0
+  const chartData = feeData[0] !== undefined ? feeData.map(item => ({
+    time: new Date(item.timestamp * 1000).getDate(),
+    fee: (item.fee / item.changesCount) / 1000
+  })) : []
 
   const xScale = useMemo(() => {
-
     if (scale === ChartScale.MONTH) {
       return d3.scaleLinear()
-        // .domain(d3.extent(timeArr))
-        .domain([0, daysCount(1, 2020) -1 ])
+        .domain(isScale ? [d3.min(chartData, d => +d.time - 1), d3.max(chartData, d => +d.time + 1)] : [1, days])
         .range([0, width])
     } else {
       return d3.scaleLinear()
-        // .domain(d3.extent(timeArr))
         .domain([0, 24])
         .range([0, width])
     }
-  }, [scale])
+  }, [scale, days, chartData])
 
-    if (feeData.length !== 0) {
+  if (feeData.length !== 0) {
 
-      const testTime = [1577836800,
-        1577923200,
-        1578009600,
-        1578096000,
-        1578182400,
-        1578268800,
-        1578355200,
-        1578441600,
-        1578528000,
-        1578614400,
-        1578700800,
-        1578787200,
-        1578873600,
-        1578960000,
-        1579046400,
-        1579132800,
-        1579219200,
-        1579305600,
-        1579392000,
-        1579478400,
-        1579564800,
-        1579651200,
-        1579737600,
-        1579824000,
-        1579910400,
-        1579996800,
-        1580083200,
-        1580169600,
-        1580256000,
-        1580342400,
-        1580428800 ]
+    const svgEl = d3.select(svgRef.current)
+    svgEl.selectAll('*').remove()
 
-      const timeArr = testTime.map(item => item * 1000)
-    // const timeArr = testTime.map((el, i) => i)
-    //   console.log(d3.extent(timeArr))
+    const svg = svgEl
+      .append('g')
+      .attr('transform', `translate(${margin.left}, ${margin.top})`)
 
-      console.log(timeArr)
+    // mouse event
+    svg.on('click', () => {
+      console.log('click')
+    })
 
-      const yScale = d3.scaleLinear()
-        .domain([0.01, 1])
-        .range([height, 0])
+// xAxis
+    const xAxisGroup = svg.append('g')
+      .attr('transform', `translate(0, ${height})`)
+      .call(d3.axisBottom(xScale)
+        .ticks(isScale ? d3.max(chartData, d => +d.time + 1) - d3.min(chartData, d => +d.time - 1) : days)
+        .tickSizeOuter(0))
 
-      const svgEl = d3.select(svgRef.current)
-      svgEl.selectAll('*').remove()
+    xAxisGroup.select('.domain').remove()
+    xAxisGroup.selectAll('line').attr('stroke', 'rgba(255, 255, 255, 0.2)')
+    xAxisGroup.selectAll('text')
+      .attr('opacity', 0.5)
+      .attr('color', 'white')
+      .attr('font-size', '0.75rem')
 
-      const svg = svgEl
-        .append('g')
-        .attr('transform', `translate(${margin.left}, ${margin.top})`)
+    // yAxis
+    const y = d3.scaleLinear()
+      .domain([d3.min(chartData, function(d) {
+        return +d.fee - 0.01
+      }), d3.max(chartData, function(d) {
+        return +d.fee + 0.01
+      })])
+      .range([height, 0])
 
-      const dateFormat = d3.timeFormat('%d')
-
-      const xAxis = d3.axisBottom(xScale)
-        .ticks(daysCount(1, 2020))
-        .tickFormat(domainValue => dateFormat(timeArr[domainValue]))
-        .tickSizeOuter(0)
-
-      const xAxisGroup = svg.append('g')
-        .attr('transform', `translate(0, ${height - margin.bottom})`)
-        .call(xAxis)
-      // xAxisGroup.select(".domain").remove();
-      xAxisGroup.selectAll('line').attr('stroke', 'rgba(255, 255, 255, 0.2)')
-      xAxisGroup.selectAll('text')
-        .attr('opacity', 0.5)
-        .attr('color', 'white')
-        .attr('font-size', '0.75rem')
-
-      const yAxis = d3.axisLeft(yScale)
+    const yAxisGroup = svg.append('g')
+      .call(d3.axisLeft(y)
         .ticks(10)
-        .tickSize(-width)
-        .tickFormat((val) => `${val}%`)
-      const yAxisGroup = svg.append('g').call(yAxis)
-      yAxisGroup.select('.domain').remove()
-      yAxisGroup.selectAll('line').attr('stroke', 'rgba(255, 255, 255, 0.2)')
-      yAxisGroup.selectAll('text')
-        .attr('opacity', 0.5)
-        .attr('color', 'white')
-        .attr('font-size', '0.75rem')
-    }
-    return <svg ref={svgRef} width={svgWidth} height={svgHeight}/>
+        .tickFormat(val => `${val}%`)
+        .tickSize(-width))
+
+    yAxisGroup.select('.domain').remove()
+    yAxisGroup.selectAll('line').attr('stroke', 'rgba(255, 255, 255, 0.2)')
+    yAxisGroup.selectAll('text')
+      .attr('opacity', 0.5)
+      .attr('color', 'white')
+      .attr('font-size', '0.75rem')
+
+    //Gradient
+    svg.append('linearGradient')
+      .attr('id', 'gradient')
+      .selectAll('stop')
+      .data([
+        {
+          offset: '0%',
+          color: 'rgba(4,120,106,0.75)'
+        },
+        {
+          offset: '66%',
+          color: 'rgba(71,172,160,0.75)'
+        },
+        {
+          offset: '100%',
+          color: 'rgba(163,218,211,0.75)'
+        }])
+      .enter().append('stop')
+      .attr('offset', d => d.offset)
+      .attr('stop-color', d => d.color)
+
+    // Chart Line
+    svg.append('path')
+      .datum(chartData)
+      .attr('fill', 'url(#gradient)')
+      .attr('stroke', '#00cab2')
+      .attr('stroke-width', 1.5)
+      .attr('d', d3.area()
+        // .curve(d3.curveBasis)
+        .x(d => xScale(d.time))
+        .y0(d => y(d3.min(chartData, d => +d.fee - 0.01)))
+        .y1(d => y(d.fee))
+      )
+  }
+  return <svg ref={svgRef} width={svgWidth} height={svgHeight}/>
 }
