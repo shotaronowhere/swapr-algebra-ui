@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import * as d3 from 'd3'
 import { ChartScale, daysCount } from './index'
 
@@ -10,6 +10,10 @@ interface ChartInterface {
     id: string
     pool: string
     timestamp: number
+    endFee: number
+    maxFee: number
+    minFee: number
+    startFee: number
   }[] | undefined
 
   dimensions: {
@@ -35,15 +39,20 @@ export default function Chart({
   const svgWidth = width + margin.left + margin.right + 10
   const svgHeight = height + margin.bottom + margin.top
   const days = feeData[0] !== undefined ? daysCount(new Date(feeData[0].timestamp).getMonth(), new Date(feeData[0].timestamp).getFullYear()) : 0
-  const chartData = feeData[0] !== undefined ? feeData.map(item => ({
+  let chartData = feeData[0] !== undefined ? feeData.map(item => ({
     time: new Date(item.timestamp * 1000).getDate(),
-    fee: (item.fee / item.changesCount) / 1000
+    fee: (item.fee / item.changesCount) / 10000,
+    start: item.startFee,
+    end: item.endFee,
+    high: item.maxFee,
+    low: item.minFee
   })) : []
 
+  const xDomain = isScale ? [d3.min(chartData, d => +d.time - 1), d3.max(chartData, d => +d.time + 1)] : [1, days]
   const xScale = useMemo(() => {
     if (scale === ChartScale.MONTH) {
       return d3.scaleLinear()
-        .domain(isScale ? [d3.min(chartData, d => +d.time - 1), d3.max(chartData, d => +d.time + 1)] : [1, days])
+        .domain(xDomain)
         .range([0, width])
     } else {
       return d3.scaleLinear()
@@ -52,7 +61,18 @@ export default function Chart({
     }
   }, [scale, days, chartData])
 
+  console.log(chartData)
+
+
   if (feeData.length !== 0) {
+
+    if (chartData[0].time !== 0) {
+      const newA = []
+      for (let i = 1; i < chartData[0].time; i++) {
+        newA.push({ time: i, start: 0, low: 0, high: 0, end: 0, fee: d3.min(chartData, d => +d.fee) })
+      }
+      chartData = [...newA, ...chartData]
+    }
 
     const svgEl = d3.select(svgRef.current)
     svgEl.selectAll('*').remove()
@@ -61,20 +81,92 @@ export default function Chart({
       .append('g')
       .attr('transform', `translate(${margin.left}, ${margin.top})`)
 
-    // mouse event
-    svg.on('click', () => {
-      console.log('click')
-    })
+    const focus = svg
+      .append('g')
+      .append('circle')
+      .style('fill', 'white')
+      .attr('stroke', 'black')
+      .attr('r', 5.5)
+      .style('opacity', 1)
 
-// xAxis
+    // mouse events
+
+    // const mouseMove = () => {
+    //
+    // }
+    // const mouseOver = () => {
+    //
+    // }
+    // const mouseOut = () => {
+    //
+    // }
+
+    d3.select('g')
+      .on('mousemove', function() {
+        const mouse = d3.pointer(event)
+
+        svg.selectAll('#infoLabel').remove()
+        svg.selectAll('#pointer').remove()
+        svg.selectAll('#infoLabelText').remove()
+
+        // console.log(chartData)
+
+        const bisect = d3.bisector(d => d.time).right
+        const x0 = xScale.invert(mouse[0])
+        const i = bisect(chartData, Math.round(x0), 1)
+        const selectedData = chartData[i - 1]
+
+        if (chartData[i] !== undefined) {
+          svg.append('line')
+            .attr('id', 'pointer')
+            .attr('x1', mouse[0])
+            .attr('y1', 0)
+            .attr('x2', mouse[0])
+            .attr('y2', height)
+            .style('stroke-width', 2)
+            .style('stroke', 'red')
+            .style('fill', 'none')
+
+          svg.append('rect')
+            .attr('id', 'infoLabel')
+            .attr('x', mouse[0] - 75)
+            .attr('y', mouse[1] - 37)
+            .attr('width', 150)
+            .attr('height', 75)
+            .style('fill', 'rgba(32,38,53,0.84)')
+
+          svg.append('text')
+            .attr('id', 'infoLabelText')
+            .attr('x', mouse[0] - 75)
+            .attr('y', mouse[1])
+            .style('fill', 'white')
+            .attr('dominant-baseline', 'middle ')
+            .text('Fee: ' + selectedData.fee + '\n Day: ' + selectedData.time)
+          // console.log(x0)
+          focus
+            .attr('cx', xScale(selectedData.time))
+            .attr('cy', y(selectedData.fee))
+        }
+      })
+
+    // xAxis
+    const xTicks = isScale ? d3.max(chartData, d => +d.time + 1) - d3.min(chartData, d => +d.time - 1) : days
     const xAxisGroup = svg.append('g')
       .attr('transform', `translate(0, ${height})`)
       .call(d3.axisBottom(xScale)
-        .ticks(isScale ? d3.max(chartData, d => +d.time + 1) - d3.min(chartData, d => +d.time - 1) : days)
+        .ticks(xTicks)
+        .tickSize(-height)
+        // .tickPadding(10)
         .tickSizeOuter(0))
 
     xAxisGroup.select('.domain').remove()
-    xAxisGroup.selectAll('line').attr('stroke', 'rgba(255, 255, 255, 0.2)')
+    //
+    xAxisGroup.selectAll('line')
+      .attr('stroke', 'rgba(255, 255, 255, 0.2)')
+      .attr('stroke-width', 3)
+      // .on('click' , () => {
+      //   console.log('dasdasdas')})
+      .attr('id', 'xline')
     xAxisGroup.selectAll('text')
       .attr('opacity', 0.5)
       .attr('color', 'white')
@@ -82,11 +174,7 @@ export default function Chart({
 
     // yAxis
     const y = d3.scaleLinear()
-      .domain([d3.min(chartData, function(d) {
-        return +d.fee - 0.01
-      }), d3.max(chartData, function(d) {
-        return +d.fee + 0.01
-      })])
+      .domain([d3.min(chartData, d => +d.fee - 0.01), d3.max(chartData, d => +d.fee + 0.01)])
       .range([height, 0])
 
     const yAxisGroup = svg.append('g')
@@ -123,7 +211,7 @@ export default function Chart({
       .attr('offset', d => d.offset)
       .attr('stop-color', d => d.color)
 
-    // Chart Line
+    // Chart data visualize
     svg.append('path')
       .datum(chartData)
       .attr('fill', 'url(#gradient)')
@@ -135,6 +223,7 @@ export default function Chart({
         .y0(d => y(d3.min(chartData, d => +d.fee - 0.01)))
         .y1(d => y(d.fee))
       )
+
   }
   return <svg ref={svgRef} width={svgWidth} height={svgHeight}/>
 }

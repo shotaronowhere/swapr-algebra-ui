@@ -57,15 +57,20 @@ query fetchPool {
     }
 }`
 
+  // , timestamp_gte: "${timestampStart}", timestamp_lte: "${timestampFinish}"
 export const FETCH_FEE_FROM_POOL = (pool: string, timestampStart: number, timestampFinish: number) => {
     return gql`
   query feeHourData {
-    feeHourDatas (where: {pool: "${pool}", timestamp_gte: "${timestampStart}", timestamp_lte: "${timestampFinish}"}) {
+    feeHourDatas (where: {pool: "${pool}"}) {
       id
       pool
       fee
       changesCount
       timestamp
+      minFee
+      maxFee
+      startFee
+      endFee
     }
   }
 `

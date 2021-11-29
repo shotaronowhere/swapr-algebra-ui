@@ -67,12 +67,12 @@ export default function FeeChartRangeInput() {
   const { fetchFees: { feesResult, feesLoading, fetchFeePoolFn } } = useInfoSubgraph()
   const [isScale, setIsScale] = useState(false)
   const windowWidth = useWindowSize()
-
+  // 0x38822da8434c40af7fd1902fb3dbee9405407828
   useEffect(() => {
-    fetchFeePoolFn('0x0f948f118904289b3995324ba4fdc474980f9ada', 1636984800, 1637917200)
+    fetchFeePoolFn(id, 1636984800, 1637917200)
   }, [])
 
-  // useEffect(() => console.log('FEE: ',feesResult, feesLoading), [feesResult, feesLoading])
+  // useEffect(() => console.log('FEE: ',feesResult), [feesResult, feesLoading])
 
   // console.log(windowWidth)
 
