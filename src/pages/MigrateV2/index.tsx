@@ -17,6 +17,8 @@ import QuestionHelper from '../../components/QuestionHelper'
 import { AutoRow } from '../../components/Row'
 import { Dots } from '../../components/swap/styleds'
 import { V2_FACTORY_ADDRESSES } from '../../constants/addresses'
+import { useIsNetworkFailed } from '../../hooks/useIsNetworkFailed'
+import usePrevious, { usePreviousNonEmptyArray } from '../../hooks/usePrevious'
 import { useActiveWeb3React } from '../../hooks/web3'
 import { toV2LiquidityToken, useTrackedTokenPairs } from '../../state/user/hooks'
 import { useTokenBalancesWithLoadingIndicator } from '../../state/wallet/hooks'
@@ -54,26 +56,26 @@ export default function MigrateV2() {
   const theme = useContext(ThemeContext)
   const { account, chainId } = useActiveWeb3React()
 
+  const networkFailed = useIsNetworkFailed()
+
   const v2FactoryAddress = chainId ? V2_FACTORY_ADDRESSES[chainId] : undefined
 
   // fetch the user's balances of all tracked V2 LP tokens
   const trackedTokenPairs = useTrackedTokenPairs()
 
   // calculate v2 + sushi pair contract addresses for all token pairs
-  const tokenPairsWithLiquidityTokens = useMemo(
-    () =>
-      trackedTokenPairs.map((tokens) => {
-        // sushi liquidity token or null
-        const sushiLiquidityToken = chainId === 137 || chainId === 42 ? toSushiLiquidityToken(tokens) : null
+  const tokenPairsWithLiquidityTokens = useMemo(() => {
+    return trackedTokenPairs.map((tokens) => {
+      // sushi liquidity token or null
+      const sushiLiquidityToken = chainId === 137 || chainId === 42 ? toSushiLiquidityToken(tokens) : null
 
-        return {
-          v2liquidityToken: v2FactoryAddress ? toV2LiquidityToken(tokens) : undefined,
-          sushiLiquidityToken,
-          tokens,
-        }
-      }),
-    [trackedTokenPairs, chainId, v2FactoryAddress]
-  )
+      return {
+        v2liquidityToken: v2FactoryAddress ? toV2LiquidityToken(tokens) : undefined,
+        sushiLiquidityToken,
+        tokens,
+      }
+    })
+  }, [trackedTokenPairs, chainId, v2FactoryAddress])
 
   //  get pair liquidity token addresses for balance-fetching purposes
   const allLiquidityTokens = useMemo(() => {
@@ -112,7 +114,24 @@ export default function MigrateV2() {
   }, [fetchingPairBalances, tokenPairsWithLiquidityTokens, pairBalances])
 
   const v2Pairs = useV2Pairs(tokenPairsWithV2Balance)
+  const previousv2Pairs = usePreviousNonEmptyArray(v2Pairs)
+  const _v2Pairs = useMemo(() => {
+    if (v2Pairs.length === 0 && previousv2Pairs) {
+      return previousv2Pairs
+    }
+
+    return v2Pairs
+  }, [v2Pairs])
+
   const v2SushiPairs = useV2Pairs(tokenPairsWithSushiBalance, true)
+  const previousv2SushiPairs = usePreviousNonEmptyArray(v2SushiPairs)
+  const _v2SushiPairs = useMemo(() => {
+    if (v2SushiPairs.length === 0 && previousv2SushiPairs) {
+      return previousv2SushiPairs
+    }
+
+    return v2SushiPairs
+  }, [v2SushiPairs])
 
   const v2IsLoading =
     fetchingPairBalances ||
@@ -137,26 +156,27 @@ export default function MigrateV2() {
                 Connect to a wallet to view your liquidity.
               </TYPE.body>
             </LightCard>
-          ) : v2IsLoading ? (
+          ) : v2IsLoading && !networkFailed ? (
             <LightCard padding="40px">
               <TYPE.body color={theme.text3} textAlign="center">
                 <Dots>Loading</Dots>
               </TYPE.body>
             </LightCard>
-          ) : v2Pairs.filter(([, pair]) => !!pair).length > 0 || tokenPairsWithSushiBalance.length > 0 ? (
+          ) : _v2Pairs.filter(([, pair]) => !!pair).length > 0 ||
+            _v2SushiPairs.filter(([, pair]) => !!pair).length > 0 ? (
             <>
-              {v2Pairs.filter(([, pair]) => !!pair).length > 0 && (
+              {_v2Pairs.filter(([, pair]) => !!pair).length > 0 && (
                 <>
-                  {v2Pairs
+                  {_v2Pairs
                     .filter(([, pair]) => !!pair)
                     .map(([, pair]) => (
                       <MigrateV2PositionCard key={(pair as Pair).liquidityToken.address} pair={pair as Pair} />
                     ))}
                 </>
               )}
-              {v2SushiPairs.filter(([, pair]) => !!pair).length > 0 && (
+              {_v2SushiPairs.filter(([, pair]) => !!pair).length > 0 && (
                 <>
-                  {v2SushiPairs
+                  {_v2SushiPairs
                     .filter(([, pair]) => !!pair)
                     .map(([, pair]) => (
                       <MigrateV2PositionCard

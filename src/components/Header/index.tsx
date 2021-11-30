@@ -318,24 +318,22 @@ export default function Header() {
         <StyledNavLink id={`info-nav-link`} to={'/info'}>
           Info
         </StyledNavLink>
+        <div>{String(networkFailed)}</div>
       </HeaderLinks>
 
       <HeaderControls>
         <NetworkCard />
         <HeaderElement>
           <AccountElement active={!!account} style={{ pointerEvents: 'auto' }}>
-            {chainId === 137 && account && userEthBalance ? (
+            {(chainId === 137 && account && userEthBalance) || networkFailed ? (
               <BalanceText
                 style={{ flexShrink: 0 }}
+                pl="0.75rem"
                 pt="0.75rem"
                 pb="0.75rem"
-                pl="0.75rem"
                 pr="0.5rem"
                 fontWeight={500}
               >
-                {userEthBalance?.toSignificant(3)} {chainValue}{' '}
-            {(chainId === 137 && account && userEthBalance) || networkFailed ? (
-              <BalanceText style={{ flexShrink: 0 }} pl="0.75rem" pt="0.75rem" pb="0.75rem" pr="0.5rem" fontWeight={500}>
                 {_userEthBalance?.toSignificant(3)} {chainValue}
               </BalanceText>
             ) : null}
