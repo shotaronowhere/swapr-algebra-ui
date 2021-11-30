@@ -38,7 +38,7 @@ export default function Chart({
   const { width, height, margin } = dimensions
   const svgWidth = width + margin.left + margin.right + 10
   const svgHeight = height + margin.bottom + margin.top
-  const days = feeData[0] !== undefined ? daysCount(new Date(feeData[0].timestamp).getMonth(), new Date(feeData[0].timestamp).getFullYear()) : 0
+  const days = feeData[0] !== undefined ? daysCount(new Date(feeData[0].timestamp * 1000).getMonth(), new Date(feeData[0].timestamp * 1000).getFullYear()) : 0
   let chartData = feeData[0] !== undefined ? feeData.map(item => ({
     time: new Date(item.timestamp * 1000).getDate(),
     fee: (item.fee / item.changesCount) / 10000,
@@ -49,6 +49,7 @@ export default function Chart({
   })) : []
 
   const xDomain = isScale ? [d3.min(chartData, d => +d.time - 1), d3.max(chartData, d => +d.time + 1)] : [1, days]
+
   const xScale = useMemo(() => {
     if (scale === ChartScale.MONTH) {
       return d3.scaleLinear()
@@ -61,17 +62,36 @@ export default function Chart({
     }
   }, [scale, days, chartData])
 
-  console.log(chartData)
-
-
   if (feeData.length !== 0) {
-
     if (chartData[0].time !== 0) {
+      let sameDays = []
+      const res = []
+      for (let i = 0; i < chartData.length; i++) {
+        if (chartData[i - 1] !== undefined) {
+          if (chartData[i].time === chartData[i - 1].time) {
+            sameDays.push(chartData[i])
+          } else {
+            if (sameDays.length !== 0) {
+              // console.log(sameDays)
+              res.push(sameDays.reduce((prev, cur) => {
+                return { time: cur.time, fee: (prev.fee + cur.fee) }
+              }, {
+                fee: 0,
+                time: null
+              }))
+              res[res.length - 1].fee = res[res.length - 1].fee / sameDays.length
+            }
+            sameDays = []
+          }
+        }
+      }
       const newA = []
       for (let i = 1; i < chartData[0].time; i++) {
         newA.push({ time: i, start: 0, low: 0, high: 0, end: 0, fee: d3.min(chartData, d => +d.fee) })
       }
-      chartData = [...newA, ...chartData]
+
+      // console.log([...newA, ...res])
+      chartData = [...newA, ...res]
     }
 
     const svgEl = d3.select(svgRef.current)
@@ -90,17 +110,6 @@ export default function Chart({
       .style('opacity', 1)
 
     // mouse events
-
-    // const mouseMove = () => {
-    //
-    // }
-    // const mouseOver = () => {
-    //
-    // }
-    // const mouseOut = () => {
-    //
-    // }
-
     d3.select('g')
       .on('mousemove', function() {
         const mouse = d3.pointer(event)
@@ -109,23 +118,22 @@ export default function Chart({
         svg.selectAll('#pointer').remove()
         svg.selectAll('#infoLabelText').remove()
 
-        // console.log(chartData)
-
         const bisect = d3.bisector(d => d.time).right
         const x0 = xScale.invert(mouse[0])
-        const i = bisect(chartData, Math.round(x0), 1)
+        const i = bisect(chartData, Math.round(x0), 0)
         const selectedData = chartData[i - 1]
 
+        svg.append('line')
+          .attr('id', 'pointer')
+          .attr('x1', mouse[0])
+          .attr('y1', 0)
+          .attr('x2', mouse[0])
+          .attr('y2', height)
+          .style('stroke-width', 2)
+          .style('stroke', 'red')
+          .style('fill', 'none')
+
         if (chartData[i] !== undefined) {
-          svg.append('line')
-            .attr('id', 'pointer')
-            .attr('x1', mouse[0])
-            .attr('y1', 0)
-            .attr('x2', mouse[0])
-            .attr('y2', height)
-            .style('stroke-width', 2)
-            .style('stroke', 'red')
-            .style('fill', 'none')
 
           svg.append('rect')
             .attr('id', 'infoLabel')
