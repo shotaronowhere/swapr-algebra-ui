@@ -34,6 +34,8 @@ import Modal from '../components/Modal'
 import { useEffect, useState } from 'react'
 import CautionModal from '../components/CautionModal'
 import PoolFinder from './PoolFinder'
+import { BigNumber } from '@ethersproject/bignumber'
+import { parseUnits } from '@ethersproject/units'
 
 const AppWrapper = styled.div`
   display: flex;

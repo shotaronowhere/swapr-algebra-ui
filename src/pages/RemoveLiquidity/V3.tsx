@@ -34,6 +34,7 @@ import RangeBadge from 'components/Badge/RangeBadge'
 import Toggle from 'components/Toggle'
 import { t, Trans } from '@lingui/macro'
 import { SupportedChainId } from 'constants/chains'
+import usePrevious from '../../hooks/usePrevious'
 
 const DEFAULT_REMOVE_V3_LIQUIDITY_SLIPPAGE_TOLERANCE = new Percent(5, 100)
 
@@ -60,6 +61,14 @@ export default function RemoveLiquidityV3({
 }
 function Remove({ tokenId }: { tokenId: BigNumber }) {
   const { position } = useV3PositionFromTokenId(tokenId)
+  const prevPosition = usePrevious({ ...position })
+  const _position = useMemo(() => {
+    if (!position && prevPosition) {
+      return { ...prevPosition }
+    }
+    return { ...position }
+  }, [position])
+
   const theme = useTheme()
   const { account, chainId, library } = useActiveWeb3React()
 
@@ -68,8 +77,11 @@ function Remove({ tokenId }: { tokenId: BigNumber }) {
 
   // burn state
   const { percent } = useBurnV3State()
+
+  const derivedInfo = useDerivedV3BurnInfo(_position, receiveWETH)
+  const prevDerivedInfo = usePrevious({ ...derivedInfo })
   const {
-    position: positionSDK,
+    positionSDK,
     liquidityPercentage,
     liquidityValue0,
     liquidityValue1,
@@ -77,10 +89,23 @@ function Remove({ tokenId }: { tokenId: BigNumber }) {
     feeValue1,
     outOfRange,
     error,
-  } = useDerivedV3BurnInfo(position, receiveWETH)
+  } = useMemo(() => {
+    if ((!derivedInfo.feeValue0 || !derivedInfo.liquidityValue0) && prevDerivedInfo) {
+      return {
+        positionSDK: prevDerivedInfo.position,
+        error: prevDerivedInfo.error,
+        ...prevDerivedInfo,
+      }
+    }
+
+    return {
+      ...derivedInfo,
+    }
+  }, [derivedInfo])
+
   const { onPercentSelect } = useBurnV3ActionHandlers()
 
-  const removed = position?.liquidity?.eq(0)
+  const removed = _position?.liquidity?.eq(0)
 
   // boilerplate for the slider
   const [percentForSlider, onPercentSelectForSlider] = useDebouncedChangeHandler(percent, onPercentSelect)
@@ -93,6 +118,7 @@ function Remove({ tokenId }: { tokenId: BigNumber }) {
   const [txnHash, setTxnHash] = useState<string | undefined>()
   const addTransaction = useTransactionAdder()
   const positionManager = useV3NFTPositionManagerContract()
+
   const burn = useCallback(async () => {
     setAttemptingTxn(true)
     if (
@@ -136,7 +162,7 @@ function Remove({ tokenId }: { tokenId: BigNumber }) {
         const newTxn = {
           ...txn,
           gasLimit: calculateGasMargin(chainId, estimate),
-          gasPrice: 70000000000
+          gasPrice: 70000000000,
         }
 
         return library
@@ -196,7 +222,7 @@ function Remove({ tokenId }: { tokenId: BigNumber }) {
             <Text fontSize={16} fontWeight={500} marginLeft={'6px'}>
               {liquidityValue0 && <FormattedCurrencyAmount currencyAmount={liquidityValue0} />}
             </Text>
-            <CurrencyLogo size="20px" style={{ marginLeft: '8px' }} currency={liquidityValue0?.currency} />
+            <CurrencyLogo size="24px" style={{ marginLeft: '8px' }} currency={liquidityValue0?.currency} />
           </RowFixed>
         </RowBetween>
         <RowBetween align="flex-end">
@@ -207,7 +233,7 @@ function Remove({ tokenId }: { tokenId: BigNumber }) {
             <Text fontSize={16} fontWeight={500} marginLeft={'6px'}>
               {liquidityValue1 && <FormattedCurrencyAmount currencyAmount={liquidityValue1} />}
             </Text>
-            <CurrencyLogo size="20px" style={{ marginLeft: '8px' }} currency={liquidityValue1?.currency} />
+            <CurrencyLogo size="24px" style={{ marginLeft: '8px' }} currency={liquidityValue1?.currency} />
           </RowFixed>
         </RowBetween>
         {feeValue0?.greaterThan(0) || feeValue1?.greaterThan(0) ? (
@@ -223,7 +249,7 @@ function Remove({ tokenId }: { tokenId: BigNumber }) {
                 <Text fontSize={16} fontWeight={500} marginLeft={'6px'}>
                   {feeValue0 && <FormattedCurrencyAmount currencyAmount={feeValue0} />}
                 </Text>
-                <CurrencyLogo size="20px" style={{ marginLeft: '8px' }} currency={feeValue0?.currency} />
+                <CurrencyLogo size="24px" style={{ marginLeft: '8px' }} currency={feeValue0?.currency} />
               </RowFixed>
             </RowBetween>
             <RowBetween>
@@ -234,7 +260,7 @@ function Remove({ tokenId }: { tokenId: BigNumber }) {
                 <Text fontSize={16} fontWeight={500} marginLeft={'6px'}>
                   {feeValue1 && <FormattedCurrencyAmount currencyAmount={feeValue1} />}
                 </Text>
-                <CurrencyLogo size="20px" style={{ marginLeft: '8px' }} currency={feeValue1?.currency} />
+                <CurrencyLogo size="24px" style={{ marginLeft: '8px' }} currency={feeValue1?.currency} />
               </RowFixed>
             </RowBetween>
           </>
@@ -280,14 +306,14 @@ function Remove({ tokenId }: { tokenId: BigNumber }) {
           defaultSlippage={DEFAULT_REMOVE_V3_LIQUIDITY_SLIPPAGE_TOLERANCE}
         />
         <Wrapper>
-          {position ? (
+          {_position ? (
             <AutoColumn gap="lg">
               <RowBetween>
                 <RowFixed>
                   <DoubleCurrencyLogo
                     currency0={feeValue0?.currency}
                     currency1={feeValue1?.currency}
-                    size={25}
+                    size={24}
                     margin={true}
                   />
                   <TYPE.label
@@ -334,7 +360,7 @@ function Remove({ tokenId }: { tokenId: BigNumber }) {
                       <Text fontSize={16} fontWeight={500} marginLeft={'6px'}>
                         {liquidityValue0 && <FormattedCurrencyAmount currencyAmount={liquidityValue0} />}
                       </Text>
-                      <CurrencyLogo size="25px" style={{ marginLeft: '8px' }} currency={liquidityValue0?.currency} />
+                      <CurrencyLogo size="24px" style={{ marginLeft: '8px' }} currency={liquidityValue0?.currency} />
                     </RowFixed>
                   </RowBetween>
                   <RowBetween>
@@ -345,7 +371,7 @@ function Remove({ tokenId }: { tokenId: BigNumber }) {
                       <Text fontSize={16} fontWeight={500} marginLeft={'6px'}>
                         {liquidityValue1 && <FormattedCurrencyAmount currencyAmount={liquidityValue1} />}
                       </Text>
-                      <CurrencyLogo size="25px" style={{ marginLeft: '8px' }} currency={liquidityValue1?.currency} />
+                      <CurrencyLogo size="24px" style={{ marginLeft: '8px' }} currency={liquidityValue1?.currency} />
                     </RowFixed>
                   </RowBetween>
                   {feeValue0?.greaterThan(0) || feeValue1?.greaterThan(0) ? (
@@ -358,7 +384,7 @@ function Remove({ tokenId }: { tokenId: BigNumber }) {
                           <Text fontSize={16} fontWeight={500} marginLeft={'6px'}>
                             {feeValue0 && <FormattedCurrencyAmount currencyAmount={feeValue0} />}
                           </Text>
-                          <CurrencyLogo size="25px" style={{ marginLeft: '8px' }} currency={feeValue0?.currency} />
+                          <CurrencyLogo size="24px" style={{ marginLeft: '8px' }} currency={feeValue0?.currency} />
                         </RowFixed>
                       </RowBetween>
                       <RowBetween>
@@ -369,7 +395,7 @@ function Remove({ tokenId }: { tokenId: BigNumber }) {
                           <Text fontSize={16} fontWeight={500} marginLeft={'6px'}>
                             {feeValue1 && <FormattedCurrencyAmount currencyAmount={feeValue1} />}
                           </Text>
-                          <CurrencyLogo size="25px" style={{ marginLeft: '8px' }} currency={feeValue1?.currency} />
+                          <CurrencyLogo size="24px" style={{ marginLeft: '8px' }} currency={feeValue1?.currency} />
                         </RowFixed>
                       </RowBetween>
                     </>
