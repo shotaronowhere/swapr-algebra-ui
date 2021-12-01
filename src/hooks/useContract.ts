@@ -65,7 +65,7 @@ export function useV2MigratorContract() {
 }
 
 export function useRealStaker() {
-  return useContract(REAL_STAKER_ADDRESS, REAL_STAKER_ABI);
+  return useContract(REAL_STAKER_ADDRESS, REAL_STAKER_ABI, true);
 }
 
 export function useTokenContract(tokenAddress?: string, withSignerIfPossible?: boolean) {

@@ -254,6 +254,22 @@ export const TOKENS_FROM_ADDRESSES = (blockNumber: number | undefined, tokens: s
     return gql(queryString)
 }
 
+export const GET_STAKE = (id: string) => gql`
+query stake {
+  factories {
+    currentStakedAmount
+    earnedForAllTime
+    ALGBbalance
+    xALGBminted
+  }
+  stakes (where:{id: "${id}"}) {
+    stakedALGBAmount
+    xALGBAmount
+  }
+}
+
+`
+
 //Blocklytics
 
 export const GET_BLOCKS = (timestamps: string[]) => {

@@ -26,6 +26,7 @@ interface StakerInputRangeProps {
 }
 
 export default function StakerInputRange ({baseCurrency, amountValue, setAmountValue}: StakerInputRangeProps) {
+  console.log(baseCurrency)
   return (
     <CurrencyInputPanelWrapper>
       <CurrencyDropdown

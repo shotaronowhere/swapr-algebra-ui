@@ -3,11 +3,18 @@ import { useState } from "react";
 import { Contract, providers } from "ethers";
 import { useActiveWeb3React } from "../web3";
 import { useClients } from "./useClients";
-import { POOLS_FROM_ADDRESSES, TOKENS_FROM_ADDRESSES, TOP_POOLS, TOP_TOKENS } from "../../utils/graphql-queries";
+import {
+    GET_STAKE,
+    POOLS_FROM_ADDRESSES,
+    TOKENS_FROM_ADDRESSES,
+    TOP_POOLS,
+    TOP_TOKENS
+} from '../../utils/graphql-queries'
 import { useBlocksFromTimestamps } from '../blocks'
 import { useEthPrices } from '../useEthPrices'
 import { useDeltaTimestamps } from "../../utils/queries";
 import { formatTokenName, formatTokenSymbol, get2DayChange, getPercentChange } from "../../utils/info";
+import { stakerClient } from '../../apollo/client'
 
 function parseTokensData(tokenData) {
     return tokenData ? tokenData.reduce((accum: { [address: string]: TokenFields }, poolData) => {
@@ -35,6 +42,9 @@ export function useInfoSubgraph() {
 
     const [tokensResult, setTokens] = useState(null);
     const [tokensLoading, setTokensLoading] = useState(null);
+
+    const [stakesResult, setStakes] = useState(null);
+    const [stakesLoading, setStakesLoading] = useState(null);
 
     async function fetchInfoPools(reload?: boolean) {
 
@@ -297,10 +307,36 @@ export function useInfoSubgraph() {
 
     }
 
+    async function fetchStaking(id: string) {
+
+        try {
+            setStakesLoading(true)
+            const { data: { factories, stakes }, error: error } = await stakerClient.query({
+                query: GET_STAKE(id),
+                fetchPolicy: 'network-only'
+            })
+
+            if (error) throw new Error(`${error.name} ${error.message}`)
+
+            setStakesLoading(false)
+            setStakes({factories: factories, stakes: stakes})
+
+            return stakes
+
+        } catch (err) {
+            setStakesLoading(false)
+            setStakes('Getting stakes failed')
+            console.error('Getting stakes failed', err);
+            return undefined
+        }
+
+    }
+
     return {
         blocksFetched: blockError ? false : !!ethPrices && !!blocks,
         fetchInfoPools: { poolsResult, poolsLoading, fetchInfoPoolsFn: fetchInfoPools },
         fetchInfoTokens: { tokensResult, tokensLoading, fetchInfoTokensFn: fetchInfoTokens },
+        getStakes: {stakesResult, stakesLoading, fetchStakingFn: fetchStaking}
     }
 
 
