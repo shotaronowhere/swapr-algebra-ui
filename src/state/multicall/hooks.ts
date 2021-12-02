@@ -92,6 +92,7 @@ function useCallsData(
 
         const result = callResults[chainId]?.[toCallKey(call)]
         let data
+
         if (result?.data && result?.data !== '0x') {
           data = result.data
         }
@@ -131,6 +132,7 @@ function toCallState(
   const success = data && data.length > 2
   const syncing = (blockNumber ?? 0) < latestBlockNumber
   let result: Result | undefined = undefined
+
   if (success && data) {
     try {
       result = contractInterface.decodeFunctionResult(fragment, data)
@@ -145,6 +147,7 @@ function toCallState(
       }
     }
   }
+
   return {
     valid: true,
     loading: false,

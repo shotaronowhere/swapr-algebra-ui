@@ -25,6 +25,8 @@ import { useTokenBalancesWithLoadingIndicator } from '../../state/wallet/hooks'
 import { BackArrow, StyledInternalLink, TYPE } from '../../theme'
 import { BodyWrapper } from '../AppBody'
 
+import { Helmet } from 'react-helmet'
+
 function EmptyState({ message }: { message: ReactNode }) {
   return (
     <AutoColumn style={{ minHeight: 200, justifyContent: 'center', alignItems: 'center' }}>
@@ -140,6 +142,9 @@ export default function MigrateV2() {
 
   return (
     <>
+      <Helmet>
+        <title>Algebra — Migrate Liquidity</title>
+      </Helmet>
       <BodyWrapper style={{ padding: 24 }}>
         <AutoColumn gap="16px">
           <AutoRow style={{ alignItems: 'center', justifyContent: 'center' }} gap="8px">
@@ -187,20 +192,6 @@ export default function MigrateV2() {
                     ))}
                 </>
               )}
-              {/* {tokenPairsWithSushiBalance.length > 0 && (
-                <>
-                  {tokenPairsWithSushiBalance.map(({ sushiLiquidityToken, tokens }) => {
-                    return (
-                      <MigrateSushiPositionCard
-                        key={(sushiLiquidityToken as Token).address}
-                        tokenA={tokens[0]}
-                        tokenB={tokens[1]}
-                        liquidityToken={sushiLiquidityToken as Token}
-                      />
-                    )
-                  })}
-                </>
-              )} */}
             </>
           ) : (
             <EmptyState message={'No liquidity found.'} />
@@ -208,7 +199,7 @@ export default function MigrateV2() {
           <AutoColumn justify={'center'} gap="md">
             <Text textAlign="center" fontSize={14} style={{ padding: '.5rem 0 .5rem 0' }}>
               Don’t see one of your pools?{' '}
-              <StyledInternalLink id="import-pool-link" to={'/pool/v2/find'}>
+              <StyledInternalLink id="import-pool-link" to={'/pool/find'}>
                 Find it.
               </StyledInternalLink>
             </Text>

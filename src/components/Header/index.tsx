@@ -318,7 +318,6 @@ export default function Header() {
         <StyledNavLink id={`info-nav-link`} to={'/info'}>
           Info
         </StyledNavLink>
-        <div>{String(networkFailed)}</div>
       </HeaderLinks>
 
       <HeaderControls>

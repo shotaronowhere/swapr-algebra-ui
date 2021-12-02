@@ -78,7 +78,7 @@ function Remove({ tokenId }: { tokenId: BigNumber }) {
   // burn state
   const { percent } = useBurnV3State()
 
-  const derivedInfo = useDerivedV3BurnInfo(_position, receiveWETH)
+  const derivedInfo = useDerivedV3BurnInfo(position, receiveWETH)
   const prevDerivedInfo = usePrevious({ ...derivedInfo })
   const {
     positionSDK,
@@ -90,7 +90,8 @@ function Remove({ tokenId }: { tokenId: BigNumber }) {
     outOfRange,
     error,
   } = useMemo(() => {
-    if ((!derivedInfo.feeValue0 || !derivedInfo.liquidityValue0) && prevDerivedInfo) {
+    if ((!derivedInfo.feeValue0 || !derivedInfo.liquidityValue0 || !derivedInfo.position) && prevDerivedInfo) {
+      // console.log(prevDerivedInfo)
       return {
         positionSDK: prevDerivedInfo.position,
         error: prevDerivedInfo.error,
@@ -99,13 +100,15 @@ function Remove({ tokenId }: { tokenId: BigNumber }) {
     }
 
     return {
+      positionSDK: derivedInfo.position,
+      error: derivedInfo.error,
       ...derivedInfo,
     }
   }, [derivedInfo])
 
   const { onPercentSelect } = useBurnV3ActionHandlers()
 
-  const removed = _position?.liquidity?.eq(0)
+  const removed = position?.liquidity?.eq(0)
 
   // boilerplate for the slider
   const [percentForSlider, onPercentSelectForSlider] = useDebouncedChangeHandler(percent, onPercentSelect)

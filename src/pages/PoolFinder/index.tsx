@@ -27,6 +27,7 @@ import { TYPE } from '../../theme'
 import { currencyId } from '../../utils/currencyId'
 import AppBody from '../AppBody'
 import { Dots } from '../Pool/styleds'
+import { Helmet } from 'react-helmet'
 
 enum Fields {
   TOKEN0 = 0,
@@ -150,28 +151,23 @@ export default function PoolFinder() {
   }, [setShowSearch])
 
   const prerequisiteMessage = (
-    <LightCard padding="45px 10px">
-      <Text textAlign="center">
-        {!account ? (
-          <Trans>Connect to a wallet to find pools</Trans>
-        ) : (
-          <Trans>Select a token to find your liquidity on SushiSwap or QuickSwap.</Trans>
-        )}
-      </Text>
+    <LightCard>
+      <Text textAlign="center">{!account && <Trans>Connect to a wallet to find pools</Trans>}</Text>
     </LightCard>
   )
 
   return (
     <>
+      <Helmet>
+        <title>Algebra — Find Pool</title>
+      </Helmet>
       <AppBody>
         <FindPoolTabs origin={query.get('origin') ?? '/migrate'} />
         <AutoColumn style={{ padding: '1rem' }} gap="md">
           <BlueCard>
             <AutoColumn gap="10px">
               <TYPE.link fontWeight={400} color={'primaryText1'}>
-                <Trans>
-                  <b>Tip:</b> Use this tool to find SushiSwap or QuickSwap pools.
-                </Trans>
+                <Trans>Select a token to find your liquidity on SushiSwap or QuickSwap.</Trans>
               </TYPE.link>
             </AutoColumn>
           </BlueCard>
@@ -262,9 +258,7 @@ export default function PoolFinder() {
                 </AutoColumn>
               </LightCard>
             ) : null
-          ) : (
-            prerequisiteMessage
-          )}
+          ) : null}
           {/* {currency0 &&
             currency1 &&
             pairState !== PairState.LOADING &&
