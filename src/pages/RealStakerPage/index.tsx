@@ -199,8 +199,7 @@ export default function RealStakerPage({}) {
   }, [account])
 
   useEffect(() => {
-    if (stakesResult !== undefined && stakesResult !== null) {
-      console.log(stakesResult)
+    if (stakesResult !== null && stakesResult.stakes[0] !== undefined) {
       setEarned(parseFloat((formatEther(BigNumber.from(stakesResult.stakes[0].xALGBAmount)) / formatEther(BigNumber.from(stakesResult.factories[0].xALGBminted)) * formatEther(BigNumber.from(stakesResult.factories[0].ALGBbalance))) - formatEther(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount))).toFixed(2))
       setStaked(formatEther(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount)))
     }
@@ -268,7 +267,7 @@ export default function RealStakerPage({}) {
           }} />
       </EarnedStakedWrapper>
 
-      <StakerStatisticWrapper to={''}>
+      <StakerStatisticWrapper to={'/staking/analytics'}>
         <StakerStatisticBackground src={StakerStatistic} />
         <h2>Statistics</h2>
         <p>APY / APR / Fees →</p>

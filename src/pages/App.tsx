@@ -35,6 +35,7 @@ import { useEffect, useState } from 'react'
 import CautionModal from '../components/CautionModal'
 import PoolFinder from './PoolFinder'
 import RealStakerPage from './RealStakerPage'
+import StakingAnalyticsPage from './StakingAnalyticsPage'
 
 const AppWrapper = styled.div`
   display: flex;
@@ -154,6 +155,8 @@ export default function App() {
               <Route exact strict path="/migrate/:address" component={MigrateV2Pair} />
 
               <Route exact strict path="/staking" component={RealStakerPage} />
+              <Route exact strict path="/staking/analytics" component={StakingAnalyticsPage} />
+
 
               <Route component={RedirectPathToSwapOnly} />
             </Switch>
