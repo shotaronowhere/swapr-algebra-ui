@@ -14,7 +14,7 @@ const ButtonsWrapper = styled.div`
   align-items: center;
 `
 
-export default function StakeRangeButtons ({onPercentSelect} : {onPercentSelect: any}) {
+export default function RealStakerRangeButtons ({onPercentSelect, showCalculate} : {onPercentSelect: any, showCalculate?: boolean}) {
   return(
     <ButtonsWrapper>
       <div>
@@ -31,7 +31,7 @@ export default function StakeRangeButtons ({onPercentSelect} : {onPercentSelect:
           <Trans>MAX</Trans>
         </StakerSmallMaxButton>
       </div>
-      <p>Calculate profits →</p>
+      {showCalculate ? <p>Calculate profits →</p> : null}
     </ButtonsWrapper>
   )
 }

@@ -36,16 +36,16 @@ interface ResBloksProps {
   amount: number
   currency: number
   action: string
-  openModal?: any
+  handler?: any
 }
 
-export default function ResBlocks ({title, amount, currency, action, openModal}: ResBloksProps){
+export default function RealStakerResBlocks ({title, amount, currency, action, handler}: ResBloksProps){
   return (
     <PageWrapper width={'367px'}>
       <h2>{title}</h2>
-      <h3>{amount} xALGB</h3>
+      <h3>{amount} ALGB</h3>
       <p>~ ${currency}</p>
-      <StakeButton onClick={openModal}>{action}</StakeButton>
+      <StakeButton onClick={handler}>{action}</StakeButton>
     </PageWrapper>
   )
 }

@@ -20,18 +20,17 @@ const CurrencyInputPanelWrapper = styled.div`
 `
 
 interface StakerInputRangeProps {
-  baseCurrency : any
+  baseCurrency? : any
   amountValue: string
   setAmountValue: any
+  fiatValue: any
 }
 
-export default function StakerInputRange ({baseCurrency, amountValue, setAmountValue}: StakerInputRangeProps) {
-  console.log(baseCurrency)
+export default function RealStakerInputRange ({baseCurrency, amountValue, setAmountValue, fiatValue}: StakerInputRangeProps) {
   return (
     <CurrencyInputPanelWrapper>
       <CurrencyDropdown
         currency={baseCurrency}
-        value={'100'}
         hideInput={true}
         showCommonBases
         showBalance={true}
@@ -49,6 +48,7 @@ export default function StakerInputRange ({baseCurrency, amountValue, setAmountV
         showBalance={true}
         disabled={false}
         shallow={true}
+        fiatValue={fiatValue}
       />
     </CurrencyInputPanelWrapper>
   )
