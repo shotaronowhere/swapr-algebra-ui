@@ -1,5 +1,5 @@
 import * as d3 from 'd3'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import styled from 'styled-components/macro'
 
 const ChartWrapper = styled.div`
@@ -33,15 +33,14 @@ export default function AreaChart({ data }: {
   const xDomain = d3.extent(X)
   const yDomain = [d3.min(Y), d3.max(Y)]
 
-  console.log(chartXDomain)
+  const memoData = useMemo(() => chartXDomain, [chartXDomain])
 
+  console.log(memoData)
 
   useEffect(() => {
 
-    if (!svgRef.current) return
-
     const svgEl = d3.select(svgRef.current)
-      // .selectAll('*').remove()
+    svgEl.selectAll('*').remove()
 
     const svg = svgEl
       .append('g')
@@ -55,8 +54,6 @@ export default function AreaChart({ data }: {
     const yScale = d3.scaleLinear(yDomain, [height - margin.bottom, margin.top])
     const xAxis = d3.axisBottom(xScale).ticks(width / 80).tickSizeOuter(0)
     const yAxis = d3.axisLeft(yScale).ticks(height / 40)
-
-    console.log(xScale)
 
     // Construct an area generator.
     const line = d3.line()
@@ -83,14 +80,11 @@ export default function AreaChart({ data }: {
       .attr('transform', `translate(0,${height - margin.bottom})`)
       .call(xAxis)
 
-
-
     //___________________________________________________________________________//
 
-
-
     const focusEl = d3.select(focusRef.current)
-      // .selectAll('*').remove()
+
+    focusEl.selectAll('*').remove()
 
     const focus = focusEl
       .attr('viewBox', [0, 0, width, focusHeight])
@@ -146,6 +140,7 @@ export default function AreaChart({ data }: {
       .call(brush)
       .call(brush.move, defaultSelection)
 
+    const pos = []
 
     function brushed({ selection }) {
       if (selection) {
@@ -154,10 +149,13 @@ export default function AreaChart({ data }: {
         const maxX = Math.floor(selection[1] / div)
         const maxY = d3.max(data, d => X[minX] <= new Date(d.date) && new Date(d.date) <= X[maxX - 1] ? d.value : NaN)
 
+        console.log(pos === selection)
+        console.log('adasdad')
         setChartData([X[minX], X[maxX - 1]])
         // setChartYDomain([d3.min(Y), maxY])
-      // xDomain = [X[minX], X[maxX - 1]]
-      // yDomain = [0, maxY]
+
+        // xDomain = [X[minX], X[maxX - 1]]
+        // yDomain = [0, maxY]
         // xScale = xScale.copy().domain()
         // yScale = yScale.copy().domain()
 
@@ -172,7 +170,8 @@ export default function AreaChart({ data }: {
       }
     }
 
-    }, [svgRef])
+  }, [])
+
 
   return (
     <ChartWrapper>
