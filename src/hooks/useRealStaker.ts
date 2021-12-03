@@ -47,7 +47,7 @@ export function useRealStakerHandlers() {
         provider.getSigner()
       )
 
-      const claimSum = claimCount * formatEther(BigNumber.from(stakesResult.factories[0].xALGBminted)) / formatEther(BigNumber.from(stakesResult.factories[0].ALGBbalance))
+      const claimSum = claimCount * formatEther(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply)) / formatEther(BigNumber.from(stakesResult.factories[0].ALGBbalance))
       const bigNumClaimCount = parseUnits(claimSum.toString(), 18)
       // console.log(bigNumClaimCount)
       const result = await realStaker.leave(bigNumClaimCount._hex)
@@ -68,7 +68,7 @@ export function useRealStakerHandlers() {
         provider.getSigner()
       )
 
-      const unstakeSum = unstakeCount * formatEther(BigNumber.from(stakesResult.factories[0].xALGBminted)) / formatEther(BigNumber.from(stakesResult.factories[0].ALGBbalance))
+      const unstakeSum = unstakeCount * formatEther(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply)) / formatEther(BigNumber.from(stakesResult.factories[0].ALGBbalance))
       const bigNumClaimCount = parseUnits(unstakeSum.toString(), 18)
       const result = await realStaker.leave(bigNumClaimCount._hex)
 
