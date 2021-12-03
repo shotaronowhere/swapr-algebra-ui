@@ -51,6 +51,59 @@ export default function Chart({ feeData = [], scale, dimensions, isScale }: Char
 
   const xDomain = isScale ? [d3.min(chartData, (d) => +d.time - 1), d3.max(chartData, (d) => +d.time + 1)] : [1, days]
 
+  const tickWidth = useMemo(() => {
+    //Todo auto length
+    return dimensions.width / 30
+  }, [dimensions, feeData])
+
+  const Line = d3
+    .create('svg:line')
+    .attr('id', 'pointer2')
+    .attr('x1', '0px')
+    .attr('y1', 0)
+    .attr('x2', '0px')
+    .attr('y2', height)
+    .style('stroke-width', 1)
+    .style('stroke', '#595f6e')
+
+  const InfoRectGroup = d3.create('svg:g').style('pointer-events', 'none')
+
+  const InfoRect = d3
+    .create('svg:rect')
+    .append('rect')
+    .attr('id', 'info-label')
+    .attr('width', '150px')
+    .attr('height', '60px')
+    .attr('rx', '6')
+    .style('fill', '#12151d')
+
+  const InfoRectFeeText = d3
+    .create('svg:text')
+    .attr('transform', 'translate(16, 25)')
+    .attr('fill', 'white')
+    .attr('font-weight', '600')
+    .attr('font-size', '14px')
+
+  const InfoRectDateText = d3
+    .create('svg:text')
+    .attr('transform', 'translate(16, 45)')
+    .attr('fill', 'white')
+    .attr('font-weight', '500')
+    .attr('font-size', '12px')
+    .attr('fill', '#b0b0b0')
+
+  InfoRectGroup.node().append(InfoRect.node())
+  InfoRectGroup.node().append(InfoRectFeeText.node())
+  InfoRectGroup.node().append(InfoRectDateText.node())
+
+  const Focus = d3
+    .create('svg:circle')
+    .style('fill', 'white')
+    .attr('stroke', '#00cab2')
+    .attr('stroke-width', '2')
+    .attr('r', 5.5)
+    .style('opacity', 1)
+
   const xScale = useMemo(() => {
     if (scale === ChartScale.MONTH) {
       return d3.scaleLinear().domain(xDomain).range([0, width])
@@ -69,7 +122,6 @@ export default function Chart({ feeData = [], scale, dimensions, isScale }: Char
             sameDays.push(chartData[i])
           } else {
             if (sameDays.length !== 0) {
-              // console.log(sameDays)
               res.push(
                 sameDays.reduce(
                   (prev, cur) => {
@@ -101,63 +153,7 @@ export default function Chart({ feeData = [], scale, dimensions, isScale }: Char
 
     const svg = svgEl.append('g').attr('transform', `translate(${margin.left}, ${margin.top})`)
 
-    const focus = svg
-      .append('g')
-      .append('circle')
-      .style('fill', 'white')
-      .attr('stroke', 'black')
-      .attr('r', 5.5)
-      .style('opacity', 1)
-      .style('z-index', 99)
-
     // mouse events
-    d3.select('g').on('mousemove', function () {
-      const mouse = d3.pointer(event)
-
-      svg.selectAll('#infoLabel').remove()
-      svg.selectAll('#pointer').remove()
-      svg.selectAll('#infoLabelText').remove()
-
-      const bisect = d3.bisector((d) => d.time).right
-      const x0 = xScale.invert(mouse[0])
-      const i = bisect(chartData, Math.round(x0), 0)
-      const selectedData = chartData[i - 1]
-
-      svg
-        .append('line')
-        .attr('id', 'pointer')
-        .attr('x1', mouse[0])
-        .attr('y1', 0)
-        .attr('x2', mouse[0])
-        .attr('y2', height)
-        .style('stroke-width', 2)
-        .style('stroke', 'red')
-        .style('fill', 'none')
-
-      if (chartData[i] !== undefined) {
-        svg
-          .append('rect')
-          .attr('id', 'infoLabel')
-          .attr('x', mouse[0] - 75)
-          .attr('y', mouse[1] - 37)
-          .attr('width', 150)
-          .attr('height', 75)
-          .style('fill', 'rgba(32,38,53,0.84)')
-
-        svg
-          .append('text')
-          .attr('id', 'infoLabelText')
-          .attr('x', mouse[0] - 75)
-          .attr('y', mouse[1])
-          .style('fill', 'white')
-          .attr('dominant-baseline', 'middle ')
-          .text('Fee: ' + selectedData.fee + '\n Day: ' + selectedData.time)
-        // console.log(x0)
-        focus.attr('cx', xScale(selectedData.time)).attr('cy', y(selectedData.fee))
-      }
-    })
-
-    // xAxis
     const xTicks = isScale ? d3.max(chartData, (d) => +d.time + 1) - d3.min(chartData, (d) => +d.time - 1) : days
     const xAxisGroup = svg.append('g').attr('transform', `translate(0, ${height})`).call(
       d3
@@ -226,11 +222,47 @@ export default function Chart({ feeData = [], scale, dimensions, isScale }: Char
         'd',
         d3
           .area()
-          // .curve(d3.curveBasis)
+          .curve(d3.curveBumpX)
           .x((d) => xScale(d.time))
           .y0((d) => y(d3.min(chartData, (d) => +d.fee - 0.01)))
           .y1((d) => y(d.fee))
       )
+
+    xAxisGroup
+      .selectAll('.tick')
+      .nodes()
+      .map((el, i) => {
+        const xTranslate = d3
+          .select(el)
+          .attr('transform')
+          .match(/\((.*?)\)/)[1]
+          .split(',')[0]
+
+        const rect = d3
+          .create('svg:rect')
+          .attr('x', `${xTranslate - tickWidth / 2}px`)
+          .attr('y', `-${0}px`)
+          .attr('width', `${tickWidth}px`)
+          .attr('height', `${dimensions.height}px`)
+          .attr('fill', 'transparent')
+          .on('mouseover', (e) => {
+            const isOverflowing = Number(xTranslate) + 150 + 16 > dimensions.width
+            Line.attr('x1', `${xTranslate}px`).attr('x2', `${xTranslate}px`)
+            InfoRectGroup.attr(
+              'transform',
+              `translate(${isOverflowing ? Number(xTranslate) - 150 - 16 : Number(xTranslate) + 16},10)`
+            )
+            InfoRectFeeText.property('innerHTML', `Fee: ${chartData[i]?.fee.toFixed(3)}`)
+            InfoRectDateText.property('innerHTML', `${chartData[i]?.time}/3/12`)
+            Focus.attr('transform', `translate(${xScale(chartData[i]?.time)},${y(chartData[i]?.fee)})`)
+          })
+
+        svg.node().append(rect.node())
+      })
+
+    svg.append(() => InfoRectGroup.node())
+    svg.append(() => Line.node())
+    svg.append(() => Focus.node())
   }
   return <svg ref={svgRef} width={svgWidth} height={svgHeight} />
 }

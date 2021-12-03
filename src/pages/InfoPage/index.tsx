@@ -70,7 +70,11 @@ export function InfoPage() {
 
   const { path } = useRouteMatch()
 
-  const { fetchInfoPools, fetchInfoTokens, blocksFetched } = useInfoSubgraph() || {}
+  const { fetchInfoPools, fetchInfoTokens, blocksFetched, fetchFees } = useInfoSubgraph() || {}
+
+  const {
+    fetchFees: { feesResult, feesLoading, fetchFeePoolFn },
+  } = useInfoSubgraph() || {}
 
   return (
     <>
@@ -104,7 +108,17 @@ export function InfoPage() {
                     blocksFetched={blocksFetched}
                   ></InfoPools>
                 </Route>
-                <Route exact path={`${path}/pools/:id`} component={FeeChartRangeInput}/>
+                <Route exact path={`${path}/pools/:id`}>
+                  <Helmet>
+                    <title>Algebra — Info • Fees history</title>
+                  </Helmet>
+                  <PageTitle
+                    title={'Fees history'}
+                    // refreshHandler={() => (blocksFetched ? fetchFees?.fetchFeePoolFn(true) : undefined)}
+                    isLoading={fetchFees?.feesLoading}
+                  ></PageTitle>
+                  <FeeChartRangeInput></FeeChartRangeInput>
+                </Route>
                 <Route exact path={`${path}/tokens`}>
                   <Helmet>
                     <title>Algebra — Info • Tokens</title>
