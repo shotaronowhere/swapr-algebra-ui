@@ -260,7 +260,7 @@ query stake {
     currentStakedAmount
     earnedForAllTime
     ALGBbalance
-    xALGBminted
+    xALGBtotalSupply
   }
   stakes (where:{id: "${id}"}) {
     stakedALGBAmount

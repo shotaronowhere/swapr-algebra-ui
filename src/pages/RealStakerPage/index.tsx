@@ -200,8 +200,9 @@ export default function RealStakerPage({}) {
 
   useEffect(() => {
     if (stakesResult !== null && stakesResult.stakes[0] !== undefined) {
-      console.log(stakesResult)
-      setEarned(parseFloat((formatEther(BigNumber.from(stakesResult.stakes[0].xALGBAmount)) / formatEther(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply)) * formatEther(BigNumber.from(stakesResult.factories[0].ALGBbalance))) - formatEther(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount))).toFixed(2))
+      // console.log(stakesResult)
+      console.log(stakesResult.factories[0].xALGBtotalSupply)
+      setEarned(parseFloat((formatEther(BigNumber.from(stakesResult.stakes[0].xALGBAmount)) * formatEther(BigNumber.from(stakesResult.factories[0].ALGBbalance)) / formatEther(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply))) - formatEther(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount))).toFixed(2))
       setStaked(formatEther(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount)))
     }
   }, [stakesResult])
