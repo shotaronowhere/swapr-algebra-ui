@@ -35,7 +35,7 @@ export default function AreaChart({ data }: {
 
   const memoData = useMemo(() => chartXDomain, [chartXDomain])
 
-  console.log(memoData)
+  // console.log(memoData)
 
   useEffect(() => {
 
@@ -50,7 +50,7 @@ export default function AreaChart({ data }: {
 
 
     // Construct scales and axes.
-    const xScale = d3.scaleUtc(chartXDomain, [margin.left, width - margin.right])
+    const xScale = d3.scaleUtc(xDomain, [margin.left, width - margin.right])
     const yScale = d3.scaleLinear(yDomain, [height - margin.bottom, margin.top])
     const xAxis = d3.axisBottom(xScale).ticks(width / 80).tickSizeOuter(0)
     const yAxis = d3.axisLeft(yScale).ticks(height / 40)
@@ -140,8 +140,6 @@ export default function AreaChart({ data }: {
       .call(brush)
       .call(brush.move, defaultSelection)
 
-    const pos = []
-
     function brushed({ selection }) {
       if (selection) {
         const div = Math.round(870 / X.length)
@@ -149,8 +147,6 @@ export default function AreaChart({ data }: {
         const maxX = Math.floor(selection[1] / div)
         const maxY = d3.max(data, d => X[minX] <= new Date(d.date) && new Date(d.date) <= X[maxX - 1] ? d.value : NaN)
 
-        console.log(pos === selection)
-        console.log('adasdad')
         setChartData([X[minX], X[maxX - 1]])
         // setChartYDomain([d3.min(Y), maxY])
 
