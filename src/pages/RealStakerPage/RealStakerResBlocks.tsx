@@ -59,17 +59,18 @@ interface ResBloksProps {
 }
 
 export default function RealStakerResBlocks({ title, amount, currency, action, handler }: ResBloksProps) {
-  const [isFull, setIsFull] = useState(false)
+  const [isFull, setIsFull] = useState(true)
   return (
     <PageWrapper width={'367px'}>
       <h2>{title}</h2>
+      {/*change title*/}
       {isFull ? <AmountTitle>{formatEther(amount)}</AmountTitle> : null}
       <h3 onMouseEnter={() => {
         setIsFull(true)
       }}
-          onMouseLeave={() => {
-        setIsFull(false)
-      }}
+      //     onMouseLeave={() => {
+      //   setIsFull(false)
+      // }}
       >{parseFloat(formatEther(amount)).toFixed(2)} ALGB</h3>
       <p>${currency}</p>
       <StakeButton disabled={amount == 0} onClick={handler}>{action}</StakeButton>
