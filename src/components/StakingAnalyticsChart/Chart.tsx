@@ -18,10 +18,12 @@ interface ChartProps {
 export default function AreaChart({ data, updateChartData, chartData }: ChartProps) {
   //-------------
   const width = 900
-  const margin = { left: 30, top: 30, right: 30, bottom: 30 }
-  const height = 500
+  const margin = { left: 50, top: 30, right: 30, bottom: 20 }
+  const height = 400
   //---------
   const svgRef = useRef(null)
+
+  // console.log(data)
 
   // const [chartYDomain, setChartYDomain] = useState([])
 
@@ -59,7 +61,7 @@ export default function AreaChart({ data, updateChartData, chartData }: ChartPro
     // Construct an area generator.
     const line = d3.line()
       .defined(i => D[i])
-      .curve(d3.curveBasis)
+      .curve(d3.curveBumpX)
       .x(i => xScale(X[i]))
       .y(i => yScale(Y[i]))
 

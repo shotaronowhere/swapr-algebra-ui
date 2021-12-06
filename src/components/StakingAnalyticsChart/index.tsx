@@ -1,9 +1,12 @@
 import styled from 'styled-components/macro'
 import AreaChart from './Chart'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import * as d3 from 'd3'
 import Brush from './Brush'
 import { log } from 'util'
+import { useInfoSubgraph } from '../../hooks/subgraph/useInfoSubgraph'
+import { BigNumber } from 'ethers'
+import { formatEther } from 'ethers/lib/utils'
 
 const data = [
   { date: '2007-04-23', value: 93.24 },
@@ -70,38 +73,61 @@ const StakingAnalyticsChartWrapper = styled.div`
   flex-direction: column;
 `
 
+
+function convertDate(date) {
+  const yyyy = date.getFullYear().toString();
+  const mm = (date.getMonth()+1).toString();
+  const dd  = date.getDate().toString();
+
+  const mmChars = mm.split('');
+  const ddChars = dd.split('');
+
+  return yyyy + '-' + (mmChars[1]?mm:"0"+mmChars[0]) + '-' + (ddChars[1]?dd:"0"+ddChars[0]);
+}
+
 export default function StakingAnalyticsChart () {
   const [chartData, setChartData] = useState([])
   const [chartBorder, setChartBorder] = useState([])
   const focusHeight = 70
   const width = 900
   const margin = { left: 30, top: 30, right: 30, bottom: 30 }
-
+  const {fetchStakedHistory: {fetchStakingHistoryFn, historiesLoading, stakeHistoriesResult}} = useInfoSubgraph()
   const stepData = []
+  const X = d3.map(chartData, d => new Date(d.date))
 
-  const X = d3.map(data, d => new Date(d.date))
+  useEffect(() => {
+    fetchStakingHistoryFn()
+  }, [])
+  useEffect(() => {
+    if (stakeHistoriesResult) {
+      setChartData(stakeHistoriesResult.map(item => {
+        return {value: formatEther(BigNumber.from(item.ALGBbalance)._hex), date: convertDate(new Date(item.date * 1000))}
+      }))
+    }
+      }, [stakeHistoriesResult])
 
-  data.map(item => {
+  chartData.map(item => {
     if (item.date >= chartBorder[0] && item.date <= chartBorder[1]) {
       stepData.push(item)
     }
   })
 
-
-  return (
-    <StakingAnalyticsChartWrapper>
-      <AreaChart
-      data={stepData}
-      chartData={chartData}
-      updateChartData={setChartBorder}
-      />
-      <Brush
-        data={data}
-        width={width}
-        margin={margin}
-        focusHeight={focusHeight}
-        X={X}
-        updateChartData={setChartBorder}/>
-    </StakingAnalyticsChartWrapper>
-  )
+  if (chartData.length !== 0) {
+    return (
+      <StakingAnalyticsChartWrapper>
+        <AreaChart
+          data={stepData}
+          updateChartData={setChartBorder}
+        />
+        <Brush
+          data={chartData}
+          width={width}
+          margin={margin}
+          focusHeight={focusHeight}
+          X={X}
+          updateChartData={setChartBorder}/>
+      </StakingAnalyticsChartWrapper>
+    )
+  }
+  return null
 }

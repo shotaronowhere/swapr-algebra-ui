@@ -4,7 +4,7 @@ import { Contract, providers } from "ethers";
 import { useActiveWeb3React } from "../web3";
 import { useClients } from "./useClients";
 import {
-    GET_STAKE,
+    GET_STAKE, GET_STAKE_HISTORY,
     POOLS_FROM_ADDRESSES,
     TOKENS_FROM_ADDRESSES,
     TOP_POOLS,
@@ -45,6 +45,11 @@ export function useInfoSubgraph() {
 
     const [stakesResult, setStakes] = useState(null);
     const [stakesLoading, setStakesLoading] = useState(null);
+
+    const [stakeHistoriesResult, setHistories] = useState(null);
+    const [historiesLoading, setHistoriesLoading] = useState(null);
+
+
 
     async function fetchInfoPools(reload?: boolean) {
 
@@ -332,12 +337,33 @@ export function useInfoSubgraph() {
 
     }
 
+    async function fetchStakingHistory() {
+        try {
+            setHistoriesLoading(true)
+
+            const { data: { histories }, error: error } = await stakerClient.query({
+                query: GET_STAKE_HISTORY(),
+                fetchPolicy: 'network-only'
+            })
+
+            if (error) throw new Error(`${error.name} ${error.message}`)
+
+            setHistoriesLoading(false)
+            setHistories(histories)
+
+        } catch (e) {
+            setHistories('Getting histories failed')
+            setHistoriesLoading(false)
+            console.log(e)
+            return undefined
+        }
+    }
+
     return {
         blocksFetched: blockError ? false : !!ethPrices && !!blocks,
         fetchInfoPools: { poolsResult, poolsLoading, fetchInfoPoolsFn: fetchInfoPools },
         fetchInfoTokens: { tokensResult, tokensLoading, fetchInfoTokensFn: fetchInfoTokens },
-        getStakes: {stakesResult, stakesLoading, fetchStakingFn: fetchStaking}
+        getStakes: {stakesResult, stakesLoading, fetchStakingFn: fetchStaking},
+        fetchStakedHistory: {historiesLoading, stakeHistoriesResult, fetchStakingHistoryFn: fetchStakingHistory}
     }
-
-
 }

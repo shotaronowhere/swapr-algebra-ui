@@ -24,6 +24,7 @@ export default function Brush({data, focusHeight, width, margin, updateChartData
 
     const focusLine = (x, y) => d3.line()
       .defined(d => !isNaN(d.value))
+      .curve(d3.curveBumpX)
       .x(d => x(new Date(d.date)))
       .y(d => y(d.value))
 
