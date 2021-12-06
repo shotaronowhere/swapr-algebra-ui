@@ -11,13 +11,11 @@ import RealStakerRangeButtons from './RealStakerRangeButtons'
 import RealStakerResBlocks from './RealStakerResBlocks'
 import { NavLink } from 'react-router-dom'
 import StakerStatistic from '../../assets/images/StakerStatisticBackground.svg'
-import { useCurrencyBalance, useCurrencyBalances } from '../../state/wallet/hooks'
+import { useCurrencyBalance } from '../../state/wallet/hooks'
 import { useActiveWeb3React } from '../../hooks/web3'
-import Modal from '../../components/Modal'
 import { useRealStakerHandlers } from '../../hooks/useRealStaker'
 import { ApprovalState, useApproveCallback } from '../../hooks/useApproveCallback'
 import { REAL_STAKER_ADDRESS } from '../../constants/addresses'
-import { Field } from '../../state/mint/v3/actions'
 import Loader from '../../components/Loader'
 import { ALGEBRA_POLYGON } from '../../constants/tokens'
 import { useInfoSubgraph } from '../../hooks/subgraph/useInfoSubgraph'
@@ -25,8 +23,6 @@ import { BigNumber } from 'ethers'
 import { formatEther } from 'ethers/lib/utils'
 import RealStakerUnstakeModal from './RealStakerUnstakeModal'
 import { useUSDCValue } from '../../hooks/useUSDCPrice'
-import { FiatValue } from '../../components/CurrencyInputPanel/FiatValue'
-import { useV3DerivedMintInfo } from '../../state/mint/v3/hooks'
 import { Currency, CurrencyAmount } from '@uniswap/sdk-core'
 import { tryParseAmount } from '../../state/swap/hooks'
 
@@ -178,11 +174,6 @@ export default function RealStakerPage({}) {
   const fiatValue = useUSDCValue(valueAmount)
   const fiatValueEarned = useUSDCValue(earnedAmount)
   const fiatValueStaked = useUSDCValue(stakedAmount)
-  // useEffect(() => {
-  //  if (((amountValue / numBalance) * 100) <= 100) {
-  //    onPercentSelectForSlider((amountValue / numBalance) * 100)
-  //  }
-  // },[amountValue])
 
   useEffect(() => {
     if (percentForSlider === 0) {
@@ -206,10 +197,10 @@ export default function RealStakerPage({}) {
 
   useEffect(() => {
     if (stakesResult !== null && stakesResult.stakes[0] !== undefined) {
-      console.log(stakesResult)
+      // console.log(stakesResult)
       const big = BigNumber.from(stakesResult.stakes[0].xALGBAmount).mul(BigNumber.from(stakesResult.factories[0].ALGBbalance)).div(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply)).sub(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount))
       setEarned(big)
-      console.log(big)
+      // console.log(big)
       setStaked(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount))
 
       if (typeof staked !== 'number') {
