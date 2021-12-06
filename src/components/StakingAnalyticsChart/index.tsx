@@ -1,6 +1,9 @@
 import styled from 'styled-components/macro'
 import AreaChart from './Chart'
 import { useState } from 'react'
+import * as d3 from 'd3'
+import Brush from './Brush'
+import { log } from 'util'
 
 const data = [
   { date: '2007-04-23', value: 93.24 },
@@ -64,17 +67,41 @@ const StakingAnalyticsChartWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
 `
 
 export default function StakingAnalyticsChart () {
   const [chartData, setChartData] = useState([])
+  const [chartBorder, setChartBorder] = useState([])
+  const focusHeight = 70
+  const width = 900
+  const margin = { left: 30, top: 30, right: 30, bottom: 30 }
+
+  const stepData = []
+
+  const X = d3.map(data, d => new Date(d.date))
+
+  data.map(item => {
+    if (item.date >= chartBorder[0] && item.date <= chartBorder[1]) {
+      stepData.push(item)
+    }
+  })
 
 
-  // setTimeout(() => {setChartData(data)}, 1000)
   return (
     <StakingAnalyticsChartWrapper>
       <AreaChart
-      data={data}/>
+      data={stepData}
+      chartData={chartData}
+      updateChartData={setChartBorder}
+      />
+      <Brush
+        data={data}
+        width={width}
+        margin={margin}
+        focusHeight={focusHeight}
+        X={X}
+        updateChartData={setChartBorder}/>
     </StakingAnalyticsChartWrapper>
   )
 }
