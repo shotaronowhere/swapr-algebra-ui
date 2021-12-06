@@ -4,6 +4,7 @@ import styled from 'styled-components/macro'
 import Modal from '../../components/Modal'
 import { SilderWrapper, StakeButton, StakerSlider } from './index'
 import RealStakerUnstakeInputRange from './RealStakerUnstakeInputRange'
+import { formatEther } from 'ethers/lib/utils'
 
 const UnStakeModalWrapper = styled(Modal)`
   flex-direction: column;
@@ -36,6 +37,7 @@ export default function RealStakerUnstakeModal(
     stakedResult
   } : UnstakeModalProps
 ) {
+  // console.log(formatEther(baseCurrency))
   return (
     <UnStakeModalWrapper
       isOpen={openModal}
@@ -48,7 +50,7 @@ export default function RealStakerUnstakeModal(
         <RealStakerUnstakeInputRange
           amountValue={unstaked}
           setAmountValue={setUnstaked}
-          baseCurrency={baseCurrency}
+          baseCurrency={parseFloat(formatEther(baseCurrency)).toFixed(13)}
           />
         <SilderWrapper>
           <StakerSlider

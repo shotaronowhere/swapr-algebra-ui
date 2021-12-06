@@ -13,9 +13,21 @@ const CurrencyInputPanelWrapper = styled.div`
     width: 36px;
     height: 36px;
   }
-
+`
+const CurrencyTop = styled(CurrencyDropdown)`
   span {
     font-size: 21px;
+  }
+`
+
+const CurrencyBottom = styled(CurrencyDropdown)`
+
+  span {
+    color: #8c909c;
+    cursor: default;
+    &:hover {
+      cursor: default;
+    }
   }
 `
 
@@ -29,7 +41,7 @@ interface StakerInputRangeProps {
 export default function RealStakerInputRange ({baseCurrency, amountValue, setAmountValue, fiatValue}: StakerInputRangeProps) {
   return (
     <CurrencyInputPanelWrapper>
-      <CurrencyDropdown
+      <CurrencyTop
         currency={baseCurrency}
         hideInput={true}
         showCommonBases
@@ -37,7 +49,7 @@ export default function RealStakerInputRange ({baseCurrency, amountValue, setAmo
         disabled={false}
         shallow={true}
       />
-      <CurrencyDropdown
+      <CurrencyBottom
         onUserInput={(e) => {setAmountValue(e)}}
         currency={baseCurrency}
         value={amountValue}

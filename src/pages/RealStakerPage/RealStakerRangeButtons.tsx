@@ -4,7 +4,8 @@ import { SmallMaxButton } from '../RemoveLiquidity/styled'
 
 const StakerSmallMaxButton = styled(SmallMaxButton)`
   background: #4A5982;
-  border: none;
+  border: 1px solid transparent;
+  box-sizing: border-box;
 `
 const ButtonsWrapper = styled.div`
   margin: 0 auto;
