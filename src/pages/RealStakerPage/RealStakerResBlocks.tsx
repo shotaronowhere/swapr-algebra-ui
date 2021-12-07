@@ -1,6 +1,6 @@
 import styled from 'styled-components/macro'
 import { ButtonConfirmed } from '../../components/Button'
-import { formatEther } from 'ethers/lib/utils'
+import { formatEther, parseUnits } from 'ethers/lib/utils'
 import { useState } from 'react'
 
 const PageWrapper = styled.div`
@@ -58,24 +58,24 @@ interface ResBloksProps {
   currency: any
   action: string
   handler?: any
+  algbCourse: any
 }
 
-export default function RealStakerResBlocks({ title, amount, currency, action, handler }: ResBloksProps) {
+export default function RealStakerResBlocks({ title, amount, currency, action, handler, algbCourse = 0 }: ResBloksProps) {
   const [isFull, setIsFull] = useState(false)
   return (
     <PageWrapper width={'367px'}>
       <h2>{title}</h2>
-      {isFull ? <AmountTitle title={`${formatEther(amount)}`}>{formatEther(amount)}</AmountTitle> : null}
+      {isFull && !(formatEther(amount) < formatEther(algbCourse)) ? <AmountTitle title={`${formatEther(amount)}`}>{formatEther(amount)}</AmountTitle> : null}
       <h3 onMouseEnter={() => {
         setIsFull(true)
       }}
           onMouseLeave={() => {
         setIsFull(false)
       }}
-      >{parseFloat(formatEther(amount)).toFixed(2)} ALGB</h3>
-      {/* < 0.01 ? '< 0.01$' : '$ ' + currency?.toSignificant(6, { groupSeparator: ',' })*/}
-      <p>$ {currency?.toSignificant(6, { groupSeparator: ',' })}</p>
-      <StakeButton disabled={amount == 0} onClick={handler}>{action}</StakeButton>
+      >{(formatEther(amount) < formatEther(algbCourse)) ? '0.00' : parseFloat(formatEther(amount)).toFixed(2)} ALGB</h3>
+      <p>$ {currency === null || formatEther(amount) < formatEther(algbCourse) ? '0' : currency?.toSignificant(6, { groupSeparator: ',' })}</p>
+      <StakeButton disabled={amount == 0 || (formatEther(amount) < formatEther(algbCourse))} onClick={handler}>{action}</StakeButton>
     </PageWrapper>
   )
 }
