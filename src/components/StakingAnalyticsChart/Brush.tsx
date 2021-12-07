@@ -13,7 +13,6 @@ interface BrushProps {
 
 export default function Brush({data, focusHeight, width, margin, updateChartData, X}: BrushProps) {
   const focusRef = useRef(null)
-
   useEffect(() => {
     const focusEl = d3.select(focusRef.current)
     focusEl.selectAll('*').remove()
@@ -80,9 +79,9 @@ export default function Brush({data, focusHeight, width, margin, updateChartData
         const maxX = Math.floor(selection[1] / div)
         const maxY = d3.max(data, d => X[minX] <= new Date(d.date) && new Date(d.date) <= X[maxX - 1] ? d.value : NaN)
 
-        console.log(minX, maxX)
-        console.log(Math.round(((X.length / 100) * 10)))
-        updateChartData([data[minX].date, data[maxX - 1].date])
+        console.log([data[minX].date, data[maxX].date])
+
+        updateChartData([data[minX].date, data[maxX].date])
 
         // setChartYDomain([d3.min(Y), maxY])
         // xDomain = [X[minX], X[maxX - 1]]

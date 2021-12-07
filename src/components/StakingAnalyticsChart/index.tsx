@@ -51,6 +51,7 @@ export default function StakingAnalyticsChart () {
         return {value: formatEther(BigNumber.from(item.ALGBbalance)._hex), date: convertDate(new Date(item.date * 1000))}
       }))
     }
+    console.log(stakeHistoriesResult)
       }, [stakeHistoriesResult])
 
   chartData.map(item => {

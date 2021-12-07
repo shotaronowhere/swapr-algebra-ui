@@ -2,6 +2,7 @@ import * as d3 from 'd3'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import styled from 'styled-components/macro'
 import Brush from './Brush'
+import { convertDate } from './index'
 
 const ChartWrapper = styled.div`
   display: flex;
@@ -24,9 +25,8 @@ export default function AreaChart({ data, margin, dimensions }: ChartProps) {
   const D = d3.map(data, (d, i) => !isNaN(X[i]) && !isNaN(Y[i]))
 
   // Compute default domains.
-  const yDomain = [d3.min(Y), d3.max(Y)]
+  const yDomain = [0, d3.max(Y)]
   const xDomain = d3.extent(X)
-
 
   //Todo auto length
   const tickWidth = useMemo(() => {
@@ -47,12 +47,12 @@ export default function AreaChart({ data, margin, dimensions }: ChartProps) {
     // Construct scales and axes.
     const xScale = d3.scaleUtc(xDomain, [margin.left, dimensions.width - margin.right])
     const yScale = d3.scaleLinear(yDomain, [dimensions.height - margin.bottom, margin.top])
-    const xAxis = d3.axisBottom(xScale).ticks(data.length).tickSizeOuter(0)
+    const xAxis = d3.axisBottom(xScale).ticks(data.length).tickSizeOuter(0).tickFormat(d => convertDate(new Date(d)))
     const yAxis = d3.axisLeft(yScale).ticks(dimensions.height / 40)
 
     // Construct an line generator.
     const line = d3.line()
-      .defined(i => D[i])
+      // .defined(i => D[i])
       .curve(d3.curveBumpX)
       .x(i => xScale(X[i]))
       .y(i => yScale(Y[i]))
@@ -126,7 +126,7 @@ export default function AreaChart({ data, margin, dimensions }: ChartProps) {
           .attr('fill', 'transparent')
           .on('mouseover', (e) => {
 
-            console.log(data.length)
+            console.log(data)
 
             const isOverflowing = Number(xTranslate) + 150 + 16 > dimensions.width
             // Line.attr('x1', `${xTranslate}px`).attr('x2', `${xTranslate}px`)
@@ -138,17 +138,12 @@ export default function AreaChart({ data, margin, dimensions }: ChartProps) {
             InfoRectDateText.property('innerHTML', `${data[i]?.date}`)
             // Focus.attr('transform', `translate(${xScale(data[i]?.time)},${y(chartData[i]?.fee)})`)
           })
-
         svg.node().append(rect.node())
       })
 
     svg.append(() => InfoRectGroup.node())
 
   }, [data, xDomain])
-
-
-
-
 
   return (
     <ChartWrapper>
