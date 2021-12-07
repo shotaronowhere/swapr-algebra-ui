@@ -47,7 +47,7 @@ export default function AreaChart({ data, margin, dimensions }: ChartProps) {
     // Construct scales and axes.
     const xScale = d3.scaleUtc(xDomain, [margin.left, dimensions.width - margin.right])
     const yScale = d3.scaleLinear(yDomain, [dimensions.height - margin.bottom, margin.top])
-    const xAxis = d3.axisBottom(xScale).ticks(dimensions.width / 80).tickSizeOuter(0)
+    const xAxis = d3.axisBottom(xScale).ticks(data.length).tickSizeOuter(0)
     const yAxis = d3.axisLeft(yScale).ticks(dimensions.height / 40)
 
     // Construct an line generator.
@@ -93,7 +93,7 @@ export default function AreaChart({ data, margin, dimensions }: ChartProps) {
       .call(yAxis)
       .call(g => g.select('.domain').remove())
       .call(g => g.selectAll('.tick line').clone()
-        .attr('x2', dimensions.width - margin.left - margin.right)
+        .attr('x2', dimensions.width - margin.left  - margin.right)
         .attr('stroke-opacity', 0.1))
 
     svg.append('path')
@@ -125,16 +125,17 @@ export default function AreaChart({ data, margin, dimensions }: ChartProps) {
           .attr('height', `${dimensions.height}px`)
           .attr('fill', 'transparent')
           .on('mouseover', (e) => {
-            // console.log(i)
-            console.log(data)
+
+            console.log(data.length)
+
             const isOverflowing = Number(xTranslate) + 150 + 16 > dimensions.width
             // Line.attr('x1', `${xTranslate}px`).attr('x2', `${xTranslate}px`)
             InfoRectGroup.attr(
               'transform',
               `translate(${isOverflowing ? Number(xTranslate) - 150 - 16 : Number(xTranslate) + 16},10)`
             )
-            // InfoRectFeeText.property('innerHTML', `Fee: ${data[i]?.value.toFixed(3)}`)
-            // InfoRectDateText.property('innerHTML', `${data[i]?.date}/3/12`)
+            InfoRectFeeText.property('innerHTML', `Balance: ${parseFloat(data[i]?.value).toFixed(3)}`)
+            InfoRectDateText.property('innerHTML', `${data[i]?.date}`)
             // Focus.attr('transform', `translate(${xScale(data[i]?.time)},${y(chartData[i]?.fee)})`)
           })
 

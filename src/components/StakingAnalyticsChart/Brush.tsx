@@ -67,7 +67,7 @@ export default function Brush({data, focusHeight, width, margin, updateChartData
       .on('brush', brushed)
       .on('end', brushended)
 
-    const defaultSelection = [focusX(X[X.length - Math.round(((X.length / 100) * 10))]), focusX.range()[1]]
+    const defaultSelection = [focusX(X[X.length - (Math.round(((X.length / 100) * 10)) === 0 ? 2 : Math.round(((X.length / 100) * 10)))]), focusX.range()[1]]
 
     const gb = focus.append('g')
       .call(brush)
@@ -80,9 +80,11 @@ export default function Brush({data, focusHeight, width, margin, updateChartData
         const maxX = Math.floor(selection[1] / div)
         const maxY = d3.max(data, d => X[minX] <= new Date(d.date) && new Date(d.date) <= X[maxX - 1] ? d.value : NaN)
 
+        console.log(minX, maxX)
+        console.log(Math.round(((X.length / 100) * 10)))
         updateChartData([data[minX].date, data[maxX - 1].date])
-        // setChartYDomain([d3.min(Y), maxY])
 
+        // setChartYDomain([d3.min(Y), maxY])
         // xDomain = [X[minX], X[maxX - 1]]
         // yDomain = [0, maxY]
         // xScale = xScale.copy().domain()
