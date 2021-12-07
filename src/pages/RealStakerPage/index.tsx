@@ -5,7 +5,7 @@ import Slider from '../../components/Slider'
 import useDebouncedChangeHandler from '../../hooks/useDebouncedChangeHandler'
 import { useBurnV3ActionHandlers, useBurnV3State } from '../../state/burn/v3/hooks'
 import { ButtonConfirmed } from '../../components/Button'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import RealStakerInputRange from './RealStakerInputRange'
 import RealStakerRangeButtons from './RealStakerRangeButtons'
 import RealStakerResBlocks from './RealStakerResBlocks'
@@ -20,7 +20,7 @@ import Loader from '../../components/Loader'
 import { ALGEBRA_POLYGON } from '../../constants/tokens'
 import { useInfoSubgraph } from '../../hooks/subgraph/useInfoSubgraph'
 import { BigNumber } from 'ethers'
-import { formatEther } from 'ethers/lib/utils'
+import { formatEther, formatUnits, parseUnits } from 'ethers/lib/utils'
 import RealStakerUnstakeModal from './RealStakerUnstakeModal'
 import { useUSDCValue } from '../../hooks/useUSDCPrice'
 import { Currency, CurrencyAmount } from '@uniswap/sdk-core'
@@ -143,7 +143,10 @@ export default function RealStakerPage({}) {
   const algbCurrency = useCurrency(algbId)
 
   const balance = useCurrencyBalance(account ?? undefined, baseCurrency)
-  const numBalance = balance !== undefined ? balance.toSignificant(4) : 0
+  const numBalance = useMemo(() => {
+    if(!balance) return 0
+    return balance
+  }, [balance])
 
   const [percentForSlider, onPercentSelectForSlider] = useDebouncedChangeHandler(percent, onPercentSelect)
   const [unstakePercent, setUnstakePercent] = useState(0)
@@ -162,18 +165,24 @@ export default function RealStakerPage({}) {
     amountValue.toString(),
     baseCurrency
   )
+
   const earnedAmount: CurrencyAmount<Currency> | undefined = tryParseAmount(
-    earned.toString(),
+    earned !== 0 ? formatEther(earned._hex) : earned.toString(),
     baseCurrency
   )
   const stakedAmount: CurrencyAmount<Currency> | undefined = tryParseAmount(
-    staked.toString(),
+    staked !== 0 ? formatEther(staked._hex) : staked.toString(),
+    baseCurrency
+  )
+  const unstakedAmount: CurrencyAmount<Currency> | undefined = tryParseAmount(
+    unstaked.toString(),
     baseCurrency
   )
 
   const fiatValue = useUSDCValue(valueAmount)
   const fiatValueEarned = useUSDCValue(earnedAmount)
   const fiatValueStaked = useUSDCValue(stakedAmount)
+  const fiatUnstakedAmount = useUSDCValue(unstakedAmount)
 
   useEffect(() => {
     if (percentForSlider === 0) {
@@ -187,22 +196,24 @@ export default function RealStakerPage({}) {
     if (unstakePercent === 0) {
       setUnstaked('')
     } else {
-      setUnstaked((formatEther(unstakeAmount) / 100) * unstakePercent)
+      setUnstaked(formatUnits(BigNumber.from(unstakeAmount).div(100).mul(unstakePercent), 18))
     }
   }, [unstakePercent])
 
   useEffect(() => {
-    account && fetchStakingFn(account.toLowerCase())
-  }, [account, numBalance])
+    if (stakesResult || !account) return
+    fetchStakingFn(account.toLowerCase())
+  }, [balance])
+
+  useEffect(() => {
+    fetchStakingFn(account.toLowerCase())
+  }, [account])
 
   useEffect(() => {
     if (stakesResult !== null && stakesResult.stakes[0] !== undefined) {
-      // console.log(stakesResult)
       const big = BigNumber.from(stakesResult.stakes[0].xALGBAmount).mul(BigNumber.from(stakesResult.factories[0].ALGBbalance)).div(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply)).sub(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount))
       setEarned(big)
-      // console.log(big)
       setStaked(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount))
-
       if (typeof staked !== 'number') {
         setUnstakeAmount(staked.add(earned))
       }
@@ -259,7 +270,7 @@ export default function RealStakerPage({}) {
       <EarnedStakedWrapper width={'765px'}>
         <RealStakerResBlocks
           action={'Claim'}
-          currency={fiatValueEarned?.toSignificant(6, { groupSeparator: ',' })}
+          currency={fiatValueEarned}
           amount={earned}
           title={'EARNED'}
           handler={() => {
@@ -267,7 +278,7 @@ export default function RealStakerPage({}) {
           }} />
         <RealStakerResBlocks
           action={'Unstake'}
-          currency={fiatValueStaked?.toSignificant(6, { groupSeparator: ',' })}
+          currency={fiatValueStaked}
           amount={staked}
           title={'STAKED'}
           handler={() => {
@@ -290,6 +301,7 @@ export default function RealStakerPage({}) {
         onPercentSelect={setUnstakePercent}
         stakedResult={stakesResult}
         unstakeHandler={stakerUnstakeHandler}
+        fiatValue={fiatUnstakedAmount}
       />
     </>
   )

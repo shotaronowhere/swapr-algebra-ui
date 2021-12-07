@@ -17,7 +17,13 @@ const CurrencyInputPanelWrapper = styled.div`
   }
 
   span {
-    font-size: 21px;
+    //font-size: px;
+    color: #C3C5CB;
+    cursor: default;
+    &:hover{
+      cursor: default;
+      color: #C3C5CB;
+    }
   }
 `
 const UnstakeTitle = styled.div`
@@ -34,9 +40,10 @@ interface StakerInputRangeProps {
   baseCurrency? : any
   amountValue: string
   setAmountValue: any
+  fiatValue: any
 }
 
-export default function RealStakerUnstakeInputRange ({baseCurrency, amountValue, setAmountValue}: StakerInputRangeProps) {
+export default function RealStakerUnstakeInputRange ({baseCurrency, amountValue, setAmountValue, fiatValue}: StakerInputRangeProps) {
 
     const ALGBCurrency = useCurrency('0x0169eC1f8f639B32Eec6D923e24C2A2ff45B9DD6')
 
@@ -58,6 +65,7 @@ export default function RealStakerUnstakeInputRange ({baseCurrency, amountValue,
         showBalance={true}
         disabled={false}
         shallow={true}
+        fiatValue={fiatValue}
       />
     </CurrencyInputPanelWrapper>
   )

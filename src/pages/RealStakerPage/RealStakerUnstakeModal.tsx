@@ -21,6 +21,7 @@ interface UnstakeModalProps {
   onPercentSelect: number,
   unstakeHandler: any,
   stakedResult: any
+  fiatValue: any
 }
 
 export default function RealStakerUnstakeModal(
@@ -34,10 +35,10 @@ export default function RealStakerUnstakeModal(
     setUnstakePercent,
     onPercentSelect,
     unstakeHandler,
-    stakedResult
+    stakedResult,
+    fiatValue
   } : UnstakeModalProps
 ) {
-  // console.log(formatEther(baseCurrency))
   return (
     <UnStakeModalWrapper
       isOpen={openModal}
@@ -50,7 +51,8 @@ export default function RealStakerUnstakeModal(
         <RealStakerUnstakeInputRange
           amountValue={unstaked}
           setAmountValue={setUnstaked}
-          baseCurrency={parseFloat(formatEther(baseCurrency)).toFixed(13)}
+          baseCurrency={formatEther(baseCurrency)}
+          fiatValue={fiatValue}
           />
         <SilderWrapper>
           <StakerSlider
@@ -63,7 +65,7 @@ export default function RealStakerUnstakeModal(
           showCalculate={false}
         />
         <StakeButton onClick={() => {
-          unstakeHandler(unstaked, stakedResult)
+          unstakeHandler(unstaked, stakedResult, baseCurrency)
         }}>
           Unstake
         </StakeButton>

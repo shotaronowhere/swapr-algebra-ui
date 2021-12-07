@@ -20,12 +20,14 @@ const PageWrapper = styled.div`
     font-weight: 600;
     margin: 10px 0 4px 0;
     cursor: default;
+    width: fit-content;
   }
 
   p {
     color: #B1BAD3;
     font-size: 14px;
     margin: 0;
+    cursor: default;
   }
 
   h2, h3, p {
@@ -37,8 +39,8 @@ const StakeButton = styled(ButtonConfirmed)`
   width: 92%;
   margin: 16px auto 27px;
 `
-const AmountTitle = styled.title`
-display: block;
+const AmountTitle = styled.div`
+  display: block;
   background-color: white;
   color: black;
   position: absolute;
@@ -59,20 +61,20 @@ interface ResBloksProps {
 }
 
 export default function RealStakerResBlocks({ title, amount, currency, action, handler }: ResBloksProps) {
-  const [isFull, setIsFull] = useState(true)
+  const [isFull, setIsFull] = useState(false)
   return (
     <PageWrapper width={'367px'}>
       <h2>{title}</h2>
-      {/*change title*/}
-      {isFull ? <AmountTitle>{formatEther(amount)}</AmountTitle> : null}
+      {isFull ? <AmountTitle title={`${formatEther(amount)}`}>{formatEther(amount)}</AmountTitle> : null}
       <h3 onMouseEnter={() => {
         setIsFull(true)
       }}
-      //     onMouseLeave={() => {
-      //   setIsFull(false)
-      // }}
+          onMouseLeave={() => {
+        setIsFull(false)
+      }}
       >{parseFloat(formatEther(amount)).toFixed(2)} ALGB</h3>
-      <p>${currency}</p>
+      {/* < 0.01 ? '< 0.01$' : '$ ' + currency?.toSignificant(6, { groupSeparator: ',' })*/}
+      <p>$ {currency?.toSignificant(6, { groupSeparator: ',' })}</p>
       <StakeButton disabled={amount == 0} onClick={handler}>{action}</StakeButton>
     </PageWrapper>
   )

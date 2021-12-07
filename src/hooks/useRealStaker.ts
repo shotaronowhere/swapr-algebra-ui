@@ -47,19 +47,17 @@ export function useRealStakerHandlers() {
         provider.getSigner()
       )
 
-      const claimSum = claimCount * BigNumber.from(stakesResult.factories[0].xALGBtotalSupply) / BigNumber.from(stakesResult.factories[0].ALGBbalance)
-      const bigNumClaimCount = parseUnits(claimSum.toString(), 18)
-      // console.log(bigNumClaimCount)
-      // const result = await realStaker.leave(bigNumClaimCount._hex)
-      console.log(claimSum)
+      const claimSum = (claimCount.mul(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply))).div(BigNumber.from(stakesResult.factories[0].ALGBbalance))
 
+      const result = await realStaker.leave(claimSum._hex)
+      console.log(result)
     } catch (e) {
       console.log(e)
       return
     }
   }, [])
 
-  const stakerUnstakeHandler = useCallback(async (unstakeCount, stakesResult) => {
+  const stakerUnstakeHandler = useCallback(async (unstakeCount, stakesResult, maxALGBAccount) => {
     try {
 
       const realStaker = new Contract(
@@ -68,8 +66,8 @@ export function useRealStakerHandlers() {
         provider.getSigner()
       )
 
-      const unstakeSum = unstakeCount * stakesResult.factories[0].xALGBtotalSupply / stakesResult.factories[0].ALGBbalance
-      const bigNumUnstakeAmount = parseUnits(unstakeSum.toString(), 18)
+      const bigNumUnstakeAmount = (parseUnits(unstakeCount.toString(), 18).mul(BigNumber.from(stakesResult.stakes[0].xALGBAmount))).div(maxALGBAccount)
+
       const result = await realStaker.leave(bigNumUnstakeAmount._hex)
 
     } catch (e) {
