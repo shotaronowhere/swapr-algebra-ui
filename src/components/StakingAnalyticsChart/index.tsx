@@ -89,7 +89,7 @@ export default function StakingAnalyticsChart () {
   const [chartData, setChartData] = useState([])
   const [chartBorder, setChartBorder] = useState([])
   const focusHeight = 70
-  const width = 900
+ const dimensions = {width: 900, height: 400}
   const margin = { left: 30, top: 30, right: 30, bottom: 30 }
   const {fetchStakedHistory: {fetchStakingHistoryFn, historiesLoading, stakeHistoriesResult}} = useInfoSubgraph()
   const stepData = []
@@ -98,6 +98,7 @@ export default function StakingAnalyticsChart () {
   useEffect(() => {
     fetchStakingHistoryFn()
   }, [])
+
   useEffect(() => {
     if (stakeHistoriesResult) {
       setChartData(stakeHistoriesResult.map(item => {
@@ -117,11 +118,12 @@ export default function StakingAnalyticsChart () {
       <StakingAnalyticsChartWrapper>
         <AreaChart
           data={stepData}
-          updateChartData={setChartBorder}
+          margin={margin}
+          dimensions={dimensions}
         />
         <Brush
           data={chartData}
-          width={width}
+          width={dimensions.width}
           margin={margin}
           focusHeight={focusHeight}
           X={X}
