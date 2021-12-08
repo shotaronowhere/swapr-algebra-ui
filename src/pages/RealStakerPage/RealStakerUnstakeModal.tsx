@@ -66,6 +66,7 @@ export default function RealStakerUnstakeModal(
         />
         <StakeButton onClick={() => {
           unstakeHandler(unstaked, stakedResult, baseCurrency)
+          setUnstaked('')
           setOpenModal(false)
         }}
         disabled={unstaked === ''}>

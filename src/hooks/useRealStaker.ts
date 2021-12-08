@@ -4,9 +4,11 @@ import { formatEther, parseUnits } from 'ethers/lib/utils'
 import { useCallback, useState } from "react"
 import { REAL_STAKER_ADDRESS } from "../constants/addresses"
 import { useActiveWeb3React } from "./web3"
+import { useTransactionAdder } from '../state/transactions/hooks'
 
 export function useRealStakerHandlers() {
 
+  const addTransaction = useTransactionAdder()
   const { chainId, account } = useActiveWeb3React()
   const _w: any = window
   const provider = _w.ethereum ? new providers.Web3Provider(_w.ethereum) : undefined
@@ -28,7 +30,10 @@ export function useRealStakerHandlers() {
       const bigNumStakerCount = parseUnits(stakedCount.toString(), 18)
       const result = await realStaker.enter(bigNumStakerCount._hex)
 
-      console.log(result)
+      addTransaction(result, {
+        summary: `Stake ${stakedCount} ALGB`
+      })
+      setStaked({hash: result.hash})
 
     } catch (e) {
       setStaked('failed')
@@ -40,7 +45,6 @@ export function useRealStakerHandlers() {
 
   const stakerClaimHandler = useCallback(async (claimCount, stakesResult) => {
     try {
-
       const realStaker = new Contract(
         REAL_STAKER_ADDRESS[chainId],
         REAL_STAKER_ABI,
@@ -50,7 +54,12 @@ export function useRealStakerHandlers() {
       const claimSum = (claimCount.mul(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply))).div(BigNumber.from(stakesResult.factories[0].ALGBbalance))
 
       const result = await realStaker.leave(claimSum._hex)
-      console.log(result)
+
+      addTransaction(result, {
+        summary: `Claim ${formatEther(claimCount)} ALGB`
+      })
+      setStaked({hash: result.hash})
+
     } catch (e) {
       console.log(e)
       return
@@ -69,6 +78,11 @@ export function useRealStakerHandlers() {
       const bigNumUnstakeAmount = (parseUnits(unstakeCount.toString(), 18).mul(BigNumber.from(stakesResult.stakes[0].xALGBAmount))).div(maxALGBAccount)
 
       const result = await realStaker.leave(bigNumUnstakeAmount._hex)
+
+      addTransaction(result, {
+        summary: `Unstake ${unstakeCount} ALGB`
+      })
+      setStaked({hash: result.hash})
 
     } catch (e) {
       console.log(e)

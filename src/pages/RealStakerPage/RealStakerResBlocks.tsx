@@ -1,18 +1,20 @@
-import styled from 'styled-components/macro'
+import styled, { keyframes } from 'styled-components/macro'
 import { ButtonConfirmed } from '../../components/Button'
 import { formatEther, parseUnits } from 'ethers/lib/utils'
 import { useState } from 'react'
+import { RefreshCw } from 'react-feather'
+import { PageTitle } from '../../components/PageTitle'
 
 const PageWrapper = styled.div`
   min-width: ${props => props.width};
   background-color: #202635;
   border-radius: 16px;
   position: relative;
-  
+
   h2 {
     color: #687086;
     font-size: 16px;
-    margin: 18px 0 0 0;
+    margin: 0;
   }
 
   h3 {
@@ -30,7 +32,7 @@ const PageWrapper = styled.div`
     cursor: default;
   }
 
-  h2, h3, p {
+  h3, p {
     margin-left: 30px;
   }
 `
@@ -50,7 +52,29 @@ const AmountTitle = styled.div`
   left: 30%;
   border-radius: 5px;
 `
+const spinAnimation = keyframes`
+  100% {
+    transform: rotate(360deg);
+  }
+`
 
+const ReloadButton = styled.button`
+  background-color: transparent;
+  border: none;
+  animation: ${(props) => (props.refreshing ? spinAnimation : '')} infinite 3s;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+`
+const TitleWrapper = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 18px 30px 0;
+`
 
 interface ResBloksProps {
   title: string
@@ -59,23 +83,36 @@ interface ResBloksProps {
   action: string
   handler?: any
   algbCourse: any
+  needReload?: boolean
+  reloadHandler?: any
+  loading?: boolean
 }
 
-export default function RealStakerResBlocks({ title, amount, currency, action, handler, algbCourse = 0 }: ResBloksProps) {
+export default function RealStakerResBlocks(
+  {
+    title, amount, currency, action, handler, algbCourse = 0, needReload, reloadHandler, loading
+  }: ResBloksProps) {
   const [isFull, setIsFull] = useState(false)
   return (
     <PageWrapper width={'367px'}>
-      <h2>{title}</h2>
-      {isFull && !(formatEther(amount) < formatEther(algbCourse)) ? <AmountTitle title={`${formatEther(amount)}`}>{formatEther(amount)}</AmountTitle> : null}
+      <TitleWrapper>
+        <h2>{title}</h2>
+        {needReload ? reloadHandler && loading !== undefined && (<ReloadButton disabled={loading} onClick={reloadHandler} refreshing={loading}>
+          <RefreshCw style={{ display: 'block' }} size={18} stroke={'white'} />
+        </ReloadButton>) : null}
+      </TitleWrapper>
+      {isFull && !(formatEther(amount) < formatEther(algbCourse)) ?
+        <AmountTitle title={`${formatEther(amount)}`}>{formatEther(amount)}</AmountTitle> : null}
       <h3 onMouseEnter={() => {
         setIsFull(true)
       }}
           onMouseLeave={() => {
-        setIsFull(false)
-      }}
+            setIsFull(false)
+          }}
       >{(formatEther(amount) < formatEther(algbCourse)) ? '0.00' : parseFloat(formatEther(amount)).toFixed(2)} ALGB</h3>
       <p>$ {currency === null || formatEther(amount) < formatEther(algbCourse) ? '0' : currency?.toSignificant(6, { groupSeparator: ',' })}</p>
-      <StakeButton disabled={amount == 0 || (formatEther(amount) < formatEther(algbCourse))} onClick={handler}>{action}</StakeButton>
+      <StakeButton disabled={amount == 0 || (formatEther(amount) < formatEther(algbCourse))}
+                   onClick={handler}>{action}</StakeButton>
     </PageWrapper>
   )
 }

@@ -1,5 +1,5 @@
 import { useApolloClient } from "@apollo/client";
-import { useState } from "react";
+import { useCallback, useState } from 'react'
 import { Contract, providers } from "ethers";
 import { useActiveWeb3React } from "../web3";
 import { useClients } from "./useClients";
@@ -307,10 +307,13 @@ export function useInfoSubgraph() {
 
     }
 
-    async function fetchStaking(id: string) {
+    const fetchStaking = useCallback(async (id: string) => {
+
+        setStakes(null)
 
         try {
             setStakesLoading(true)
+
             const { data: { factories, stakes }, error: error } = await stakerClient.query({
                 query: GET_STAKE(id),
                 fetchPolicy: 'network-only'
@@ -330,7 +333,7 @@ export function useInfoSubgraph() {
             return undefined
         }
 
-    }
+    }, [account])
 
     return {
         blocksFetched: blockError ? false : !!ethPrices && !!blocks,

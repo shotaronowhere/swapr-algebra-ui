@@ -5,7 +5,7 @@ import Slider from '../../components/Slider'
 import useDebouncedChangeHandler from '../../hooks/useDebouncedChangeHandler'
 import { useBurnV3ActionHandlers, useBurnV3State } from '../../state/burn/v3/hooks'
 import { ButtonConfirmed } from '../../components/Button'
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import RealStakerInputRange from './RealStakerInputRange'
 import RealStakerRangeButtons from './RealStakerRangeButtons'
 import RealStakerResBlocks from './RealStakerResBlocks'
@@ -25,6 +25,8 @@ import RealStakerUnstakeModal from './RealStakerUnstakeModal'
 import { useUSDCValue } from '../../hooks/useUSDCPrice'
 import { Currency, CurrencyAmount } from '@uniswap/sdk-core'
 import { tryParseAmount } from '../../state/swap/hooks'
+import { useAllTransactions } from '../../state/transactions/hooks'
+import { useWalletModalToggle } from '../../state/application/hooks'
 
 const PageWrapper = styled.div`
   min-width: ${props => props.width};
@@ -138,28 +140,32 @@ export default function RealStakerPage({}) {
   const { onPercentSelect } = useBurnV3ActionHandlers()
   const { stakerHash, stakerHandler, stakerClaimHandler, stakerUnstakeHandler } = useRealStakerHandlers()
   const { getStakes: { stakesResult, stakesLoading, fetchStakingFn } } = useInfoSubgraph()
+  const toggleWalletModal = useWalletModalToggle()
 
   const baseCurrency = useCurrency(currencyId)
   const algbCurrency = useCurrency(algbId)
 
+  //balances
   const balance = useCurrencyBalance(account ?? undefined, baseCurrency)
 
+
   const _balance = useMemo(() => {
-      return balance
+    return balance
   }, [balance])
 
   const numBalance = useMemo(() => {
-    if(!balance) return 0
+    if (!balance) return 0
     return balance
   }, [balance])
 
   const [percentForSlider, onPercentSelectForSlider] = useDebouncedChangeHandler(percent, onPercentSelect)
   const [unstakePercent, setUnstakePercent] = useState(0)
 
+  const [openModal, setOpenModal] = useState(false)
+
   const [amountValue, setAmountValue] = useState('')
   const [earned, setEarned] = useState(0)
   const [staked, setStaked] = useState(0)
-  const [openModal, setOpenModal] = useState(false)
   const [unstaked, setUnstaked] = useState('')
   const [unstakeAmount, setUnstakeAmount] = useState(0)
   const [algbCourse, setAlbgCourse] = useState()
@@ -183,53 +189,97 @@ export default function RealStakerPage({}) {
     unstaked.toString(),
     baseCurrency
   )
-//staker my rewards
+
   const fiatValue = useUSDCValue(valueAmount)
   const fiatValueEarned = useUSDCValue(earnedAmount)
   const fiatValueStaked = useUSDCValue(stakedAmount)
   const fiatUnstakedAmount = useUSDCValue(unstakedAmount)
 
+  const allTransactions = useAllTransactions()
+
+  const sortedRecentTransactions = useMemo(() => {
+    const txs = Object.values(allTransactions)
+    return txs
+      .filter((tx) => new Date().getTime() - tx.addedTime < 86_400_000)
+      .sort((a, b) => b.addedTime - a.addedTime)
+  }, [allTransactions])
+
+  const confirmed = useMemo(
+    () => sortedRecentTransactions.filter((tx) => tx.receipt).map((tx) => tx.hash),
+    [sortedRecentTransactions, allTransactions]
+  )
+
+  const [loadingClaim, setLoadingClaim] = useState(false)
+  const reloadClaim = useCallback(() => {
+    if (!account) return
+    setLoadingClaim(true)
+    fetchStakingFn(account.toLowerCase())
+      .then(res => {setLoadingClaim(false)})
+  }, [])
+
+
+  useEffect(() => {
+    if (!account) return
+
+    console.log('Account: ',account.toLowerCase())
+    // console.log('fetch')
+    fetchStakingFn(account.toLowerCase())
+
+    // if (stakerHash && confirmed.includes(stakerHash.hash)) {
+    //  fetchStakingFn(account.toLowerCase())
+    // }
+  },[confirmed, stakerHash, account])
+
+  // useEffect(() => {
+  //   if (!account) return
+  //   fetchStakingFn(account.toLowerCase())
+  // }, [allTransactions])
+
+  //calc amount when choose range in slider
   useEffect(() => {
     if (percentForSlider === 0) {
       setAmountValue('')
     } else if (percentForSlider === 100) {
       setAmountValue(+numBalance.toSignificant(4))
-    }else {
+    } else {
       setAmountValue((+numBalance.toSignificant(4) / 100) * percentForSlider)
     }
   }, [percentForSlider])
 
+  //calc unstakeAmount when choose range in slider
   useEffect(() => {
     if (unstakePercent === 0) {
       setUnstaked('')
     } else if (unstakePercent === 100) {
       setUnstaked(formatUnits(BigNumber.from(unstakeAmount), 18))
-    }else {
+    } else {
       setUnstaked(formatUnits(BigNumber.from(unstakeAmount).div(100).mul(unstakePercent), 18))
     }
   }, [unstakePercent])
 
+  //get data for staked and earned
   useEffect(() => {
     if (stakesResult || !account) return
     fetchStakingFn(account.toLowerCase())
   }, [_balance])
 
-  useEffect(() => {
-    if (!account) return
-    fetchStakingFn(account.toLowerCase())
-  }, [account])
+  //get data for staked and earned
 
+  //calc staked, earned, algbCourse, unstakedAmount
   useEffect(() => {
+    console.log('HERE', stakesResult)
     if (stakesResult !== null && stakesResult.stakes[0] !== undefined) {
-      const big = BigNumber.from(stakesResult.stakes[0].xALGBAmount).mul(BigNumber.from(stakesResult.factories[0].ALGBbalance)).div(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply)).sub(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount))
-      setEarned(big)
-      setStaked(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount))
-      if (typeof staked !== 'number') {
-        setUnstakeAmount(staked.add(earned))
-      }
-    setAlbgCourse(BigNumber.from(stakesResult.factories[0].ALGBbalance).div(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply)))
+        setEarned(BigNumber.from(stakesResult.stakes[0].xALGBAmount).mul(BigNumber.from(stakesResult.factories[0].ALGBbalance)).div(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply)).sub(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount)))
+        setStaked(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount))
+        setAlbgCourse(BigNumber.from(stakesResult.factories[0].ALGBbalance).div(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply)))
     }
   }, [stakesResult])
+
+  useEffect(() => {
+    if (typeof staked !== 'number') {
+      setUnstakeAmount(staked.add(earned))
+    }
+  }, [staked, earned])
 
   return (
     <>
@@ -262,20 +312,24 @@ export default function RealStakerPage({}) {
             {approval === ApprovalState.NOT_APPROVED ?
               <StakeButton onClick={approveCallback}>
                 Approve token
-              </StakeButton> : approval === ApprovalState.UNKNOWN ?
-                <StakeButton>
-                  <Loader stroke={'white'} size={'19px'} />
-                </StakeButton> : approval === ApprovalState.APPROVED ?
-                  <StakeButton onClick={() => {
-                    stakerHandler(amountValue)
-                    onPercentSelectForSlider(0)
-                    if (percentForSlider === 0) {
-                      setAmountValue('')
-                    }
-                  }}
-                  disabled={amountValue === ''}>
-                    Stake
-                  </StakeButton> : null}
+              </StakeButton> :
+              approval === ApprovalState.UNKNOWN && account === null ?
+                <StakeButton onClick={toggleWalletModal}>
+                  Connect to a wallet
+                </StakeButton> :
+                approval === ApprovalState.UNKNOWN ?
+                  <StakeButton>
+                    <Loader stroke={'white'} size={'19px'} />
+                  </StakeButton> : approval === ApprovalState.APPROVED ?
+                    <StakeButton onClick={() => {
+                      stakerHandler(amountValue)
+                      onPercentSelectForSlider(0)
+                      if (percentForSlider === 0) {
+                        setAmountValue('')
+                      }
+                    }} disabled={amountValue === ''}>
+                      Stake
+                    </StakeButton> : null}
           </>
         }
       </PageWrapper>
@@ -288,7 +342,10 @@ export default function RealStakerPage({}) {
           handler={() => {
             stakerClaimHandler(earned, stakesResult)
           }}
-        algbCourse={algbCourse}/>
+          algbCourse={algbCourse}
+          needReload={true}
+        reloadHandler={reloadClaim}
+        loading={loadingClaim}/>
         <RealStakerResBlocks
           action={'Unstake'}
           currency={fiatValueStaked}
@@ -297,7 +354,7 @@ export default function RealStakerPage({}) {
           handler={() => {
             setOpenModal(true)
           }}
-          algbCourse={algbCourse}/>
+          algbCourse={algbCourse} />
       </EarnedStakedWrapper>
       <StakerStatisticWrapper to={''}>
         <StakerStatisticBackground src={StakerStatistic} />
