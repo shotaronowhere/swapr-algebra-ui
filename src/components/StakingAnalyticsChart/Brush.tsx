@@ -1,5 +1,5 @@
 import * as d3 from 'd3'
-import { useEffect, useRef } from 'react'
+import {useEffect, useMemo, useRef} from 'react'
 
 interface BrushProps {
   width: number
@@ -13,6 +13,18 @@ interface BrushProps {
 
 export default function Brush({data, focusHeight, width, margin, updateChartData, X}: BrushProps) {
   const focusRef = useRef(null)
+
+  useEffect(() => {
+    // console.log(data)
+  }, [data])
+
+
+  const tiks = useMemo(() => {
+    const min = d3.min(data, d => new Date(d.date).getTime())
+    const current = new Date().getTime()
+    return Math.ceil((current - min)/(1000*60*60*24))
+  }, [])
+
   useEffect(() => {
     const focusEl = d3.select(focusRef.current)
     focusEl.selectAll('*').remove()
@@ -28,7 +40,7 @@ export default function Brush({data, focusHeight, width, margin, updateChartData
       .y(d => y(d.value))
 
     const focusX = d3.scaleUtc()
-      .domain(d3.extent(data, d => new Date(d.date)))
+      .domain([d3.min(data, d => new Date(d.date)), Date.now()])
       .range([margin.left, width - margin.right])
 
     const focusY = d3.scaleLinear()
@@ -37,7 +49,14 @@ export default function Brush({data, focusHeight, width, margin, updateChartData
 
     const focusXAxis = (g, x, height) => g
       .attr('transform', `translate(0,${height - margin.bottom})`)
-      .call(d3.axisBottom(x).ticks(width / 80).tickSizeOuter(0))
+      .call(d3.axisBottom(x).ticks(tiks).tickSizeOuter(0))
+        .selectAll('.tick')
+        .nodes()
+        .map((el, i)  => {
+          if (i % 2 === 0) {
+              d3.select(el).attr('display', 'none')
+          }
+        })
 
     const focusYAxis = (g, y, title) => g
       .attr('transform', `translate(${margin.left},0)`)
@@ -79,9 +98,12 @@ export default function Brush({data, focusHeight, width, margin, updateChartData
         const maxX = Math.floor(selection[1] / div)
         const maxY = d3.max(data, d => X[minX] <= new Date(d.date) && new Date(d.date) <= X[maxX - 1] ? d.value : NaN)
 
-        console.log([data[minX].date, data[maxX].date])
+        // console.log([data[minX].date, data[maxX].date])
 
-        updateChartData([data[minX].date, data[maxX].date])
+        updateChartData([data[minX]?.date, data[maxX - 1]?.date])
+
+        // console.log(minX, maxX)
+        // console.log([data[minX]?.date, data[maxX - 1]?.date])
 
         // setChartYDomain([d3.min(Y), maxY])
         // xDomain = [X[minX], X[maxX - 1]]
