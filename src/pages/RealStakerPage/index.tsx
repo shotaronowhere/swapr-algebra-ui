@@ -29,7 +29,7 @@ import { useAllTransactions } from '../../state/transactions/hooks'
 import { useWalletModalToggle } from '../../state/application/hooks'
 
 const PageWrapper = styled.div`
-  min-width: ${props => props.width};
+  min-width: ${(props) => props.width};
   background-color: #202635;
   border-radius: 16px;
 `
@@ -43,21 +43,20 @@ export const SilderWrapper = styled.div`
   margin: 0 auto;
 `
 export const StakerSlider = styled(Slider)`
-
   &::-webkit-slider-runnable-track {
-    background: #4A5982;
+    background: #4a5982;
     height: 5px;
     border-radius: 20px;
   }
 
   &::-moz-range-track {
-    background: #4A5982;
+    background: #4a5982;
     height: 5px;
     border-radius: 20px;
   }
 
   &::-moz-range-progress {
-    background-color: #5D32ED;
+    background-color: #5d32ed;
     height: 5px;
     border-radius: 20px;
   }
@@ -66,33 +65,34 @@ export const StakerSlider = styled(Slider)`
     -webkit-appearance: none;
     height: ${({ size }) => size}px;
     width: ${({ size }) => size}px;
-    background-color: #2E3957;
+    background-color: #2e3957;
     border-radius: 100%;
-    border: 7px solid #6F86C9;
+    border: 7px solid #6f86c9;
     transform: translateY(-50%);
     color: ${({ theme }) => theme.bg1};
 
     &:hover,
     &:focus {
       box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1), 0px 4px 8px rgba(0, 0, 0, 0.08), 0px 16px 24px rgba(0, 0, 0, 0.06),
-      0px 24px 32px rgba(0, 0, 0, 0.04);
+        0px 24px 32px rgba(0, 0, 0, 0.04);
     }
   }
 
   &::-moz-range-thumb {
     height: ${({ size }) => size}px;
     width: ${({ size }) => size}px;
-    background-color: #2E3957;
+    background-color: #2e3957;
     border-radius: 100%;
-    border: 7px solid #6F86C9;
+    border: 7px solid #6f86c9;
     color: ${({ theme }) => theme.bg1};
 
     &:hover,
     &:focus {
       box-shadow: 0px 0px 1px rgba(0, 0, 0, 0.1), 0px 4px 8px rgba(0, 0, 0, 0.08), 0px 16px 24px rgba(0, 0, 0, 0.06),
-      0px 24px 32px rgba(0, 0, 0, 0.04);
+        0px 24px 32px rgba(0, 0, 0, 0.04);
     }
-  }`
+  }
+`
 export const StakeButton = styled(ButtonConfirmed)`
   border-radius: 8px !important;
   width: 92%;
@@ -102,8 +102,7 @@ const EarnedStakedWrapper = styled.div`
   margin: 27px auto;
   display: flex;
   justify-content: space-between;
-  min-width: ${props => props.width};
-
+  min-width: ${(props) => props.width};
 `
 const StakerStatisticWrapper = styled(NavLink)`
   position: relative;
@@ -111,7 +110,8 @@ const StakerStatisticWrapper = styled(NavLink)`
   height: 107px;
   text-decoration: none;
 
-  h2, p {
+  h2,
+  p {
     color: white;
     text-decoration: none;
     margin: 0 0 0 27px;
@@ -133,13 +133,15 @@ const StakerStatisticBackground = styled.img`
 `
 
 export default function RealStakerPage({}) {
-  const currencyId = '0x4259Abc22981480D81075b0E8C4Bb0b142be8EF8'
+  const currencyId = '0x0169eC1f8f639B32Eec6D923e24C2A2ff45B9DD6'
   const algbId = '0x0169eC1f8f639B32Eec6D923e24C2A2ff45B9DD6'
   const { chainId, account } = useActiveWeb3React()
   const { percent } = useBurnV3State()
   const { onPercentSelect } = useBurnV3ActionHandlers()
   const { stakerHash, stakerHandler, stakerClaimHandler, stakerUnstakeHandler } = useRealStakerHandlers()
-  const { getStakes: { stakesResult, stakesLoading, fetchStakingFn } } = useInfoSubgraph()
+  const {
+    getStakes: { stakesResult, stakesLoading, fetchStakingFn },
+  } = useInfoSubgraph()
   const toggleWalletModal = useWalletModalToggle()
 
   const baseCurrency = useCurrency(currencyId)
@@ -147,7 +149,6 @@ export default function RealStakerPage({}) {
 
   //balances
   const balance = useCurrencyBalance(account ?? undefined, baseCurrency)
-
 
   const _balance = useMemo(() => {
     return balance
@@ -170,13 +171,8 @@ export default function RealStakerPage({}) {
   const [unstakeAmount, setUnstakeAmount] = useState(0)
   const [algbCourse, setAlbgCourse] = useState()
 
-  const [approval, approveCallback] = useApproveCallback(
-    balance, chainId ? REAL_STAKER_ADDRESS[chainId] : undefined
-  )
-  const valueAmount: CurrencyAmount<Currency> | undefined = tryParseAmount(
-    amountValue.toString(),
-    baseCurrency
-  )
+  const [approval, approveCallback] = useApproveCallback(balance, chainId ? REAL_STAKER_ADDRESS[chainId] : undefined)
+  const valueAmount: CurrencyAmount<Currency> | undefined = tryParseAmount(amountValue.toString(), baseCurrency)
   const earnedAmount: CurrencyAmount<Currency> | undefined = tryParseAmount(
     earned !== 0 ? formatEther(earned._hex) : earned.toString(),
     baseCurrency
@@ -185,10 +181,7 @@ export default function RealStakerPage({}) {
     staked !== 0 ? formatEther(staked._hex) : staked.toString(),
     baseCurrency
   )
-  const unstakedAmount: CurrencyAmount<Currency> | undefined = tryParseAmount(
-    unstaked.toString(),
-    baseCurrency
-  )
+  const unstakedAmount: CurrencyAmount<Currency> | undefined = tryParseAmount(unstaked.toString(), baseCurrency)
 
   const fiatValue = useUSDCValue(valueAmount)
   const fiatValueEarned = useUSDCValue(earnedAmount)
@@ -213,22 +206,22 @@ export default function RealStakerPage({}) {
   const reloadClaim = useCallback(() => {
     if (!account) return
     setLoadingClaim(true)
-    fetchStakingFn(account.toLowerCase())
-      .then(res => {setLoadingClaim(false)})
+    fetchStakingFn(account.toLowerCase()).then((res) => {
+      setLoadingClaim(false)
+    })
   }, [])
-
 
   useEffect(() => {
     if (!account) return
 
-    console.log('Account: ',account.toLowerCase())
+    console.log('Account: ', account.toLowerCase())
     // console.log('fetch')
     fetchStakingFn(account.toLowerCase())
 
     // if (stakerHash && confirmed.includes(stakerHash.hash)) {
     //  fetchStakingFn(account.toLowerCase())
     // }
-  },[confirmed, stakerHash, account])
+  }, [confirmed, stakerHash, account])
 
   // useEffect(() => {
   //   if (!account) return
@@ -269,9 +262,18 @@ export default function RealStakerPage({}) {
   useEffect(() => {
     console.log('HERE', stakesResult)
     if (stakesResult !== null && stakesResult.stakes[0] !== undefined) {
-        setEarned(BigNumber.from(stakesResult.stakes[0].xALGBAmount).mul(BigNumber.from(stakesResult.factories[0].ALGBbalance)).div(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply)).sub(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount)))
-        setStaked(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount))
-        setAlbgCourse(BigNumber.from(stakesResult.factories[0].ALGBbalance).div(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply)))
+      setEarned(
+        BigNumber.from(stakesResult.stakes[0].xALGBAmount)
+          .mul(BigNumber.from(stakesResult.factories[0].ALGBbalance))
+          .div(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply))
+          .sub(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount))
+      )
+      setStaked(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount))
+      setAlbgCourse(
+        BigNumber.from(stakesResult.factories[0].ALGBbalance).div(
+          BigNumber.from(stakesResult.factories[0].xALGBtotalSupply)
+        )
+      )
     }
   }, [stakesResult])
 
@@ -292,46 +294,42 @@ export default function RealStakerPage({}) {
           amountValue={amountValue}
           setAmountValue={setAmountValue}
           baseCurrency={baseCurrency}
-          fiatValue={fiatValue} />
-        {numBalance == 0 && balance ?
+          fiatValue={fiatValue}
+        />
+        {numBalance == 0 && balance ? (
           <NavLink to={''} style={{ textDecoration: 'none' }}>
-            <StakeButton>
-              BUY ALGB
-            </StakeButton>
-          </NavLink> :
+            <StakeButton>BUY ALGB</StakeButton>
+          </NavLink>
+        ) : (
           <>
             <SilderWrapper>
-              <StakerSlider
-                value={percentForSlider}
-                onChange={onPercentSelectForSlider}
-                size={22} />
+              <StakerSlider value={percentForSlider} onChange={onPercentSelectForSlider} size={22} />
             </SilderWrapper>
-            <RealStakerRangeButtons
-              onPercentSelect={onPercentSelect}
-              showCalculate={true} />
-            {approval === ApprovalState.NOT_APPROVED ?
-              <StakeButton onClick={approveCallback}>
-                Approve token
-              </StakeButton> :
-              approval === ApprovalState.UNKNOWN && account === null ?
-                <StakeButton onClick={toggleWalletModal}>
-                  Connect to a wallet
-                </StakeButton> :
-                approval === ApprovalState.UNKNOWN ?
-                  <StakeButton>
-                    <Loader stroke={'white'} size={'19px'} />
-                  </StakeButton> : approval === ApprovalState.APPROVED ?
-                    <StakeButton onClick={() => {
-                      stakerHandler(amountValue)
-                      onPercentSelectForSlider(0)
-                      if (percentForSlider === 0) {
-                        setAmountValue('')
-                      }
-                    }} disabled={amountValue === ''}>
-                      Stake
-                    </StakeButton> : null}
+            <RealStakerRangeButtons onPercentSelect={onPercentSelect} showCalculate={true} />
+            {approval === ApprovalState.NOT_APPROVED ? (
+              <StakeButton onClick={approveCallback}>Approve token</StakeButton>
+            ) : approval === ApprovalState.UNKNOWN && account === null ? (
+              <StakeButton onClick={toggleWalletModal}>Connect to a wallet</StakeButton>
+            ) : approval === ApprovalState.UNKNOWN ? (
+              <StakeButton>
+                <Loader stroke={'white'} size={'19px'} />
+              </StakeButton>
+            ) : approval === ApprovalState.APPROVED ? (
+              <StakeButton
+                onClick={() => {
+                  stakerHandler(amountValue)
+                  onPercentSelectForSlider(0)
+                  if (percentForSlider === 0) {
+                    setAmountValue('')
+                  }
+                }}
+                disabled={amountValue === ''}
+              >
+                Stake
+              </StakeButton>
+            ) : null}
           </>
-        }
+        )}
       </PageWrapper>
       <EarnedStakedWrapper width={'765px'}>
         <RealStakerResBlocks
@@ -344,8 +342,9 @@ export default function RealStakerPage({}) {
           }}
           algbCourse={algbCourse}
           needReload={true}
-        reloadHandler={reloadClaim}
-        loading={loadingClaim}/>
+          reloadHandler={reloadClaim}
+          loading={loadingClaim}
+        />
         <RealStakerResBlocks
           action={'Unstake'}
           currency={fiatValueStaked}
@@ -354,7 +353,8 @@ export default function RealStakerPage({}) {
           handler={() => {
             setOpenModal(true)
           }}
-          algbCourse={algbCourse} />
+          algbCourse={algbCourse}
+        />
       </EarnedStakedWrapper>
       <StakerStatisticWrapper to={''}>
         <StakerStatisticBackground src={StakerStatistic} />

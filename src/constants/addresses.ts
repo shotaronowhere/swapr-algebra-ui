@@ -37,7 +37,7 @@ export const STAKER_ADDRESS: AddressMap = {
 }
 
 export const REAL_STAKER_ADDRESS: AddressMap = {
-  [SupportedChainId.POLYGON]: '0xfc10730039738926e8bed82578b970f1155485b0'
+  [SupportedChainId.POLYGON]: '0x32CFF674763b06B983C0D55Ef2e41B84D16855bb'
 }
 
 export const V2_FACTORY_ADDRESSES: AddressMap = {
