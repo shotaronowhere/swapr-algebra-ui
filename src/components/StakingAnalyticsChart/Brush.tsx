@@ -1,5 +1,6 @@
 import * as d3 from 'd3'
 import {useEffect, useMemo, useRef} from 'react'
+import dayjs from "dayjs";
 
 interface BrushProps {
   width: number
@@ -44,7 +45,7 @@ export default function Brush({data, focusHeight, width, margin, updateChartData
       .range([margin.left, width - margin.right])
 
     const focusY = d3.scaleLinear()
-      .domain([0, d3.max(data, d => d.value)])
+      .domain([0, d3.max(data, d => +d.value)])
       .range([focusHeight - margin.bottom, margin.top])
 
     const focusXAxis = (g, x, height) => g
@@ -92,6 +93,7 @@ export default function Brush({data, focusHeight, width, margin, updateChartData
       .call(brush.move, defaultSelection)
 
     function brushed({ selection }) {
+
       if (selection) {
         const div = Math.round(870 / X.length)
         const minX = Math.floor(selection[0] / div)
@@ -100,7 +102,10 @@ export default function Brush({data, focusHeight, width, margin, updateChartData
 
         // console.log([data[minX].date, data[maxX].date])
 
-        updateChartData([data[minX]?.date, data[maxX - 1]?.date])
+        if (dayjs(data[maxX - 1]?.date).startOf('day').subtract(2, 'day').diff((dayjs(data[minX -1 ]?.date).startOf('day'))) <= 4) return
+
+        // console.log(data.length)
+        updateChartData([data[minX -1 ]?.date, data[maxX - 1]?.date])
 
         // console.log(minX, maxX)
         // console.log([data[minX]?.date, data[maxX - 1]?.date])

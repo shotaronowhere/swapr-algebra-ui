@@ -34,8 +34,12 @@ export default function AreaChart({data, margin, dimensions}: ChartProps) {
     const tickWidth = useMemo(() => {
         return dimensions.width / data.length
     }, [dimensions, data])
+    console.log(data.length)
 
-    console.log(xDomain, X, data)
+    useEffect(() => {
+        // console.log(D)
+    }, [D])
+
     useEffect(() => {
         const svgEl = d3.select(svgRef.current)
         svgEl.selectAll('*').remove()
@@ -50,8 +54,10 @@ export default function AreaChart({data, margin, dimensions}: ChartProps) {
         // Construct scales and axes.
         const xScale = d3.scaleUtc(xDomain, [margin.left, dimensions.width - margin.right])
         const yScale = d3.scaleLinear(yDomain, [dimensions.height - margin.bottom, margin.top])
-        const xAxis = d3.axisBottom(xScale).ticks(data.length).tickSizeOuter(0)
+        const xAxis = d3.axisBottom(xScale).ticks(data.length)
         const yAxis = d3.axisLeft(yScale).ticks(dimensions.height / 40)
+
+        // console.log(data.length)
 
         const Line = d3
             .create('svg:line')
@@ -134,7 +140,9 @@ export default function AreaChart({data, margin, dimensions}: ChartProps) {
             .nodes()
             .map((el, i) => {
                 if (i % 2 === 0) {
-                    d3.select(el).attr('display', 'none')
+                   if (data.length > 14) {
+                       d3.select(el).attr('display', 'none')
+                   }
                 }
                 const xTranslate = d3
                     .select(el)
