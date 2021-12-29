@@ -214,14 +214,13 @@ export default function RealStakerPage({}) {
   useEffect(() => {
     if (!account) return
 
-    console.log('Account: ', account.toLowerCase())
-    // console.log('fetch')
+
     fetchStakingFn(account.toLowerCase())
 
     // if (stakerHash && confirmed.includes(stakerHash.hash)) {
     //  fetchStakingFn(account.toLowerCase())
     // }
-  }, [confirmed, stakerHash, account])
+  }, [account])
 
   // useEffect(() => {
   //   if (!account) return
@@ -260,20 +259,25 @@ export default function RealStakerPage({}) {
 
   //calc staked, earned, algbCourse, unstakedAmount
   useEffect(() => {
-    console.log('HERE', stakesResult)
+    // console.log('HERE', stakesResult)
     if (stakesResult !== null && stakesResult.stakes[0] !== undefined) {
-      setEarned(
-        BigNumber.from(stakesResult.stakes[0].xALGBAmount)
-          .mul(BigNumber.from(stakesResult.factories[0].ALGBbalance))
-          .div(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply))
-          .sub(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount))
-      )
-      setStaked(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount))
-      setAlbgCourse(
-        BigNumber.from(stakesResult.factories[0].ALGBbalance).div(
-          BigNumber.from(stakesResult.factories[0].xALGBtotalSupply)
+      console.log(stakesResult.stakes[0].xALGBAmount, stakesResult.stakes[0].xALGBtotalSupply, stakesResult.stakes[0].ALGBbalance, stakesResult.stakes[0].stakedALGBAmount)
+      if (+stakesResult.stakes[0].stakedALGBAmount !== 0 && +stakesResult.stakes[0].xALGBAmount !== 0) {
+        setEarned(
+            BigNumber.from(stakesResult.stakes[0].xALGBAmount)
+                .mul(BigNumber.from(stakesResult.factories[0].ALGBbalance))
+                .div(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply))
+                .sub(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount))
         )
-      )
+      }
+      setStaked(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount))
+
+      if (+stakesResult.factories[0].xALGBtotalSupply !== 0) {
+        setAlbgCourse(
+            BigNumber.from(stakesResult.factories[0].ALGBbalance)
+                .div(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply))
+        )
+      }
     }
   }, [stakesResult])
 
