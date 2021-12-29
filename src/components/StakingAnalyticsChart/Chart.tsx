@@ -34,11 +34,6 @@ export default function AreaChart({data, margin, dimensions}: ChartProps) {
     const tickWidth = useMemo(() => {
         return dimensions.width / data.length
     }, [dimensions, data])
-    console.log(data.length)
-
-    useEffect(() => {
-        // console.log(D)
-    }, [D])
 
     useEffect(() => {
         const svgEl = d3.select(svgRef.current)
@@ -127,7 +122,7 @@ export default function AreaChart({data, margin, dimensions}: ChartProps) {
         const xGroup = svg.append('g')
             .attr('transform', `translate(0,${dimensions.height - margin.bottom})`)
             .call(xAxis)
-            // .select('domain').attr('fill', 'transparent')
+        // .select('domain').attr('fill', 'transparent')
 
         svg.append('path')
             .attr('fill', 'none')
@@ -140,9 +135,9 @@ export default function AreaChart({data, margin, dimensions}: ChartProps) {
             .nodes()
             .map((el, i) => {
                 if (i % 2 === 0) {
-                   if (data.length > 14) {
-                       d3.select(el).attr('display', 'none')
-                   }
+                    if (data.length > 14) {
+                        d3.select(el).attr('display', 'none')
+                    }
                 }
                 const xTranslate = d3
                     .select(el)
