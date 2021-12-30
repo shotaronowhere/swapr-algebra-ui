@@ -50,14 +50,14 @@ export default function Brush({data, focusHeight, width, margin, updateChartData
 
         const focusXAxis = (g, x, height) => g
             .attr('transform', `translate(0,${height - margin.bottom})`)
-            .call(d3.axisBottom(x).ticks(tiks).tickSizeOuter(0))
-            .selectAll('.tick')
-            .nodes()
-            .map((el, i) => {
-                if (i % 2 !== 0) {
-                    d3.select(el).attr('display', 'none')
-                }
-            })
+            // .call(d3.axisBottom(x).ticks(tiks).tickSizeOuter(0))
+            // .selectAll('.tick')
+            // .nodes()
+            // .map((el, i) => {
+            //     if (i % 2 !== 0) {
+            //         d3.select(el).attr('display', 'none')
+            //     }
+            // })
 
         const focusYAxis = (g, y, title) => g
             .attr('transform', `translate(${margin.left},0)`)
@@ -86,7 +86,7 @@ export default function Brush({data, focusHeight, width, margin, updateChartData
             .on('brush', brushed)
             .on('end', brushended)
 
-        const defaultSelection = [focusX(X[X.length - (Math.round(((X.length / 100) * 15)) === 0 ? 2 : Math.round(((X.length / 100) * 10)))]), focusX.range()[1]]
+        const defaultSelection = [focusX(X[X.length - (Math.round(((X.length / 100) * 15)) === 0 ? 2 : Math.round(((X.length / 100) * 15)))]), focusX.range()[1]]
 
         const gb = focus.append('g')
             .call(brush)
@@ -106,16 +106,6 @@ export default function Brush({data, focusHeight, width, margin, updateChartData
                 const minX = Math.floor(selection[0] / div)
                 const maxX = Math.floor(selection[1] / div)
                 // const maxY = d3.max(data, d => X[minX] <= new Date(d.date) && new Date(d.date) <= X[maxX - 1] ? d.value : NaN)
-                if (maxX - minX < 2) {
-                    gb.call(brush.move, defaultSelection)
-                }
-                if (dayjs(data[maxX - 1]?.date).startOf('day').subtract(2, 'day').diff((dayjs(data[minX - 1]?.date).startOf('day'))) <= 4) {
-                    brush.extent([[margin.left, 0.5], [width - margin.right, focusHeight - margin.bottom + 0.5]])
-                    return
-                }
-                // if (brushItem) {
-                //   console.log(brushItem._groups[0][0])
-                // }
 
                 updateChartData([data[minX - 1]?.date, data[maxX - 1]?.date])
 
@@ -127,6 +117,7 @@ export default function Brush({data, focusHeight, width, margin, updateChartData
         function brushended({selection}) {
             if (!selection) {
                 gb.call(brush.move, defaultSelection)
+                return
             }
         }
     }, [data])
