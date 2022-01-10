@@ -84,7 +84,9 @@ export default function Brush({data, focusHeight, width, margin, updateChartData
 
         const gb = focus.append('g')
             .call(brush)
+            .call(brush.touchable, [1, 7])
             .call(brush.move, defaultSelection)
+
 
         const brushItem = gb
             .select('.selection')
@@ -94,7 +96,6 @@ export default function Brush({data, focusHeight, width, margin, updateChartData
             .attr('ry', '5')
 
         function brushed({selection}) {
-
             if (selection) {
                 const div = Math.round(870 / X.length)
                 const minX = Math.floor(selection[0] / div)

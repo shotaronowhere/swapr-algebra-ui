@@ -4,6 +4,7 @@ import styled from 'styled-components/macro'
 import Brush from './Brush'
 import {ChardDataInterface, convertDate} from './index'
 import {sv} from "make-plural/plurals";
+import {isMobile} from "react-device-detect"
 
 const ChartWrapper = styled.div`
   display: flex;
@@ -23,9 +24,6 @@ export default function Chart({data, margin, dimensions}: ChartProps) {
     const Y = d3.map(data, d => +d.value)
     const Y2 = d3.map(data2, d => +d.value)
     const I = d3.range(X.length)
-
-    // Compute which data points are considered defined.
-    // const D = d3.map(data, (d, i) => !isNaN(X[i]) && !isNaN(Y[i]))
 
     // Compute default domains.
     const yDomain = [0, d3.max([...Y, ...Y2])]
@@ -191,6 +189,15 @@ export default function Chart({data, margin, dimensions}: ChartProps) {
             .selectAll('.tick')
             .nodes()
             .map((el, i) => {
+                if (isMobile) {
+                 d3.select(el)
+                     .selectAll('text')
+                     .style('text-anchor', 'end')
+                     .attr('dx', '-.8em')
+                     .attr('dy', '.15em')
+                     .attr('transform', 'rotate(-65)')
+                     .attr('transform', 'rotate(-65)')
+                }
                 if (i % 2 === 0) {
                     if (data.length > 14) {
                         d3.select(el).attr('display', 'none')

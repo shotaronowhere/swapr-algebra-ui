@@ -1,11 +1,13 @@
 import styled from 'styled-components/macro'
 import Chart from './Chart'
-import {useCallback, useEffect, useMemo, useState} from 'react'
+import {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import * as d3 from 'd3'
 import Brush from './Brush'
 import {BigNumber} from 'ethers'
 import {formatEther} from 'ethers/lib/utils'
 import {isMobile} from 'react-device-detect'
+import RangeButtons from "./RangeButtons"
+import dayjs from "dayjs"
 
 const StakingAnalyticsChartWrapper = styled.div`
   max-width: 1000px;
@@ -44,9 +46,12 @@ export default function StakingAnalyticsChart({stakeHistoriesResult, type}: Stak
     const [chartData, setChartData] = useState([])
     const [chartBorder, setChartBorder] = useState([])
     const focusHeight = 70
-    const dimensions = {width: isMobile ? 600 : 900, height: 400}
-    const margin = {left: 50, top: 30, right: 30, bottom: 30}
+    const wrapper = useRef(null)
+    // const dimensions =
+    const margin = isMobile ? {left: 30, top: 30, right: 10, bottom: 50} :{left: 50, top: 30, right: 30, bottom: 30}
     const borderedData: ChardDataInterface[] = []
+    const [span, setSpan] = useState('Day')
+
 
     const getDaysArray = useCallback((start, end) => {
         const arr = []
@@ -58,6 +63,32 @@ export default function StakingAnalyticsChart({stakeHistoriesResult, type}: Stak
         }
         return arr
     }, [])
+
+    const startTimestamp = useMemo(() => {
+        const day = dayjs()
+
+        switch (span) {
+            case 'Day':
+                return day.subtract(1, 'day').unix()
+            case 'Week':
+                return day.subtract(7, 'day').unix()
+            case 'Month':
+                return day.subtract(1, 'month').unix()
+            case 'All':
+                return 'All'
+            default:
+                return day.subtract(1, 'day').unix()
+        }
+    }, [span])
+
+    useEffect(() => {
+        if (startTimestamp === 'All') {
+            setChartBorder([fullDateData[0]?.date, fullDateData[fullDateData.length - 1]?.date])
+            return
+        }
+        setChartBorder([convertDate(new Date(startTimestamp * 1000)), convertDate(new Date())])
+    }, [startTimestamp])
+
 
     useEffect(() => {
         if (stakeHistoriesResult) {
@@ -102,19 +133,20 @@ export default function StakingAnalyticsChart({stakeHistoriesResult, type}: Stak
     const X = useMemo(() => d3.map(fullDateData, d => new Date(d.date)), [fullDateData])
 
     return (
-        <StakingAnalyticsChartWrapper>
+        <StakingAnalyticsChartWrapper ref={wrapper}>
+            {isMobile && <RangeButtons setSpan={setSpan} span={span}/>}
             <Chart
                 data={borderedData}
                 margin={margin}
-                dimensions={dimensions}
+                dimensions={{width: isMobile ? wrapper?.current?.offsetWidth  - 80 : 900, height: isMobile ? 300 : 400}}
             />
-            <Brush
+            {!isMobile && <Brush
                 data={fullDateData}
-                width={dimensions.width}
+                width={isMobile ? wrapper?.current?.offsetWidth  - 80 : 900}
                 margin={margin}
                 focusHeight={focusHeight}
                 X={X}
-                updateChartData={setChartBorder}/>
+                updateChartData={setChartBorder}/>}
         </StakingAnalyticsChartWrapper>
     )
 }

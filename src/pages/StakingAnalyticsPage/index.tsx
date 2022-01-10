@@ -4,6 +4,8 @@ import {useEffect} from "react";
 import {useInfoSubgraph} from "../../hooks/subgraph/useInfoSubgraph";
 import Loader from "../../components/Loader";
 import React from 'react'
+import { NavLink } from 'react-router-dom'
+import {ArrowLeft} from "react-feather"
 
 const StakingAnalyticsPageWrapper = styled.div`
   width: 100%;
@@ -19,7 +21,17 @@ const LoaderWrapper = styled.div`
   background-color: #313644;
   border-radius: 16px;
 `
-
+const BackButton = styled(NavLink)`
+  text-decoration: none;
+  color: white;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  width: fit-content;
+   p {
+     margin:  0 0 0 5px;
+   }
+`
 const chartsInfo = [
     {title: 'xALGB Minted', type: 'xALGBminted'},
     {title: 'ALGB From Vault', type: 'ALGBfromVault'},
@@ -37,18 +49,18 @@ export default function StakingAnalyticsPage() {
 
     return (
         <StakingAnalyticsPageWrapper>
+            <BackButton to={'/staking'}><ArrowLeft size={'16px'}/> <p>Staking</p>
+            </BackButton>
             {chartsInfo.map((item, i) =>
                     <React.Fragment key={i}>
                         <h2>{item.title}</h2>
                         {historiesLoading ?
-                            <LoaderWrapper key={i}>
+                            <LoaderWrapper>
                                 <Loader size={'35px'} stroke={'white'}/>
                             </LoaderWrapper> :
-                            <React.Fragment key={i}>
-                                <StakingAnalyticsChart
-                                    stakeHistoriesResult={stakeHistoriesResult}
-                                    type={item.type}/>
-                            </React.Fragment>
+                            <StakingAnalyticsChart
+                                stakeHistoriesResult={stakeHistoriesResult}
+                                type={item.type}/>
                         }
                     </React.Fragment>
             )}
