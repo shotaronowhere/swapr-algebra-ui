@@ -147,6 +147,14 @@ export default function RealStakerPage({}) {
   const baseCurrency = useCurrency(currencyId)
   const algbCurrency = useCurrency(algbId)
 
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+  // {
+  //   stakeTxes (where:{owner:"account", timestamp_gte: "now / 1000" }, orderBy: timestamp, orderDirection:asc ) {
+  //   id
+  // }
+  // }
+
+
   //balances
   const balance = useCurrencyBalance(account ?? undefined, baseCurrency)
 

@@ -2,8 +2,9 @@ import styled, { keyframes } from 'styled-components/macro'
 import { ButtonConfirmed } from '../../components/Button'
 import { formatEther, parseUnits } from 'ethers/lib/utils'
 import { useState } from 'react'
-import { RefreshCw } from 'react-feather'
+import {ArrowDown, ArrowUp, RefreshCw} from 'react-feather'
 import { PageTitle } from '../../components/PageTitle'
+import Frozen from "./Frozen"
 
 const PageWrapper = styled.div`
   min-width: ${props => props.width};
@@ -75,7 +76,17 @@ const TitleWrapper = styled.div`
   justify-content: space-between;
   margin: 18px 30px 0;
 `
-
+const FrozenDropDown = styled.h2`
+  color: white !important;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  
+  svg {
+    margin-left: 5px;
+  }
+  
+`
 interface ResBloksProps {
   title: string
   amount: number
@@ -93,13 +104,16 @@ export default function RealStakerResBlocks(
     title, amount, currency, action, handler, algbCourse = 0, needReload, reloadHandler, loading
   }: ResBloksProps) {
   const [isFull, setIsFull] = useState(false)
+    const [showFrozen, setFrozen] = useState(false)
   return (
     <PageWrapper width={'367px'}>
+        {showFrozen ? <Frozen/> : null}
       <TitleWrapper>
         <h2>{title}</h2>
         {needReload ? reloadHandler && loading !== undefined && (<ReloadButton disabled={loading} onClick={reloadHandler} refreshing={loading}>
           <RefreshCw style={{ display: 'block' }} size={18} stroke={'white'} />
         </ReloadButton>) : null}
+          {title === 'STAKED' ? <FrozenDropDown onClick={() => {setFrozen(!showFrozen)}}>Frozen {showFrozen ? <ArrowUp size={'16px'}/> : <ArrowDown size={'16px'}/>} </FrozenDropDown>: null}
       </TitleWrapper>
       {isFull && !(formatEther(amount) < formatEther(algbCourse)) ?
         <AmountTitle title={`${formatEther(amount)}`}>{formatEther(amount)}</AmountTitle> : null}
