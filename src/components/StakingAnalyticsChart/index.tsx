@@ -5,6 +5,7 @@ import * as d3 from 'd3'
 import Brush from './Brush'
 import {BigNumber} from 'ethers'
 import {formatEther} from 'ethers/lib/utils'
+import {isMobile} from 'react-device-detect'
 
 const StakingAnalyticsChartWrapper = styled.div`
   max-width: 1000px;
@@ -19,14 +20,14 @@ const StakingAnalyticsChartWrapper = styled.div`
 `
 
 export function convertDate(date: Date) {
-    const yyyy = date.getFullYear().toString();
-    const mm = (date.getMonth() + 1).toString();
-    const dd = date.getDate().toString();
+    const yyyy = date.getFullYear().toString()
+    const mm = (date.getMonth() + 1).toString()
+    const dd = date.getDate().toString()
 
-    const mmChars = mm.split('');
-    const ddChars = dd.split('');
+    const mmChars = mm.split('')
+    const ddChars = dd.split('')
 
-    return yyyy + '-' + (mmChars[1] ? mm : "0" + mmChars[0]) + '-' + (ddChars[1] ? dd : "0" + ddChars[0]);
+    return yyyy + '-' + (mmChars[1] ? mm : "0" + mmChars[0]) + '-' + (ddChars[1] ? dd : "0" + ddChars[0])
 }
 
 interface StakingAnalyticsChartProps {
@@ -43,7 +44,7 @@ export default function StakingAnalyticsChart({stakeHistoriesResult, type}: Stak
     const [chartData, setChartData] = useState([])
     const [chartBorder, setChartBorder] = useState([])
     const focusHeight = 70
-    const dimensions = {width: 900, height: 400}
+    const dimensions = {width: isMobile ? 600 : 900, height: 400}
     const margin = {left: 50, top: 30, right: 30, bottom: 30}
     const borderedData: ChardDataInterface[] = []
 

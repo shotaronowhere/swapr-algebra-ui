@@ -18,7 +18,7 @@ interface ChartProps {
 
 export default function Chart({data, margin, dimensions}: ChartProps) {
     const svgRef = useRef(null)
-    const data2 = data.map(item => ({value: +item.value + (+item.value * 0.2), date: item.date}))
+    const data2 = data.map((item, i) => ({value: i % 2 === 0 ? +item.value + (+item.value * Math.random()): +item.value - (+item.value * Math.random()), date: item.date}))
     const X = d3.map(data, d => new Date(d.date))
     const Y = d3.map(data, d => +d.value)
     const Y2 = d3.map(data2, d => +d.value)
@@ -104,7 +104,7 @@ export default function Chart({data, margin, dimensions}: ChartProps) {
         const InfoRectColor = d3
             .create('svg:rect')
             .attr('transform', 'translate(120, 15)')
-            .attr('fill', '#b41870')
+
             .attr('width', '10px')
             .attr('height', '10px')
             .attr('rx', '2')
@@ -112,7 +112,6 @@ export default function Chart({data, margin, dimensions}: ChartProps) {
         const InfoRectColor2 = d3
             .create('svg:rect')
             .attr('transform', 'translate(120, 40)')
-            .attr('fill', '#123')
             .attr('width', '10px')
             .attr('height', '10px')
             .attr('rx', '2')
@@ -217,8 +216,13 @@ export default function Chart({data, margin, dimensions}: ChartProps) {
                             'transform',
                             `translate(${isOverflowing ? Number(xTranslate) - 150 - 16 : Number(xTranslate) + 16},10)`
                         )
-                        InfoRectFeeText.property('innerHTML', `Value: ${parseFloat(data[i]?.value).toFixed(3)}`)
-                        InfoRectFeeText2.property('innerHTML', `Value: ${parseFloat(data2[i]?.value.toString()).toFixed(3)}`)
+                        const val1 = parseFloat(data[i]?.value).toFixed(3)
+                        const val2 = parseFloat(data2[i]?.value.toString()).toFixed(3)
+
+                        InfoRectFeeText.property('innerHTML', `Value: ${+val1 > +val2 ? val1 : val2}`)
+                        InfoRectColor.attr('fill', +val1 > +val2 ? '#b41870' : '#123')
+                        InfoRectFeeText2.property('innerHTML', `Value: ${+val1 < +val2 ? val1 : val2}`)
+                        InfoRectColor2.attr('fill', +val2 < +val1 ? '#123' : '#b41870')
                         InfoRectDateText.property('innerHTML', `${data[i]?.date}`)
 
                         Focus.attr('transform', `translate(${xScale(new Date(data[i]?.date))},${yScale(+data[i]?.value)})`)

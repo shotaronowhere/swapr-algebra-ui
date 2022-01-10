@@ -36,8 +36,8 @@ export const client = new ApolloClient({
 })
 
 export const stakerClient = new ApolloClient({
-    //  'https://api.thegraph.com/subgraphs/name/iliaazhel/algebra-staking' current
-    uri: 'https://api.thegraph.com/subgraphs/name/iliaazhel/staker',
+    // 'https://api.thegraph.com/subgraphs/name/iliaazhel/staker'  current
+    uri: 'https://api.thegraph.com/subgraphs/name/iliaazhel/algebra-staking',
     cache: new InMemoryCache(),
     queryDeduplication: true,
     defaultOptions: {

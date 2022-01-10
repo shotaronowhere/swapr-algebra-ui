@@ -9,16 +9,10 @@ interface BrushProps {
     margin: any
     X: any
     updateChartData: any
-
 }
 
 export default function Brush({data, focusHeight, width, margin, updateChartData, X}: BrushProps) {
     const focusRef = useRef(null)
-
-    useEffect(() => {
-        // console.log(data)
-    }, [data])
-
 
     const tiks = useMemo(() => {
         const min = d3.min(data, d => new Date(d.date).getTime())
@@ -42,7 +36,7 @@ export default function Brush({data, focusHeight, width, margin, updateChartData
 
         const focusX = d3.scaleUtc()
             .domain([d3.min(data, d => new Date(d.date)), Date.now()])
-            .range([margin.left, width - margin.right])
+            .range([margin.left, width])
 
         const focusY = d3.scaleLinear()
             .domain([0, d3.max(data, d => +d.value)])
@@ -86,7 +80,7 @@ export default function Brush({data, focusHeight, width, margin, updateChartData
             .on('brush', brushed)
             .on('end', brushended)
 
-        const defaultSelection = [focusX(X[X.length - (Math.round(((X.length / 100) * 15)) === 0 ? 2 : Math.round(((X.length / 100) * 15)))]), focusX.range()[1]]
+        const defaultSelection = [focusX(X[X.length - (Math.round(((X.length / 100) * 25)) === 0 ? 2 : Math.round(((X.length / 100) * 25)))]), focusX.range()[1] - margin.right]
 
         const gb = focus.append('g')
             .call(brush)
@@ -105,9 +99,8 @@ export default function Brush({data, focusHeight, width, margin, updateChartData
                 const div = Math.round(870 / X.length)
                 const minX = Math.floor(selection[0] / div)
                 const maxX = Math.floor(selection[1] / div)
-                // const maxY = d3.max(data, d => X[minX] <= new Date(d.date) && new Date(d.date) <= X[maxX - 1] ? d.value : NaN)
 
-                updateChartData([data[minX - 1]?.date, data[maxX - 1]?.date])
+                updateChartData([data[minX]?.date, data[maxX]?.date])
 
                 focus.property('value', selection.map(focusX.invert, focusX).map(d3.utcDay.round))
                 focus.dispatch('input')

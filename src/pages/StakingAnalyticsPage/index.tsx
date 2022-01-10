@@ -38,7 +38,7 @@ export default function StakingAnalyticsPage() {
     return (
         <StakingAnalyticsPageWrapper>
             {chartsInfo.map((item, i) =>
-                    <>
+                    <React.Fragment key={i}>
                         <h2>{item.title}</h2>
                         {historiesLoading ?
                             <LoaderWrapper key={i}>
@@ -50,7 +50,7 @@ export default function StakingAnalyticsPage() {
                                     type={item.type}/>
                             </React.Fragment>
                         }
-                    </>
+                    </React.Fragment>
             )}
         </StakingAnalyticsPageWrapper>
 
