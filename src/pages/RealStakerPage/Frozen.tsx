@@ -1,5 +1,6 @@
 import React from 'react'
 import styled from "styled-components/macro"
+import {formatUnits} from "ethers/lib/utils"
 
 const FrozenWrapper = styled.div`
   width: 100%;
@@ -18,30 +19,23 @@ const FrozenTransaction = styled.div`
   color: white;
   justify-content: space-between;
   p {
-    color: white;
-    font-size: 16px;
-    margin: 5px 0;
+    color: white !important;
+    font-size: 16px !important;
+    margin: 5px 0 !important;
     font-weight: 600;
   }
 `
-const trans = [
-    {amount: '1231', timestamp: '13:13'},
-    {amount: '1231', timestamp: '13:13'},
-    {amount: '1231', timestamp: '13:13'},
-    {amount: '1231', timestamp: '13:13'},
-    {amount: '1231', timestamp: '13:13'},
-    {amount: '1231', timestamp: '13:13'},
-    {amount: '1231', timestamp: '13:13'},
-]
-const Frozen = () => {
+
+const Frozen = ({data}: {data: any[]}) => {
     return (
         <FrozenWrapper>
-            {trans.map((el, i) =>
-                <FrozenTransaction key={i}>
-                    <p>{el.amount} ALGB</p>
-                    <p>Freezed for {el.timestamp} min</p>
+            {data && data.map((el, i) => {
+                    const time = new Date(el.timestamp * 1000)
+                return  <FrozenTransaction key={i}>
+                    <p>{formatUnits(el.stakedALGBAmount).slice(0,6)} ALGB</p>
+                    <p>Freeze for {`${time.getHours()}:${time.getMinutes()}:${time.getSeconds()}`}</p>
                 </FrozenTransaction>
-            )}
+                })}
         </FrozenWrapper>
     )
 }

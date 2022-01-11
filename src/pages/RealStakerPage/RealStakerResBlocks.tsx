@@ -8,7 +8,7 @@ import Frozen from "./Frozen"
 
 const PageWrapper = styled.div`
   min-width: ${props => props.width};
-  background-color: #202635;
+  background-color: #111621;
   border-radius: 16px;
   position: relative;
 
@@ -40,7 +40,8 @@ const PageWrapper = styled.div`
 const StakeButton = styled(ButtonConfirmed)`
   border-radius: 8px !important;
   width: 92%;
-  margin: 16px auto 27px;
+  margin: 16px auto 15px;
+  padding: 12px;
 `
 const AmountTitle = styled.div`
   display: block;
@@ -53,40 +54,14 @@ const AmountTitle = styled.div`
   left: 30%;
   border-radius: 5px;
 `
-const spinAnimation = keyframes`
-  100% {
-    transform: rotate(360deg);
-  }
-`
 
-const ReloadButton = styled.button`
-  background-color: transparent;
-  border: none;
-  animation: ${(props) => (props.refreshing ? spinAnimation : '')} infinite 3s;
-  cursor: pointer;
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: default;
-  }
-`
 const TitleWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin: 18px 30px 0;
 `
-const FrozenDropDown = styled.h2`
-  color: white !important;
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  
-  svg {
-    margin-left: 5px;
-  }
-  
-`
+
 interface ResBloksProps {
   title: string
   amount: number
@@ -94,26 +69,17 @@ interface ResBloksProps {
   action: string
   handler?: any
   algbCourse: any
-  needReload?: boolean
-  reloadHandler?: any
-  loading?: boolean
 }
 
 export default function RealStakerResBlocks(
   {
-    title, amount, currency, action, handler, algbCourse = 0, needReload, reloadHandler, loading
-  }: ResBloksProps) {
+    title, amount, currency, action, handler, algbCourse = 0}: ResBloksProps) {
   const [isFull, setIsFull] = useState(false)
-    const [showFrozen, setFrozen] = useState(false)
+
   return (
-    <PageWrapper width={'367px'}>
-        {showFrozen ? <Frozen/> : null}
+    <PageWrapper width={'337px'}>
       <TitleWrapper>
         <h2>{title}</h2>
-        {needReload ? reloadHandler && loading !== undefined && (<ReloadButton disabled={loading} onClick={reloadHandler} refreshing={loading}>
-          <RefreshCw style={{ display: 'block' }} size={18} stroke={'white'} />
-        </ReloadButton>) : null}
-          {title === 'STAKED' ? <FrozenDropDown onClick={() => {setFrozen(!showFrozen)}}>Frozen {showFrozen ? <ArrowUp size={'16px'}/> : <ArrowDown size={'16px'}/>} </FrozenDropDown>: null}
       </TitleWrapper>
       {isFull && !(formatEther(amount) < formatEther(algbCourse)) ?
         <AmountTitle title={`${formatEther(amount)}`}>{formatEther(amount)}</AmountTitle> : null}

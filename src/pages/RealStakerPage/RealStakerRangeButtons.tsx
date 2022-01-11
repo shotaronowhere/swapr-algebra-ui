@@ -32,7 +32,7 @@ export default function RealStakerRangeButtons ({onPercentSelect, showCalculate}
           <Trans>MAX</Trans>
         </StakerSmallMaxButton>
       </div>
-      {showCalculate ? <p>Calculate profits →</p> : null}
+      {showCalculate ? <p onClick={() => {window.open('Calculator:///')}}>Calculate profits →</p> : null}
     </ButtonsWrapper>
   )
 }

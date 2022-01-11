@@ -5,6 +5,8 @@ import { useCallback, useState } from "react"
 import { REAL_STAKER_ADDRESS } from "../constants/addresses"
 import { useActiveWeb3React } from "./web3"
 import { useTransactionAdder } from '../state/transactions/hooks'
+import {stakerClient} from "../apollo/client"
+import {FROZEN_STAKED} from "../utils/graphql-queries"
 
 export function useRealStakerHandlers() {
 
@@ -14,6 +16,7 @@ export function useRealStakerHandlers() {
   const provider = _w.ethereum ? new providers.Web3Provider(_w.ethereum) : undefined
 
   const [stakerHash, setStaked] = useState(null)
+  const [frozenStaked, setFrozen] = useState<string | null | any[]>(null)
 
   const stakerHandler = useCallback(async (stakedCount) => {
 
@@ -90,10 +93,29 @@ export function useRealStakerHandlers() {
     }
   }, [])
 
+  const frozenStakedHandler = useCallback(async (account) => {
+    try {
+
+      const {data: {stakeTxes}, error: error} = await stakerClient.query({
+        query: FROZEN_STAKED(account.toLowerCase()),
+        fetchPolicy: 'network-only'
+      })
+
+     setFrozen(stakeTxes)
+
+    } catch (e) {
+      console.log(e)
+      setFrozen(`Error: ${e.message}`)
+      return
+    }
+  }, [])
+
   return {
     stakerHandler,
     stakerHash,
     stakerClaimHandler,
-    stakerUnstakeHandler
+    stakerUnstakeHandler,
+    frozenStakedHandler,
+    frozenStaked
   }
 }
