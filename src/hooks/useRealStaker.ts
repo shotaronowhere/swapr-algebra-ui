@@ -16,7 +16,7 @@ export function useRealStakerHandlers() {
   const provider = _w.ethereum ? new providers.Web3Provider(_w.ethereum) : undefined
 
   const [stakerHash, setStaked] = useState(null)
-  const [frozenStaked, setFrozen] = useState<string | null | any[]>(null)
+  const [frozenStaked, setFrozen] = useState<string | any[]>([])
 
   const stakerHandler = useCallback(async (stakedCount) => {
 

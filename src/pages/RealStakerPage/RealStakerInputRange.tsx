@@ -2,11 +2,11 @@ import { CurrencyDropdown } from '../AddLiquidity/styled'
 import styled from 'styled-components/macro'
 
 const CurrencyInputPanelWrapper = styled.div`
-  width: 92%;
+  width: 100%;
   background-color: #111621;
-  margin: 26px auto 32px;
+  margin: 26px 0 32px 0;
   border-radius: 16px;
-  padding: 21px 0 20px 24px;
+  padding: 20px 24px;
   min-height: 150px;
 
   img {
@@ -42,6 +42,7 @@ export default function RealStakerInputRange ({baseCurrency, amountValue, setAmo
   return (
     <CurrencyInputPanelWrapper>
       <CurrencyTop
+          style={{width: '100%'}}
         currency={baseCurrency}
         hideInput={true}
         showCommonBases
@@ -50,6 +51,7 @@ export default function RealStakerInputRange ({baseCurrency, amountValue, setAmo
         shallow={true}
       />
       <CurrencyBottom
+          style={{width: '100%'}}
         onUserInput={(e) => {setAmountValue(e)}}
         currency={baseCurrency}
         value={amountValue}

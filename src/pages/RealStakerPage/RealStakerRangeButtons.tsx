@@ -8,18 +8,23 @@ const StakerSmallMaxButton = styled(SmallMaxButton)`
   box-sizing: border-box;
 `
 const ButtonsWrapper = styled.div`
-  margin: 0 auto;
-  width: 92%;
+  margin: 0;
+  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  ${({theme}) => theme.mediaWidth.upToSmall`
+    flex-direction: column;
+    align-items: start;
+    margin-bottom: 20px;
+  `}
 `
 
 export default function RealStakerRangeButtons ({onPercentSelect, showCalculate} : {onPercentSelect: any, showCalculate?: boolean}) {
   return(
     <ButtonsWrapper>
       <div>
-        <StakerSmallMaxButton onClick={() => onPercentSelect(25)}>
+        <StakerSmallMaxButton onClick={() => onPercentSelect(25)} style={{marginLeft: 0}}>
           <Trans>25%</Trans>
         </StakerSmallMaxButton>
         <StakerSmallMaxButton onClick={() => onPercentSelect(50)}>

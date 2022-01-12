@@ -1,5 +1,5 @@
 import RealStakerRangeButtons from './RealStakerRangeButtons'
-import React, { useEffect } from 'react'
+import React from 'react'
 import styled from 'styled-components/macro'
 import Modal from '../../components/Modal'
 import { SilderWrapper, StakeButton, StakerSlider } from './index'
@@ -7,7 +7,11 @@ import RealStakerUnstakeInputRange from './RealStakerUnstakeInputRange'
 import { formatEther } from 'ethers/lib/utils'
 
 const UnStakeModalWrapper = styled(Modal)`
-  flex-direction: column;
+    
+`
+const ContentModal = styled.div`
+  width: 100%;
+  padding: 5px 30px 20px;
 `
 
 interface UnstakeModalProps {
@@ -47,7 +51,7 @@ export default function RealStakerUnstakeModal(
       }}
       maxHeight={300}
     >
-      <div style={{width: '100%'}}>
+      <ContentModal>
         <RealStakerUnstakeInputRange
           amountValue={unstaked}
           setAmountValue={setUnstaked}
@@ -72,7 +76,7 @@ export default function RealStakerUnstakeModal(
         disabled={unstaked === ''}>
           Unstake
         </StakeButton>
-      </div>
+      </ContentModal>
     </UnStakeModalWrapper>
   )
 }

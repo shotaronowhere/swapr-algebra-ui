@@ -4,9 +4,9 @@ import CurrencyLogo from '../../components/CurrencyLogo'
 import { useCurrency } from '../../hooks/Tokens'
 
 const CurrencyInputPanelWrapper = styled.div`
-  width: 92%;
+  width: 100%;
   background-color: #111621;
-  margin: 26px auto 32px;
+  margin: 26px 0 32px;
   border-radius: 16px;
   padding: 21px 0 20px 24px;
   min-height: 150px;
@@ -17,7 +17,6 @@ const CurrencyInputPanelWrapper = styled.div`
   }
 
   span {
-    //font-size: px;
     color: #C3C5CB;
     cursor: default;
     &:hover{
@@ -25,6 +24,10 @@ const CurrencyInputPanelWrapper = styled.div`
       color: #C3C5CB;
     }
   }
+  ${({theme}) => theme.mediaWidth.upToSmall`
+    padding: 20px 0 10px 12px;
+    margin: 15px 0 10px;
+  `}
 `
 const UnstakeTitle = styled.div`
   font-size: 18px;
@@ -55,6 +58,7 @@ export default function RealStakerUnstakeInputRange ({baseCurrency, amountValue,
         {baseCurrency} ALGB
       </UnstakeTitle>
       <CurrencyDropdown
+          style={{width: '100%'}}
         onUserInput={(e) => {setAmountValue(e)}}
         currency={baseCurrency}
         value={amountValue}

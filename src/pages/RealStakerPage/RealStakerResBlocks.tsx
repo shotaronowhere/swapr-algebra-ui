@@ -36,6 +36,13 @@ const PageWrapper = styled.div`
   h3, p {
     margin-left: 30px;
   }
+  
+  ${({theme}) => theme.mediaWidth.upToSmall`
+    min-width: 80%;
+    &:first-child {
+    margin-bottom: 1rem;
+  }
+  `}
 `
 const StakeButton = styled(ButtonConfirmed)`
   border-radius: 8px !important;

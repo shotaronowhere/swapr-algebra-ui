@@ -30,20 +30,26 @@ import {useWalletModalToggle} from '../../state/application/hooks'
 import {isArray} from "util"
 import {ArrowDown, ArrowUp, RefreshCw} from "react-feather"
 import Frozen from "./Frozen"
+import {darken} from "polished"
 
 const PageWrapper = styled.div`
   min-width: ${(props) => props.width};
   background-color: #202635;
   border-radius: 16px;
+  padding: 26px 30px 27px;
+
+  ${({theme}) => theme.mediaWidth.upToSmall`
+    min-width: 100%;
+  `}
 `
 const StakeTitle = styled.h1`
-  width: 92%;
-  margin: 26px auto 0;
+  width: 100%;
+  margin: 0;
   font-size: 20px;
 `
 export const SilderWrapper = styled.div`
-  width: 92%;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
 `
 export const StakerSlider = styled(Slider)`
   &::-webkit-slider-runnable-track {
@@ -98,15 +104,25 @@ export const StakerSlider = styled(Slider)`
 `
 export const StakeButton = styled(ButtonConfirmed)`
   border-radius: 8px !important;
-  width: 92%;
-  margin: 24px auto 27px;
+  width: 100%;
+  margin-top: 24px;
+
+  ${({theme}) => theme.mediaWidth.upToSmall`
+    margin-top: 0;
+  `}
 `
 const EarnedStakedWrapper = styled.div`
-  margin: 27px auto;
+  margin: 27px 0;
   min-width: ${(props) => props.width};
   background-color: #202635;
-  padding: 0 33px 30px;
+  padding: 25px 33px 30px;
   border-radius: 16px;
+
+  ${({theme}) => theme.mediaWidth.upToSmall`
+    min-width: 100%;
+    display: flex;
+    flex-direction: column;
+  `}
 `
 const StakerStatisticWrapper = styled(NavLink)`
   position: relative;
@@ -127,6 +143,22 @@ const StakerStatisticWrapper = styled(NavLink)`
     font-size: 20px;
     font-weight: 600;
   }
+  ${({theme}) => theme.mediaWidth.upToSmall`
+    min-width: 100%;
+    display: flex;
+    align-items: center;
+    height: unset;
+    padding: 15px 20px;
+    
+    img {
+        height: unset;
+    }
+    
+    h2,p {
+        margin: 0 10px;
+        z-index: 10;
+    }
+  `}
 `
 const StakerStatisticBackground = styled.img`
   height: 107px;
@@ -136,15 +168,23 @@ const StakerStatisticBackground = styled.img`
   top: 0;
 `
 const ResBlocksTitle = styled.div`
-  margin: 25px auto;
+  margin-bottom: 25px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   position: relative;
+  
+  h3 {
+    margin: 0;
+  }
 `
 const ResBlocksWrapper = styled.div`
   display: flex;
   justify-content: space-between;
+    
+  ${({theme}) => theme.mediaWidth.upToSmall`
+    flex-direction: column;
+  `}
 `
 
 const spinAnimation = keyframes`
@@ -164,7 +204,7 @@ const ReloadButton = styled.button`
     cursor: default;
   }
 `
-const FrozenDropDown = styled.h2`
+const FrozenDropDown = styled.button`
   color: white !important;
   display: flex;
   width: 170px;
@@ -172,14 +212,30 @@ const FrozenDropDown = styled.h2`
   align-items: center;
   cursor: pointer;
   background-color: #08537E;
+  border: none;
   font-size: 13px;
   padding: 3px 7px 3px 14px;
   border-radius: 5px;
+
+  &:disabled {
+    background-color: ${darken(.05, '#08537E')};
+    cursor: default;
+  }
+`
+
+const LeftBlock = styled.div`
+  display: flex;
+  align-items: center;
+  width: 40%;
+  justify-content: space-between;
+  
+  ${({theme}) => theme.mediaWidth.upToSmall`
+    width: 86%;
+  `}
 `
 
 export default function RealStakerPage({}) {
     const currencyId = '0x0169eC1f8f639B32Eec6D923e24C2A2ff45B9DD6'
-    const algbId = '0x0169eC1f8f639B32Eec6D923e24C2A2ff45B9DD6'
     const {chainId, account} = useActiveWeb3React()
     const {percent} = useBurnV3State()
     const {onPercentSelect} = useBurnV3ActionHandlers()
@@ -197,7 +253,6 @@ export default function RealStakerPage({}) {
     const toggleWalletModal = useWalletModalToggle()
 
     const baseCurrency = useCurrency(currencyId)
-    const algbCurrency = useCurrency(algbId)
 
     //balances
     const balance = useCurrencyBalance(account ?? undefined, baseCurrency)
@@ -268,19 +323,14 @@ export default function RealStakerPage({}) {
             })
     }, [])
 
-
+    const formatedData = frozenStaked?.map((el, i) => {
+        return BigNumber.from(el?.stakedALGBAmount)
+    })
     const allFreeze = useMemo(() => {
         if (!isArray(frozenStaked)) return
 
-        console.log(frozenStaked, 'ashjdgaskl;dajshgkl')
-
-        const formatedData = frozenStaked?.map((el, i) => {
-            return BigNumber.from(el?.stakedALGBAmount)
-        })
-
         return formatedData.reduce((prev, cur) => prev.add(cur), BigNumber.from('0'))
     }, [frozenStaked])
-
 
     useEffect(() => {
         if (!account) return
@@ -298,9 +348,9 @@ export default function RealStakerPage({}) {
         if (percentForSlider === 0) {
             setAmountValue('')
         } else if (percentForSlider === 100) {
-            setAmountValue(+numBalance.toSignificant(4))
+            setAmountValue(+numBalance?.toSignificant(4))
         } else {
-            setAmountValue((+numBalance.toSignificant(4) / 100) * percentForSlider)
+            setAmountValue((+numBalance?.toSignificant(4) / 100) * percentForSlider)
         }
     }, [percentForSlider])
 
@@ -321,7 +371,6 @@ export default function RealStakerPage({}) {
         fetchStakingFn(account.toLowerCase())
     }, [_balance])
 
-
     //calc staked, earned, algbCourse, unstakedAmount
     useEffect(() => {
         // console.log('HERE', stakesResult)
@@ -336,7 +385,7 @@ export default function RealStakerPage({}) {
                 )
             }
 
-            if (+stakesResult.factories[0].xALGBtotalSupply !== 0) {
+            if (+stakesResult?.factories[0].xALGBtotalSupply !== 0) {
                 setAlbgCourse(
                     BigNumber.from(stakesResult.factories[0].ALGBbalance)
                         .div(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply))
@@ -344,7 +393,7 @@ export default function RealStakerPage({}) {
             }
             setStaked(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount).sub(allFreeze))
         }
-    }, [stakesResult])
+    }, [stakesResult, allFreeze])
 
     useEffect(() => {
         if (typeof staked !== 'number') {
@@ -402,14 +451,16 @@ export default function RealStakerPage({}) {
             </PageWrapper>
             <EarnedStakedWrapper width={'765px'}>
                 <ResBlocksTitle>
-                    <div style={{display: "flex", alignItems: 'center', width: '40%', justifyContent: 'space-between'}}>
+                    <LeftBlock>
                         <h3>Balance</h3>
-                            <FrozenDropDown onClick={() => {
-                                setFrozen(!showFrozen)
-                            }}>
-                                {formatEther(allFreeze || BigNumber.from('0')).toString().slice(0,5)} ALGB Frozen {showFrozen ? <ArrowUp size={'16px'}/> : <ArrowDown size={'16px'}/>}
-                            </FrozenDropDown>
-                    </div>
+                        <FrozenDropDown onClick={() => {
+                            setFrozen(!showFrozen)
+                        }}
+                                        disabled={frozenStaked?.length === 0}>
+                            {formatEther(allFreeze || BigNumber.from('0')).toString().slice(0, 5)} ALGB
+                            Frozen {showFrozen ? <ArrowUp size={'16px'}/> : <ArrowDown size={'16px'}/>}
+                        </FrozenDropDown>
+                    </LeftBlock>
                     {showFrozen && frozenStaked?.length !== 0 ? <Frozen data={frozenStaked}/> : null}
                     <ReloadButton disabled={loadingClaim} onClick={reloadClaim} refreshing={loadingClaim}>
                         <RefreshCw style={{display: 'block'}} size={18} stroke={'white'}/>
