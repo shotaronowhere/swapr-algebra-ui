@@ -101,7 +101,7 @@ export default function Brush({data, focusHeight, width, margin, updateChartData
                 const minX = Math.floor(selection[0] / div)
                 const maxX = Math.floor(selection[1] / div)
 
-                updateChartData([data[minX]?.date, data[maxX]?.date])
+                updateChartData([data[minX]?.date, data[maxX]?.date === undefined ? data[maxX -1]?.date : data[maxX]?.date])
 
                 focus.property('value', selection.map(focusX.invert, focusX).map(d3.utcDay.round))
                 focus.dispatch('input')
