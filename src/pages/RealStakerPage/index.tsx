@@ -345,6 +345,8 @@ export default function RealStakerPage({}) {
 
     //calc amount when choose range in slider
     useEffect(() => {
+        if (!numBalance) return
+
         if (percentForSlider === 0) {
             setAmountValue('')
         } else if (percentForSlider === 100) {
@@ -391,7 +393,8 @@ export default function RealStakerPage({}) {
                         .div(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply))
                 )
             }
-            setStaked(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount).sub(allFreeze))
+            console.log(stakesResult.stakes[0].stakedALGBAmount)
+            setStaked(BigNumber.from(stakesResult?.stakes[0]?.stakedALGBAmount).sub(allFreeze))
         }
     }, [stakesResult, allFreeze])
 
@@ -401,6 +404,17 @@ export default function RealStakerPage({}) {
         }
     }, [staked, earned])
 
+    const enterHandler = (e) => {
+        if (e.charCode === 13){
+            if (!(+amountValue > +balance?.toSignificant(4))) {
+                stakerHandler(amountValue)
+                onPercentSelectForSlider(0)
+                if (percentForSlider === 0) {
+                    setAmountValue('')
+                }
+            }
+        }
+    }
     return (
         <>
             <Helmet>
@@ -408,12 +422,14 @@ export default function RealStakerPage({}) {
             </Helmet>
             <PageWrapper width={'765px'}>
                 <StakeTitle>Stake ALGB</StakeTitle>
+                <div onKeyPress={(e) => enterHandler(e)}>
                 <RealStakerInputRange
                     amountValue={amountValue}
                     setAmountValue={setAmountValue}
                     baseCurrency={baseCurrency}
                     fiatValue={fiatValue}
                 />
+                    </div>
                 {numBalance == 0 && balance ? (
                     <NavLink to={''} style={{textDecoration: 'none'}}>
                         <StakeButton>BUY ALGB</StakeButton>
@@ -441,9 +457,9 @@ export default function RealStakerPage({}) {
                                         setAmountValue('')
                                     }
                                 }}
-                                disabled={amountValue === ''}
+                                disabled={+amountValue > +balance?.toSignificant(4) || amountValue === ''}
                             >
-                                Stake
+                                {+amountValue > +balance?.toSignificant(4) ? 'Insufficient ALGB balance' : 'Stake'}
                             </StakeButton>
                         ) : null}
                     </>
@@ -453,13 +469,15 @@ export default function RealStakerPage({}) {
                 <ResBlocksTitle>
                     <LeftBlock>
                         <h3>Balance</h3>
-                        <FrozenDropDown onClick={() => {
-                            setFrozen(!showFrozen)
-                        }}
-                                        disabled={frozenStaked?.length === 0}>
-                            {formatEther(allFreeze || BigNumber.from('0')).toString().slice(0, 5)} ALGB
-                            Frozen {showFrozen ? <ArrowUp size={'16px'}/> : <ArrowDown size={'16px'}/>}
-                        </FrozenDropDown>
+                        {
+                            frozenStaked?.length !== 0 &&
+                            <FrozenDropDown onClick={() => {
+                                setFrozen(!showFrozen)
+                            }}>
+                                {formatEther(allFreeze || BigNumber.from('0')).toString().slice(0, 5)} ALGB
+                                Frozen {showFrozen ? <ArrowUp size={'16px'}/> : <ArrowDown size={'16px'}/>}
+                            </FrozenDropDown>
+                        }
                     </LeftBlock>
                     {showFrozen && frozenStaked?.length !== 0 ? <Frozen data={frozenStaked}/> : null}
                     <ReloadButton disabled={loadingClaim} onClick={reloadClaim} refreshing={loadingClaim}>

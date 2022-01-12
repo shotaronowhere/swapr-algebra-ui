@@ -73,8 +73,8 @@ export default function RealStakerUnstakeModal(
           setUnstaked('')
           setOpenModal(false)
         }}
-        disabled={unstaked === ''}>
-          Unstake
+        disabled={+unstaked > +formatEther(baseCurrency) || unstaked === ''}>
+            {+unstaked > +formatEther(baseCurrency) ? 'Insufficient ALGB balance' : 'Unstake'}
         </StakeButton>
       </ContentModal>
     </UnStakeModalWrapper>
