@@ -419,7 +419,7 @@ export default function RealStakerPage({}) {
             return setStaked(BigNumber.from('0'))
         }
         setStaked(BigNumber.from(stakesResult?.stakes[0]?.stakedALGBAmount).sub(stakedFreeze))
-    }, [stakesResult, allFreeze])
+    }, [stakesResult, allFreeze, stakedFreeze, earnedFreeze])
 
     useEffect(() => {
         setUnstakeAmount(staked.add(earned))
