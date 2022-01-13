@@ -67,7 +67,7 @@ export function useRealStakerHandlers() {
       console.log(e)
       return
     }
-  }, [])
+  }, [account])
 
   const stakerUnstakeHandler = useCallback(async (unstakeCount, stakesResult, maxALGBAccount) => {
     try {
@@ -91,7 +91,7 @@ export function useRealStakerHandlers() {
       console.log(e)
       return
     }
-  }, [])
+  }, [account])
 
   const frozenStakedHandler = useCallback(async (account) => {
     try {
@@ -108,7 +108,7 @@ export function useRealStakerHandlers() {
       setFrozen(`Error: ${e.message}`)
       return
     }
-  }, [])
+  }, [account])
 
   return {
     stakerHandler,
