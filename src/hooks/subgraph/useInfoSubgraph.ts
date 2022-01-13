@@ -328,7 +328,7 @@ export function useInfoSubgraph() {
 
         } catch (err) {
             setStakesLoading(false)
-            setStakes('Getting stakes failed')
+            setStakes('failed')
             console.error('Getting stakes failed', err);
             return undefined
         }

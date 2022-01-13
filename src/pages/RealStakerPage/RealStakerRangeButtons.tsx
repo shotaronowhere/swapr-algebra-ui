@@ -1,6 +1,7 @@
 import { Trans } from '@lingui/macro'
 import styled from 'styled-components/macro'
 import { SmallMaxButton } from '../RemoveLiquidity/styled'
+import {darken} from "polished"
 
 const StakerSmallMaxButton = styled(SmallMaxButton)`
   background: #4A5982;
@@ -18,6 +19,13 @@ const ButtonsWrapper = styled.div`
     align-items: start;
     margin-bottom: 20px;
   `}
+ p {
+    cursor: pointer;
+    
+    &:hover {
+      color: rgb(222,222,222);
+    }
+  }
 `
 
 export default function RealStakerRangeButtons ({onPercentSelect, showCalculate} : {onPercentSelect: any, showCalculate?: boolean}) {

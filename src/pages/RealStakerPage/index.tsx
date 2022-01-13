@@ -143,6 +143,7 @@ const StakerStatisticWrapper = styled(NavLink)`
     font-size: 20px;
     font-weight: 600;
   }
+
   ${({theme}) => theme.mediaWidth.upToSmall`
     min-width: 100%;
     display: flex;
@@ -173,7 +174,7 @@ const ResBlocksTitle = styled.div`
   align-items: center;
   justify-content: space-between;
   position: relative;
-  
+
   h3 {
     margin: 0;
   }
@@ -181,7 +182,7 @@ const ResBlocksTitle = styled.div`
 const ResBlocksWrapper = styled.div`
   display: flex;
   justify-content: space-between;
-    
+
   ${({theme}) => theme.mediaWidth.upToSmall`
     flex-direction: column;
   `}
@@ -228,7 +229,7 @@ const LeftBlock = styled.div`
   align-items: center;
   width: 40%;
   justify-content: space-between;
-  
+
   ${({theme}) => theme.mediaWidth.upToSmall`
     width: 86%;
   `}
@@ -272,11 +273,11 @@ export default function RealStakerPage({}) {
     const [openModal, setOpenModal] = useState(false)
 
     const [amountValue, setAmountValue] = useState('')
-    const [earned, setEarned] = useState(0)
-    const [staked, setStaked] = useState(0)
+    const [earned, setEarned] = useState(BigNumber.from('0'))
+    const [staked, setStaked] = useState(BigNumber.from('0'))
     const [unstaked, setUnstaked] = useState('')
     const [unstakeAmount, setUnstakeAmount] = useState(0)
-    const [algbCourse, setAlbgCourse] = useState()
+    const [algbCourse, setAlbgCourse] = useState(BigNumber.from('0'))
     const [showFrozen, setFrozen] = useState(false)
 
     const [approval, approveCallback] = useApproveCallback(balance, chainId ? REAL_STAKER_ADDRESS[chainId] : undefined)
@@ -321,16 +322,43 @@ export default function RealStakerPage({}) {
             .then(res => {
                 setLoadingClaim(false)
             })
-    }, [])
+    }, [account])
 
-    const formatedData = frozenStaked?.map((el, i) => {
-        return BigNumber.from(el?.stakedALGBAmount)
-    })
     const allFreeze = useMemo(() => {
+        if (!isArray(frozenStaked) || !stakesResult?.factories) return
+
+        const formatedData = frozenStaked?.map((el, i) => {
+            if (!el.xALGBAmount) return
+
+            // console.log(BigNumber.from(el?.xALGBAmount)
+            //     .mul(BigNumber.from(stakesResult?.factories[0]?.ALGBbalance))
+            //     .div(BigNumber.from(stakesResult?.factories[0]?.xALGBtotalSupply)))
+
+            return BigNumber.from(el?.xALGBAmount)
+                .mul(BigNumber.from(stakesResult?.factories[0]?.ALGBbalance))
+                .div(BigNumber.from(stakesResult?.factories[0]?.xALGBtotalSupply))
+        })
+
+        return formatedData.reduce((prev, cur) => {
+            // console.log(prev, cur, formatedData)
+            return prev?.add(cur)
+        }, BigNumber.from('0'))
+    }, [frozenStaked, account])
+
+    const stakedFreeze = useMemo(() => {
         if (!isArray(frozenStaked)) return
 
+        const formatedData = frozenStaked?.map((el, i) => {
+            return BigNumber.from(el?.stakedALGBAmount)
+        })
         return formatedData.reduce((prev, cur) => prev.add(cur), BigNumber.from('0'))
-    }, [frozenStaked])
+    }, [frozenStaked, account])
+
+    const earnedFreeze = useMemo(() => {
+        if (!allFreeze || !stakedFreeze) return
+
+        return allFreeze.sub(stakedFreeze)
+    }, [allFreeze, stakedFreeze])
 
     useEffect(() => {
         if (!account) return
@@ -338,9 +366,6 @@ export default function RealStakerPage({}) {
         fetchStakingFn(account.toLowerCase())
         frozenStakedHandler(account)
 
-        // if (stakerHash && confirmed.includes(stakerHash.hash)) {
-        //  fetchStakingFn(account.toLowerCase())
-        // }
     }, [account])
 
     //calc amount when choose range in slider
@@ -375,37 +400,33 @@ export default function RealStakerPage({}) {
 
     //calc staked, earned, algbCourse, unstakedAmount
     useEffect(() => {
-        // console.log('HERE', stakesResult)
-        if (stakesResult !== null && stakesResult.stakes[0] !== undefined) {
-            // console.log(stakesResult.stakes[0].xALGBAmount, stakesResult.stakes[0].xALGBtotalSupply, stakesResult.stakes[0].ALGBbalance, stakesResult.stakes[0].stakedALGBAmount)
-            if (+stakesResult.stakes[0].stakedALGBAmount !== 0 && +stakesResult.stakes[0].xALGBAmount !== 0) {
-                setEarned(
-                    BigNumber.from(stakesResult.stakes[0].xALGBAmount)
-                        .mul(BigNumber.from(stakesResult.factories[0].ALGBbalance))
-                        .div(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply))
-                        .sub(BigNumber.from(stakesResult.stakes[0].stakedALGBAmount))
-                )
-            }
+        if (!stakesResult || stakesResult === 'failed' || !earnedFreeze) return
+        setEarned(
+            BigNumber.from(stakesResult.stakes[0]?.xALGBAmount || '0')
+                .mul(BigNumber.from(stakesResult.factories[0].ALGBbalance))
+                .div(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply))
+                .sub(BigNumber.from(stakesResult.stakes[0]?.stakedALGBAmount || '0'))
+                .sub(earnedFreeze)
+        )
 
-            if (+stakesResult?.factories[0].xALGBtotalSupply !== 0) {
-                setAlbgCourse(
-                    BigNumber.from(stakesResult.factories[0].ALGBbalance)
-                        .div(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply))
-                )
-            }
-            console.log(stakesResult.stakes[0].stakedALGBAmount)
-            setStaked(BigNumber.from(stakesResult?.stakes[0]?.stakedALGBAmount).sub(allFreeze))
+        if (+stakesResult?.factories[0].xALGBtotalSupply !== 0) {
+            setAlbgCourse(
+                BigNumber.from(stakesResult.factories[0].ALGBbalance)
+                    .div(BigNumber.from(stakesResult.factories[0].xALGBtotalSupply))
+            )
         }
+        if (!stakesResult?.stakes[0]) {
+            return setStaked(BigNumber.from('0'))
+        }
+        setStaked(BigNumber.from(stakesResult?.stakes[0]?.stakedALGBAmount).sub(stakedFreeze))
     }, [stakesResult, allFreeze])
 
     useEffect(() => {
-        if (typeof staked !== 'number') {
-            setUnstakeAmount(staked.add(earned))
-        }
+        setUnstakeAmount(staked.add(earned))
     }, [staked, earned])
 
     const enterHandler = (e) => {
-        if (e.charCode === 13){
+        if (e.charCode === 13) {
             if (!(+amountValue > +balance?.toSignificant(4))) {
                 stakerHandler(amountValue)
                 onPercentSelectForSlider(0)
@@ -423,13 +444,13 @@ export default function RealStakerPage({}) {
             <PageWrapper width={'765px'}>
                 <StakeTitle>Stake ALGB</StakeTitle>
                 <div onKeyPress={(e) => enterHandler(e)}>
-                <RealStakerInputRange
-                    amountValue={amountValue}
-                    setAmountValue={setAmountValue}
-                    baseCurrency={baseCurrency}
-                    fiatValue={fiatValue}
-                />
-                    </div>
+                    <RealStakerInputRange
+                        amountValue={amountValue}
+                        setAmountValue={setAmountValue}
+                        baseCurrency={baseCurrency}
+                        fiatValue={fiatValue}
+                    />
+                </div>
                 {numBalance == 0 && balance ? (
                     <NavLink to={''} style={{textDecoration: 'none'}}>
                         <StakeButton>BUY ALGB</StakeButton>
@@ -474,7 +495,7 @@ export default function RealStakerPage({}) {
                             <FrozenDropDown onClick={() => {
                                 setFrozen(!showFrozen)
                             }}>
-                                {formatEther(allFreeze || BigNumber.from('0')).toString().slice(0, 5)} ALGB
+                                {(+formatEther(allFreeze || BigNumber.from('0'))).toFixed(2)} ALGB
                                 Frozen {showFrozen ? <ArrowUp size={'16px'}/> : <ArrowDown size={'16px'}/>}
                             </FrozenDropDown>
                         }

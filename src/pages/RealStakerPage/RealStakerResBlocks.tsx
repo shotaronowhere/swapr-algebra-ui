@@ -11,6 +11,7 @@ const PageWrapper = styled.div`
   background-color: #111621;
   border-radius: 16px;
   position: relative;
+  padding: 1.5rem 1rem 1rem;
 
   h2 {
     color: #687086;
@@ -31,10 +32,7 @@ const PageWrapper = styled.div`
     font-size: 14px;
     margin: 0;
     cursor: default;
-  }
-
-  h3, p {
-    margin-left: 30px;
+    margin-bottom: 10px;
   }
   
   ${({theme}) => theme.mediaWidth.upToSmall`
@@ -46,8 +44,7 @@ const PageWrapper = styled.div`
 `
 const StakeButton = styled(ButtonConfirmed)`
   border-radius: 8px !important;
-  width: 92%;
-  margin: 16px auto 15px;
+  width: 100%;
   padding: 12px;
 `
 const AmountTitle = styled.div`
@@ -66,7 +63,6 @@ const TitleWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin: 18px 30px 0;
 `
 
 interface ResBloksProps {
