@@ -39,6 +39,7 @@ interface StakerInputRangeProps {
 }
 
 export default function RealStakerInputRange ({baseCurrency, amountValue, setAmountValue, fiatValue}: StakerInputRangeProps) {
+
   return (
     <CurrencyInputPanelWrapper>
       <CurrencyTop

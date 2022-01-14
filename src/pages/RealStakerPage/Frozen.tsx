@@ -2,6 +2,8 @@ import React, {useEffect, useState} from 'react'
 import styled from "styled-components/macro"
 import {formatUnits} from "ethers/lib/utils"
 import {BigNumber} from "@ethersproject/bignumber"
+import {getCountdownTime} from "../../utils/time"
+import Loader from "../../components/Loader"
 
 const FrozenWrapper = styled.div`
   width: 100%;
@@ -29,7 +31,7 @@ const FrozenTransaction = styled.div`
     margin: 5px 0 !important;
     font-weight: 600;
   }
-  
+
   ${({theme}) => theme.mediaWidth.upToSmall`
     flex-direction: column;
     background-color: #202635;
@@ -37,23 +39,31 @@ const FrozenTransaction = styled.div`
     border-radius: 10px;
   `}
 `
+const Time = styled.p`
+  min-width: 90px;
+  text-align: center;
+`
+const TimeWrapper = styled.div`
+  display: flex;
+  color: white !important;
+  font-size: 16px !important;
+  margin: 7px 0 !important;
+  font-weight: 600;
+  align-items: center;
+  p {
+    margin: 0!important;
+  }
+`
+const LoaderStyled = styled(Loader)`
+  margin: auto;
+`
 
 
-const FrozenTrans = ({el, earnedFreeze}: {el: any; earnedFreeze: BigNumber}) => {
-    const { hours = 0, minutes = 0, seconds = 60 } = {hours: 0, minutes: new Date( el.timestamp * 1000 - Date.now()).getMinutes(), seconds: new Date( el.timestamp * 1000 - Date.now()).getSeconds()}
-    const [[hrs, mins, secs], setTime] = React.useState([hours, minutes, seconds])
-
+const FrozenTrans = ({el, earnedFreeze, now}: { el: any; earnedFreeze: BigNumber; now: Date }) => {
+    const [time, setTime] = useState('00:00:00')
 
     const tick = () => {
-        if (mins === 0 && secs === 0)
-           return
-        else if (mins === 0 && secs === 0) {
-            setTime([hrs - 1, 59, 59]);
-        } else if (secs === 0) {
-            setTime([hrs, mins - 1, 59]);
-        } else {
-            setTime([hrs, mins, secs - 1]);
-        }
+        setTime(getCountdownTime(el.timestamp, now()))
     }
 
     useEffect(() => {
@@ -62,22 +72,30 @@ const FrozenTrans = ({el, earnedFreeze}: {el: any; earnedFreeze: BigNumber}) => 
         }, 1000)
         return () => clearInterval(interval)
     })
-    return (
-        <FrozenTransaction>
-            <p>{(+formatUnits(el.stakedALGBAmount)).toFixed(2) < 0.01 ? '<' : ''}{(+formatUnits(el.stakedALGBAmount)).toFixed(2)} ALGB staked</p>
-            {+formatUnits(earnedFreeze) < 0.01 ? null : <p>{(+formatUnits(earnedFreeze)).toFixed(2)} ALGB earned</p>}
-            <p>Frozen for {`${mins >= 0 && mins <10 ? `0${mins}` : mins}:${secs >= 0 && secs <10 ? `0${secs}` : secs} minutes`}</p>
 
-        </FrozenTransaction>
+    if (!el?.stakedALGBAmount || !earnedFreeze) return null
+
+    return (
+        <>
+            {!(time < '00:00:00') &&
+                <FrozenTransaction>
+                    <p>{(+formatUnits(el?.stakedALGBAmount)).toFixed(2) < 0.01 ? '<' : ''}{(+formatUnits(el?.stakedALGBAmount)).toFixed(2)} ALGB
+                        staked</p>
+                    {+formatUnits(earnedFreeze) < 0.01 ? null :
+                        <p>{(+formatUnits(earnedFreeze)).toFixed(2)} ALGB earned</p>}
+                    <TimeWrapper>Frozen for <Time>{(time <= '00:00:00') ? <LoaderStyled stroke={'white'} size={'16px'}/> : time}</Time> minutes</TimeWrapper>
+                </FrozenTransaction>
+            }
+        </>
     )
 }
 
-const Frozen = ({data, earnedFreeze}: { data: any[]; earnedFreeze: BigNumber}) => {
+const Frozen = ({data, earnedFreeze, now}: { data: any[]; earnedFreeze: BigNumber, now: Date }) => {
     return (
         <FrozenWrapper>
-            {data && data.map((el, i) => {
-                return <FrozenTrans key={i} el={el} earnedFreeze={earnedFreeze}/>
-            })}
+            {data && earnedFreeze ? data.map((el, i) => {
+                return <FrozenTrans key={i} el={el} earnedFreeze={earnedFreeze} now={now}/>
+            }) : <LoaderStyled size={'35px'} stroke={'white'}/>}
         </FrozenWrapper>
     )
 }

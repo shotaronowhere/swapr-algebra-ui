@@ -50,6 +50,8 @@ export default function RealStakerUnstakeModal(
       isOpen={openModal}
       onDismiss={() => {
         setOpenModal(false)
+          setUnstaked('')
+          setUnstakePercent(0)
       }}
       maxHeight={300}
     >
@@ -73,6 +75,7 @@ export default function RealStakerUnstakeModal(
         <StakeButton onClick={() => {
           unstakeHandler(unstaked, stakedResult, baseCurrency, allXALGBFreeze)
           setUnstaked('')
+            setUnstakePercent(0)
           setOpenModal(false)
         }}
         disabled={+unstaked > +formatEther(baseCurrency) || unstaked === ''}>

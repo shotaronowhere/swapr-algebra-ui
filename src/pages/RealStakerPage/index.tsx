@@ -273,9 +273,7 @@ export default function RealStakerPage({}) {
 
     const [percentForSlider, onPercentSelectForSlider] = useDebouncedChangeHandler(percent, onPercentSelect)
     const [unstakePercent, setUnstakePercent] = useState(0)
-
     const [openModal, setOpenModal] = useState(false)
-
     const [amountValue, setAmountValue] = useState('')
     const [earned, setEarned] = useState(BigNumber.from('0'))
     const [staked, setStaked] = useState(BigNumber.from('0'))
@@ -284,6 +282,8 @@ export default function RealStakerPage({}) {
     const [algbCourse, setAlbgCourse] = useState(BigNumber.from('0'))
     const [showFrozen, setFrozen] = useState(false)
     const [loadingClaim, setLoadingClaim] = useState(false)
+
+    const now = Date.now
 
     const [approval, approveCallback] = useApproveCallback(balance, chainId ? REAL_STAKER_ADDRESS[chainId] : undefined)
     const valueAmount: CurrencyAmount<Currency> | undefined = tryParseAmount(amountValue.toString(), baseCurrency)
@@ -301,20 +301,6 @@ export default function RealStakerPage({}) {
     const fiatValueEarned = useUSDCValue(earnedAmount)
     const fiatValueStaked = useUSDCValue(stakedAmount)
     const fiatUnstakedAmount = useUSDCValue(unstakedAmount)
-
-    // const allTransactions = useAllTransactions()
-
-    // const sortedRecentTransactions = useMemo(() => {
-    //     const txs = Object.values(allTransactions)
-    //     return txs
-    //         .filter((tx) => new Date().getTime() - tx.addedTime < 86_400_000)
-    //         .sort((a, b) => b.addedTime - a.addedTime)
-    // }, [allTransactions])
-
-    // const confirmed = useMemo(
-    //     () => sortedRecentTransactions.filter((tx) => tx.receipt).map((tx) => tx.hash),
-    //     [sortedRecentTransactions, allTransactions]
-    // )
 
     const reloadClaim = useCallback(() => {
         if (!account) return
@@ -334,7 +320,6 @@ export default function RealStakerPage({}) {
         const formatedData = frozenStaked?.map((el, i) => {
             if (!el.xALGBAmount) return
 
-            console.log(el?.xALGBAmount)
             return BigNumber.from(el?.xALGBAmount)
                 .mul(BigNumber.from(stakesResult?.factories[0]?.ALGBbalance))
                 .div(BigNumber.from(stakesResult?.factories[0]?.xALGBtotalSupply))
@@ -440,7 +425,6 @@ export default function RealStakerPage({}) {
 
     //calc unstake amount
     useEffect(() => {
-        // console.log(staked, earned, allFreeze, account)
         setUnstakeAmount(staked.add(earned))
     }, [staked, earned])
 
@@ -503,7 +487,9 @@ export default function RealStakerPage({}) {
                             >
                                 {+amountValue > +balance?.toSignificant(4) ? 'Insufficient ALGB balance' : 'Stake'}
                             </StakeButton>
-                        ) : null}
+                        ) : <StakeButton>
+                            <Loader stroke={'white'} size={'19px'}/>
+                        </StakeButton>}
                     </>
                 )}
             </PageWrapper>
@@ -516,12 +502,11 @@ export default function RealStakerPage({}) {
                             <FrozenDropDown onClick={() => {
                                 setFrozen(!showFrozen)
                             }}>
-                                {`${(+formatEther(allFreeze || BigNumber.from('0'))).toFixed(2) < 0.01 ? '<' : ''}${(+formatEther(allFreeze || BigNumber.from('0'))).toFixed(2)}`} ALGB
-                                Frozen {showFrozen ? <ArrowUp size={'16px'}/> : <ArrowDown size={'16px'}/>}
+                                {!allFreeze ? <Loader size={'16px'} stroke={'white'}/> : `${(+formatEther(allFreeze || BigNumber.from('0'))).toFixed(2) < 0.01 ? '<' : ''} ${(+formatEther(allFreeze)).toFixed(2)}`} ALGB Frozen {showFrozen ? <ArrowUp size={'16px'}/> : <ArrowDown size={'16px'}/>}
                             </FrozenDropDown>
                         }
                     </LeftBlock>
-                    {showFrozen && frozenStaked?.length !== 0 ? <Frozen data={frozenStaked} earnedFreeze={earnedFreeze}/> : null}
+                    {showFrozen && frozenStaked?.length !== 0 && frozenStaked?.some(el => +Math.floor(el.timestamp * 1000) > now()) ? <Frozen data={frozenStaked} earnedFreeze={earnedFreeze} now={now}/> : null}
                     <ReloadButton disabled={loadingClaim} onClick={reloadClaim} refreshing={loadingClaim}>
                         <RefreshCw style={{display: 'block'}} size={18} stroke={'white'}/>
                     </ReloadButton>
