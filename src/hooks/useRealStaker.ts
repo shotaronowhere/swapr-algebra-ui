@@ -1,6 +1,6 @@
 import REAL_STAKER_ABI from 'abis/real-staker.json'
 import { BigNumber, Contract, providers } from 'ethers'
-import { formatEther, parseUnits } from 'ethers/lib/utils'
+import {formatEther, formatUnits, parseEther, parseUnits} from 'ethers/lib/utils'
 import { useCallback, useState } from "react"
 import { REAL_STAKER_ADDRESS } from "../constants/addresses"
 import { useActiveWeb3React } from "./web3"
@@ -69,7 +69,7 @@ export function useRealStakerHandlers() {
     }
   }, [account])
 
-  const stakerUnstakeHandler = useCallback(async (unstakeCount, stakesResult, maxALGBAccount) => {
+  const stakerUnstakeHandler = useCallback(async (unstakeCount, stakesResult, maxALGBAccount, allXALGBFreeze) => {
     try {
 
       const realStaker = new Contract(
@@ -78,7 +78,7 @@ export function useRealStakerHandlers() {
         provider.getSigner()
       )
 
-      const bigNumUnstakeAmount = (parseUnits(unstakeCount.toString(), 18).mul(BigNumber.from(stakesResult.stakes[0].xALGBAmount))).div(maxALGBAccount)
+      const bigNumUnstakeAmount = (parseUnits(unstakeCount.toString(), 18).mul(BigNumber.from(stakesResult.stakes[0].xALGBAmount).sub(allXALGBFreeze))).div(maxALGBAccount)
 
       const result = await realStaker.leave(bigNumUnstakeAmount._hex)
 

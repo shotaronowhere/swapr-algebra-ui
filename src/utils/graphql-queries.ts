@@ -102,7 +102,7 @@ query currentEvents {
 
 export const FROZEN_STAKED = (account: string) => gql`
    query frozenStaked  {
-     stakeTxes (where: {owner: "${account.toLowerCase()}", timestamp_gte: ${Math.round((Date.now() - 30 * 60000)  / 1000)}}, orderBy: timestamp, orderDirection: asc) {
+     stakeTxes (where: {owner: "${account.toLowerCase()}", timestamp_gte: ${Math.round(Date.now()  / 1000)}}, orderBy: timestamp, orderDirection: asc) {
      timestamp
      stakedALGBAmount
      xALGBAmount

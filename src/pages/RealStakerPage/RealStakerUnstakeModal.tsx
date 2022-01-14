@@ -26,6 +26,7 @@ interface UnstakeModalProps {
   unstakeHandler: any,
   stakedResult: any
   fiatValue: any
+    allXALGBFreeze: any
 }
 
 export default function RealStakerUnstakeModal(
@@ -40,7 +41,8 @@ export default function RealStakerUnstakeModal(
     onPercentSelect,
     unstakeHandler,
     stakedResult,
-    fiatValue
+    fiatValue,
+      allXALGBFreeze
   } : UnstakeModalProps
 ) {
   return (
@@ -69,7 +71,7 @@ export default function RealStakerUnstakeModal(
           showCalculate={false}
         />
         <StakeButton onClick={() => {
-          unstakeHandler(unstaked, stakedResult, baseCurrency)
+          unstakeHandler(unstaked, stakedResult, baseCurrency, allXALGBFreeze)
           setUnstaked('')
           setOpenModal(false)
         }}

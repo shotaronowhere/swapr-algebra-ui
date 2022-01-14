@@ -222,6 +222,10 @@ const FrozenDropDown = styled.button`
     background-color: ${darken(.05, '#08537E')};
     cursor: default;
   }
+  ${({theme}) => theme.mediaWidth.upToSmall`
+    padding-left: 7px;
+    width: 150px;
+  `}
 `
 
 const LeftBlock = styled.div`
@@ -279,6 +283,7 @@ export default function RealStakerPage({}) {
     const [unstakeAmount, setUnstakeAmount] = useState(0)
     const [algbCourse, setAlbgCourse] = useState(BigNumber.from('0'))
     const [showFrozen, setFrozen] = useState(false)
+    const [loadingClaim, setLoadingClaim] = useState(false)
 
     const [approval, approveCallback] = useApproveCallback(balance, chainId ? REAL_STAKER_ADDRESS[chainId] : undefined)
     const valueAmount: CurrencyAmount<Currency> | undefined = tryParseAmount(amountValue.toString(), baseCurrency)
@@ -297,29 +302,28 @@ export default function RealStakerPage({}) {
     const fiatValueStaked = useUSDCValue(stakedAmount)
     const fiatUnstakedAmount = useUSDCValue(unstakedAmount)
 
-    const allTransactions = useAllTransactions()
+    // const allTransactions = useAllTransactions()
 
-    const sortedRecentTransactions = useMemo(() => {
-        const txs = Object.values(allTransactions)
-        return txs
-            .filter((tx) => new Date().getTime() - tx.addedTime < 86_400_000)
-            .sort((a, b) => b.addedTime - a.addedTime)
-    }, [allTransactions])
+    // const sortedRecentTransactions = useMemo(() => {
+    //     const txs = Object.values(allTransactions)
+    //     return txs
+    //         .filter((tx) => new Date().getTime() - tx.addedTime < 86_400_000)
+    //         .sort((a, b) => b.addedTime - a.addedTime)
+    // }, [allTransactions])
 
-    const confirmed = useMemo(
-        () => sortedRecentTransactions.filter((tx) => tx.receipt).map((tx) => tx.hash),
-        [sortedRecentTransactions, allTransactions]
-    )
+    // const confirmed = useMemo(
+    //     () => sortedRecentTransactions.filter((tx) => tx.receipt).map((tx) => tx.hash),
+    //     [sortedRecentTransactions, allTransactions]
+    // )
 
-    const [loadingClaim, setLoadingClaim] = useState(false)
     const reloadClaim = useCallback(() => {
         if (!account) return
         setLoadingClaim(true)
         fetchStakingFn(account.toLowerCase())
-            .then((res) => {
+            .then(() => {
                 frozenStakedHandler(account)
             })
-            .then(res => {
+            .then(() => {
                 setLoadingClaim(false)
             })
     }, [account])
@@ -330,20 +334,31 @@ export default function RealStakerPage({}) {
         const formatedData = frozenStaked?.map((el, i) => {
             if (!el.xALGBAmount) return
 
-            // console.log(BigNumber.from(el?.xALGBAmount)
-            //     .mul(BigNumber.from(stakesResult?.factories[0]?.ALGBbalance))
-            //     .div(BigNumber.from(stakesResult?.factories[0]?.xALGBtotalSupply)))
-
+            console.log(el?.xALGBAmount)
             return BigNumber.from(el?.xALGBAmount)
                 .mul(BigNumber.from(stakesResult?.factories[0]?.ALGBbalance))
                 .div(BigNumber.from(stakesResult?.factories[0]?.xALGBtotalSupply))
         })
 
         return formatedData.reduce((prev, cur) => {
-            // console.log(prev, cur, formatedData)
             return prev?.add(cur)
         }, BigNumber.from('0'))
-    }, [frozenStaked, account])
+    }, [frozenStaked, account, stakesResult])
+
+
+    const allXALGBFreeze = useMemo(() => {
+        if (!isArray(frozenStaked) || !stakesResult?.factories) return
+
+        const formatedData = frozenStaked?.map((el, i) => {
+            if (!el.xALGBAmount) return
+
+            return BigNumber.from(el?.xALGBAmount)
+        })
+
+        return formatedData.reduce((prev, cur) => {
+            return prev?.add(cur)
+        }, BigNumber.from('0'))
+    }, [frozenStaked, account, stakesResult])
 
     const stakedFreeze = useMemo(() => {
         if (!isArray(frozenStaked)) return
@@ -355,6 +370,7 @@ export default function RealStakerPage({}) {
     }, [frozenStaked, account])
 
     const earnedFreeze = useMemo(() => {
+
         if (!allFreeze || !stakedFreeze) return
 
         return allFreeze.sub(stakedFreeze)
@@ -367,6 +383,12 @@ export default function RealStakerPage({}) {
         frozenStakedHandler(account)
 
     }, [account])
+
+    //get data for staked and earned
+    useEffect(() => {
+        if (stakesResult || !account) return
+        fetchStakingFn(account.toLowerCase())
+    }, [_balance])
 
     //calc amount when choose range in slider
     useEffect(() => {
@@ -392,15 +414,10 @@ export default function RealStakerPage({}) {
         }
     }, [unstakePercent])
 
-    //get data for staked and earned
+    //calc staked, earned, algbCourse
     useEffect(() => {
-        if (stakesResult || !account) return
-        fetchStakingFn(account.toLowerCase())
-    }, [_balance])
+        if (!stakesResult || stakesResult === 'failed' || !earnedFreeze || !stakedFreeze) return
 
-    //calc staked, earned, algbCourse, unstakedAmount
-    useEffect(() => {
-        if (!stakesResult || stakesResult === 'failed' || !earnedFreeze) return
         setEarned(
             BigNumber.from(stakesResult.stakes[0]?.xALGBAmount || '0')
                 .mul(BigNumber.from(stakesResult.factories[0].ALGBbalance))
@@ -419,13 +436,16 @@ export default function RealStakerPage({}) {
             return setStaked(BigNumber.from('0'))
         }
         setStaked(BigNumber.from(stakesResult?.stakes[0]?.stakedALGBAmount).sub(stakedFreeze))
-    }, [stakesResult, allFreeze, stakedFreeze, earnedFreeze])
+    }, [stakesResult, stakedFreeze, earnedFreeze])
 
+    //calc unstake amount
     useEffect(() => {
+        // console.log(staked, earned, allFreeze, account)
         setUnstakeAmount(staked.add(earned))
     }, [staked, earned])
 
-    const enterHandler = (e) => {
+    //stake handler invoked from keyboard
+    const enterHandler = useCallback((e) => {
         if (e.charCode === 13) {
             if (!(+amountValue > +balance?.toSignificant(4))) {
                 stakerHandler(amountValue)
@@ -435,7 +455,8 @@ export default function RealStakerPage({}) {
                 }
             }
         }
-    }
+    }, [])
+
     return (
         <>
             <Helmet>
@@ -495,12 +516,12 @@ export default function RealStakerPage({}) {
                             <FrozenDropDown onClick={() => {
                                 setFrozen(!showFrozen)
                             }}>
-                                {(+formatEther(allFreeze || BigNumber.from('0'))).toFixed(2)} ALGB
+                                {`${(+formatEther(allFreeze || BigNumber.from('0'))).toFixed(2) < 0.01 ? '<' : ''}${(+formatEther(allFreeze || BigNumber.from('0'))).toFixed(2)}`} ALGB
                                 Frozen {showFrozen ? <ArrowUp size={'16px'}/> : <ArrowDown size={'16px'}/>}
                             </FrozenDropDown>
                         }
                     </LeftBlock>
-                    {showFrozen && frozenStaked?.length !== 0 ? <Frozen data={frozenStaked}/> : null}
+                    {showFrozen && frozenStaked?.length !== 0 ? <Frozen data={frozenStaked} earnedFreeze={earnedFreeze}/> : null}
                     <ReloadButton disabled={loadingClaim} onClick={reloadClaim} refreshing={loadingClaim}>
                         <RefreshCw style={{display: 'block'}} size={18} stroke={'white'}/>
                     </ReloadButton>
@@ -545,6 +566,7 @@ export default function RealStakerPage({}) {
                 stakedResult={stakesResult}
                 unstakeHandler={stakerUnstakeHandler}
                 fiatValue={fiatUnstakedAmount}
+                allXALGBFreeze={allXALGBFreeze}
             />
         </>
     )

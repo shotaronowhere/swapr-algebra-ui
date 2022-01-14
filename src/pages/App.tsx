@@ -35,6 +35,7 @@ import { useEffect, useState } from 'react'
 import CautionModal from '../components/CautionModal'
 import PoolFinder from './PoolFinder'
 import RealStakerPage from './RealStakerPage'
+import {useInternet} from "../hooks/useInternet"
 
 const AppWrapper = styled.div`
   display: flex;
@@ -77,6 +78,16 @@ const BugReportLink = styled.a`
   text-decoration: none;
 `
 
+const InternetError = styled.div`
+  width: 100%;
+  height: 100vh;
+  background-color: #040b1e;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+`
+
 const GlobalStyle = createGlobalStyle`
   button {
     cursor: pointer;
@@ -89,6 +100,7 @@ export default function App() {
       return 60
     },
   })
+  const internet = useInternet()
 
   return (
     <ErrorBoundary>
@@ -101,6 +113,9 @@ export default function App() {
           <HeaderWrapper style={{ zIndex: 3 }}>
             <Header />
           </HeaderWrapper>
+          { !internet && <InternetError>
+            Network ERROR
+          </InternetError>}
           <BodyWrapper style={{ zIndex: 2 }}>
             <div
               style={{

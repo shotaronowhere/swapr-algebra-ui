@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import styled from "styled-components/macro"
 import {formatUnits} from "ethers/lib/utils"
+import {BigNumber} from "@ethersproject/bignumber"
 
 const FrozenWrapper = styled.div`
   width: 100%;
@@ -12,6 +13,9 @@ const FrozenWrapper = styled.div`
   border-radius: 16px;
   padding: 25px 30px;
   overflow-y: scroll;
+  ${({theme}) => theme.mediaWidth.upToSmall`
+     padding: 1rem;
+    `}
 `
 
 const FrozenTransaction = styled.div`
@@ -25,16 +29,23 @@ const FrozenTransaction = styled.div`
     margin: 5px 0 !important;
     font-weight: 600;
   }
+  
+  ${({theme}) => theme.mediaWidth.upToSmall`
+    flex-direction: column;
+    background-color: #202635;
+    padding: 5px 7px;
+    border-radius: 10px;
+  `}
 `
 
 
-const FrozenTrans = ({el}: {el: any}) => {
-    const { hours = 0, minutes = 0, seconds = 60 } = {hours: 0, minutes: 3, seconds: 0}
+const FrozenTrans = ({el, earnedFreeze}: {el: any; earnedFreeze: BigNumber}) => {
+    const { hours = 0, minutes = 0, seconds = 60 } = {hours: 0, minutes: new Date( el.timestamp * 1000 - Date.now()).getMinutes(), seconds: new Date( el.timestamp * 1000 - Date.now()).getSeconds()}
     const [[hrs, mins, secs], setTime] = React.useState([hours, minutes, seconds])
 
 
     const tick = () => {
-        if (hrs === 0 && mins === 0 && secs === 0)
+        if (mins === 0 && secs === 0)
            return
         else if (mins === 0 && secs === 0) {
             setTime([hrs - 1, 59, 59]);
@@ -53,17 +64,19 @@ const FrozenTrans = ({el}: {el: any}) => {
     })
     return (
         <FrozenTransaction>
-            <p>{formatUnits(el.stakedALGBAmount).slice(0, 6)} ALGB</p>
-            <p>Frozen for {`${mins >= 0 && mins <10 ? `0${mins}` : mins}:${secs >= 0 && secs <10 ? `0${secs}` : secs}minutes`}</p>
+            <p>{(+formatUnits(el.stakedALGBAmount)).toFixed(2) < 0.01 ? '<' : ''}{(+formatUnits(el.stakedALGBAmount)).toFixed(2)} ALGB staked</p>
+            {+formatUnits(earnedFreeze) < 0.01 ? null : <p>{(+formatUnits(earnedFreeze)).toFixed(2)} ALGB earned</p>}
+            <p>Frozen for {`${mins >= 0 && mins <10 ? `0${mins}` : mins}:${secs >= 0 && secs <10 ? `0${secs}` : secs} minutes`}</p>
+
         </FrozenTransaction>
     )
 }
 
-const Frozen = ({data}: { data: any[] }) => {
+const Frozen = ({data, earnedFreeze}: { data: any[]; earnedFreeze: BigNumber}) => {
     return (
         <FrozenWrapper>
             {data && data.map((el, i) => {
-                return <FrozenTrans key={i} el={el}/>
+                return <FrozenTrans key={i} el={el} earnedFreeze={earnedFreeze}/>
             })}
         </FrozenWrapper>
     )
