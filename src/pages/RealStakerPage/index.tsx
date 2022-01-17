@@ -222,6 +222,7 @@ const FrozenDropDown = styled.button`
     background-color: ${darken(.05, '#08537E')};
     cursor: default;
   }
+
   ${({theme}) => theme.mediaWidth.upToSmall`
     padding-left: 7px;
     width: 150px;
@@ -382,9 +383,9 @@ export default function RealStakerPage({}) {
         if (percentForSlider === 0) {
             setAmountValue('')
         } else if (percentForSlider === 100) {
-            setAmountValue(+numBalance?.toSignificant(4))
+            setAmountValue(numBalance?.toSignificant(4))
         } else {
-            setAmountValue((+numBalance?.toSignificant(4) / 100) * percentForSlider)
+            setAmountValue(formatEther(parseUnits(numBalance?.toSignificant(4), 18).div(BigNumber.from('100')).mul(percentForSlider)))
         }
     }, [percentForSlider])
 
@@ -465,7 +466,7 @@ export default function RealStakerPage({}) {
                         <SilderWrapper>
                             <StakerSlider value={percentForSlider} onChange={onPercentSelectForSlider} size={22}/>
                         </SilderWrapper>
-                        <RealStakerRangeButtons onPercentSelect={onPercentSelect} showCalculate={true}/>
+                        <RealStakerRangeButtons onPercentSelect={onPercentSelect} showCalculate={false}/>
                         {approval === ApprovalState.NOT_APPROVED ? (
                             <StakeButton onClick={approveCallback}>Approve token</StakeButton>
                         ) : approval === ApprovalState.UNKNOWN && account === null ? (
@@ -502,11 +503,14 @@ export default function RealStakerPage({}) {
                             <FrozenDropDown onClick={() => {
                                 setFrozen(!showFrozen)
                             }}>
-                                {!allFreeze ? <Loader size={'16px'} stroke={'white'}/> : `${(+formatEther(allFreeze || BigNumber.from('0'))).toFixed(2) < 0.01 ? '<' : ''} ${(+formatEther(allFreeze)).toFixed(2)}`} ALGB Frozen {showFrozen ? <ArrowUp size={'16px'}/> : <ArrowDown size={'16px'}/>}
+                                {!allFreeze ? <Loader size={'16px'}
+                                                      stroke={'white'}/> : `${(+formatEther(allFreeze || BigNumber.from('0'))).toFixed(2) < 0.01 ? '<' : ''} ${(+formatEther(allFreeze)).toFixed(2)}`} ALGB
+                                Frozen {showFrozen ? <ArrowUp size={'16px'}/> : <ArrowDown size={'16px'}/>}
                             </FrozenDropDown>
                         }
                     </LeftBlock>
-                    {showFrozen && frozenStaked?.length !== 0 && frozenStaked?.some(el => +Math.floor(el.timestamp * 1000) > now()) ? <Frozen data={frozenStaked} earnedFreeze={earnedFreeze} now={now}/> : null}
+                    {showFrozen && frozenStaked?.length !== 0 && frozenStaked?.some(el => +Math.floor(el.timestamp * 1000) > now()) ?
+                        <Frozen data={frozenStaked} earnedFreeze={earnedFreeze} now={now}/> : null}
                     <ReloadButton disabled={loadingClaim} onClick={reloadClaim} refreshing={loadingClaim}>
                         <RefreshCw style={{display: 'block'}} size={18} stroke={'white'}/>
                     </ReloadButton>
