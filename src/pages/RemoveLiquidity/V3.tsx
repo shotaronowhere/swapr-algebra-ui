@@ -8,9 +8,7 @@ import useDebouncedChangeHandler from "hooks/useDebouncedChangeHandler";
 import { useBurnV3ActionHandlers, useBurnV3State, useDerivedV3BurnInfo } from "state/burn/v3/hooks";
 import Slider from "components/Slider";
 import { AutoRow, RowBetween, RowFixed } from "components/Row";
-import TransactionConfirmationModal, { ConfirmationModalContent } from "../../components/TransactionConfirmationModal";
 import { AutoColumn } from "components/Column";
-import { ButtonConfirmed, ButtonPrimary } from "components/Button";
 import { Text } from "rebass";
 import CurrencyLogo from "components/CurrencyLogo";
 import FormattedCurrencyAmount from "components/FormattedCurrencyAmount";
@@ -33,11 +31,9 @@ import usePrevious from "../../hooks/usePrevious";
 import ReactGA from "react-ga";
 import { useAppSelector } from "../../state/hooks";
 import { useActiveWeb3React } from "../../hooks/web3";
-import useTheme from "../../hooks/useTheme";
 import { WrappedCurrency } from "../../models/types";
 import { GAS_PRICE_MULTIPLIER } from "../../hooks/useGasPrice";
 import Card from "../../shared/components/Card/Card";
-import { isMobileOnly } from "react-device-detect";
 
 const DEFAULT_REMOVE_V3_LIQUIDITY_SLIPPAGE_TOLERANCE = new Percent(5, 100);
 
@@ -71,7 +67,7 @@ function Remove({ tokenId }: { tokenId: BigNumber }) {
             return { ...prevPosition };
         }
         return { ...position };
-    }, [position]);
+    }, [position, prevPosition]);
 
     const gasPrice = useAppSelector((state) => {
         if (!state.application.gasPrice.fetched) return 36;
@@ -83,9 +79,7 @@ function Remove({ tokenId }: { tokenId: BigNumber }) {
 
     // burn state
     const { percent } = useBurnV3State();
-
     const { account, chainId, library } = useActiveWeb3React();
-    const theme = useTheme();
 
     const derivedInfo = useDerivedV3BurnInfo(position, receiveWETH);
     const prevDerivedInfo = usePrevious({ ...derivedInfo });
@@ -103,7 +97,7 @@ function Remove({ tokenId }: { tokenId: BigNumber }) {
             error: derivedInfo.error,
             ...derivedInfo,
         };
-    }, [derivedInfo]);
+    }, [derivedInfo, prevDerivedInfo]);
 
     const { onPercentSelect } = useBurnV3ActionHandlers();
 
@@ -114,15 +108,10 @@ function Remove({ tokenId }: { tokenId: BigNumber }) {
 
     const deadline = useTransactionDeadline(); // custom from users settings
     const allowedSlippage = useUserSlippageToleranceWithDefault(DEFAULT_REMOVE_V3_LIQUIDITY_SLIPPAGE_TOLERANCE); // custom from users
-
-    const [showConfirm, setShowConfirm] = useState(false);
-    const [attemptingTxn, setAttemptingTxn] = useState(false);
-    const [txnHash, setTxnHash] = useState<string | undefined>();
     const addTransaction = useTransactionAdder();
     const positionManager = useV3NFTPositionManagerContract();
 
     const burn = useCallback(async () => {
-        setAttemptingTxn(true);
         if (!positionManager || !liquidityValue0 || !liquidityValue1 || !deadline || !account || !chainId || !feeValue0 || !feeValue1 || !positionSDK || !liquidityPercentage || !library) {
             return;
         }
@@ -164,91 +153,31 @@ function Remove({ tokenId }: { tokenId: BigNumber }) {
                             action: "RemoveV3",
                             label: [liquidityValue0.currency.symbol, liquidityValue1.currency.symbol].join("/"),
                         });
-                        setTxnHash(response.hash);
-                        setAttemptingTxn(false);
                         addTransaction(response, {
                             summary: t`Remove ${liquidityValue0.currency.symbol}/${liquidityValue1.currency.symbol} liquidity`,
                         });
                     });
             })
             .catch((error) => {
-                setAttemptingTxn(false);
                 console.error(error);
             });
-    }, [tokenId, liquidityValue0, liquidityValue1, deadline, allowedSlippage, account, addTransaction, positionManager, chainId, feeValue0, feeValue1, library, liquidityPercentage, positionSDK]);
-
-    const handleDismissConfirmation = useCallback(() => {
-        setShowConfirm(false);
-        // if there was a tx hash, we want to clear the input
-        if (txnHash) {
-            onPercentSelectForSlider(0);
-        }
-        setAttemptingTxn(false);
-        setTxnHash("");
-    }, [onPercentSelectForSlider, txnHash]);
-
-    const pendingText = t`Removing ${liquidityValue0?.toSignificant(6)} ${liquidityValue0?.currency?.symbol} and ${liquidityValue1?.toSignificant(6)} ${liquidityValue1?.currency?.symbol}`;
-
-    function modalHeader() {
-        return (
-            <AutoColumn gap={"sm"} style={{ padding: "16px" }}>
-                <RowBetween align="flex-end">
-                    <Text fontSize={16} fontWeight={500}>
-                        <Trans>Pooled {liquidityValue0?.currency?.symbol}:</Trans>
-                    </Text>
-                    <RowFixed>
-                        <Text fontSize={16} fontWeight={500} marginLeft={"6px"}>
-                            {liquidityValue0 && <FormattedCurrencyAmount currencyAmount={liquidityValue0} />}
-                        </Text>
-                        <CurrencyLogo size="24px" style={{ marginLeft: "8px" }} currency={liquidityValue0?.currency as WrappedCurrency} />
-                    </RowFixed>
-                </RowBetween>
-                <RowBetween align="flex-end">
-                    <Text fontSize={16} fontWeight={500}>
-                        <Trans>Pooled {liquidityValue1?.currency?.symbol}:</Trans>
-                    </Text>
-                    <RowFixed>
-                        <Text fontSize={16} fontWeight={500} marginLeft={"6px"}>
-                            {liquidityValue1 && <FormattedCurrencyAmount currencyAmount={liquidityValue1} />}
-                        </Text>
-                        <CurrencyLogo size="24px" style={{ marginLeft: "8px" }} currency={liquidityValue1?.currency as WrappedCurrency} />
-                    </RowFixed>
-                </RowBetween>
-                {feeValue0?.greaterThan(0) || feeValue1?.greaterThan(0) ? (
-                    <>
-                        <TYPE.italic fontSize={12} color={theme.winterDisabledButton} textAlign="left" padding={"8px 0 0 0"}>
-                            <Trans>You will also collect fees earned from this position.</Trans>
-                        </TYPE.italic>
-                        <RowBetween>
-                            <Text fontSize={16} fontWeight={500}>
-                                <Trans>{feeValue0?.currency?.symbol} Fees Earned:</Trans>
-                            </Text>
-                            <RowFixed>
-                                <Text fontSize={16} fontWeight={500} marginLeft={"6px"}>
-                                    {feeValue0 && <FormattedCurrencyAmount currencyAmount={feeValue0} />}
-                                </Text>
-                                <CurrencyLogo size="24px" style={{ marginLeft: "8px" }} currency={feeValue0?.currency as WrappedCurrency} />
-                            </RowFixed>
-                        </RowBetween>
-                        <RowBetween>
-                            <Text fontSize={16} fontWeight={500}>
-                                <Trans>{feeValue1?.currency?.symbol} Fees Earned:</Trans>
-                            </Text>
-                            <RowFixed>
-                                <Text fontSize={16} fontWeight={500} marginLeft={"6px"}>
-                                    {feeValue1 && <FormattedCurrencyAmount currencyAmount={feeValue1} />}
-                                </Text>
-                                <CurrencyLogo size="24px" style={{ marginLeft: "8px" }} currency={feeValue1?.currency as WrappedCurrency} />
-                            </RowFixed>
-                        </RowBetween>
-                    </>
-                ) : null}
-                <ButtonPrimary mt="16px" onClick={burn}>
-                    <Trans>Remove</Trans>
-                </ButtonPrimary>
-            </AutoColumn>
-        );
-    }
+    }, [
+        positionManager,
+        liquidityValue0,
+        liquidityValue1,
+        deadline,
+        account,
+        chainId,
+        feeValue0,
+        feeValue1,
+        positionSDK,
+        liquidityPercentage,
+        library,
+        tokenId,
+        allowedSlippage,
+        gasPrice,
+        addTransaction,
+    ]);
 
     const showCollectAsWeth = Boolean(
         !chainId &&

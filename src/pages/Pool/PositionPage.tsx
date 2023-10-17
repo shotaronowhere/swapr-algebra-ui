@@ -60,7 +60,7 @@ export default function PositionPage({
 
     const query = useQuery();
 
-    const isOnFarming = useMemo(() => query.get("onFarming"), [tokenIdFromUrl, query]);
+    const isOnFarming = useMemo(() => query.get("onFarming"), [query]);
 
     const parsedTokenId = tokenIdFromUrl ? BigNumber.from(tokenIdFromUrl) : undefined;
     const { loading, position: positionDetails } = useV3PositionFromTokenId(parsedTokenId);
@@ -85,7 +85,7 @@ export default function PositionPage({
             return { ...prevPositionDetails };
         }
         return { ...positionDetails };
-    }, [positionDetails]);
+    }, [positionDetails, prevPositionDetails]);
 
     const removed = _liquidity?.eq(0);
 
@@ -148,7 +148,6 @@ export default function PositionPage({
     const [collecting, setCollecting] = useState<boolean>(false);
     const [collectMigrationHash, setCollectMigrationHash] = useState<string | null>(null);
     const isCollectPending = useIsTransactionPending(collectMigrationHash ?? undefined);
-    const [showConfirm, setShowConfirm] = useState(false);
 
     // usdc prices always in terms of tokens
     const price0 = useUSDCPrice(token0 ?? undefined);
@@ -174,7 +173,7 @@ export default function PositionPage({
             return prevFiatValueOfFees;
         }
         return fiatValueOfFees;
-    }, [fiatValueOfFees]);
+    }, [fiatValueOfFees, prevFiatValueOfFees]);
 
     const fiatValueOfLiquidity: CurrencyAmount<Token> | null = useMemo(() => {
         if (!price0 || !price1 || !position) return null;
@@ -189,7 +188,7 @@ export default function PositionPage({
             return prevFiatValueOfLiquidity;
         }
         return fiatValueOfLiquidity;
-    }, [fiatValueOfLiquidity]);
+    }, [fiatValueOfLiquidity, prevFiatValueOfLiquidity]);
 
     const addTransaction = useTransactionAdder();
     const positionManager = useV3NFTPositionManagerContract();
@@ -245,7 +244,7 @@ export default function PositionPage({
                 setCollecting(false);
                 console.error(error);
             });
-    }, [chainId, feeValue0, feeValue1, positionManager, account, tokenId, addTransaction, library]);
+    }, [chainId, feeValue0, feeValue1, positionManager, account, tokenId, library, isOnFarming, gasPrice, addTransaction]);
 
     const owner = useSingleCallResult(!!tokenId ? positionManager : null, "ownerOf", [tokenId]).result?.[0];
     const ownsNFT = owner === account || positionDetails?.operator === account;
@@ -257,35 +256,6 @@ export default function PositionPage({
     const below = _pool && typeof _tickLower === "number" ? _pool.tickCurrent < _tickLower : undefined;
     const above = _pool && typeof _tickUpper === "number" ? _pool.tickCurrent >= _tickUpper : undefined;
     const inRange: boolean = typeof below === "boolean" && typeof above === "boolean" ? !below && !above : false;
-
-    function modalHeader() {
-        return (
-            <>
-                <Card isDark classes={"p-1 br-12"}>
-                    <div className={"flex-s-between mb-1"}>
-                        <div className={"f f-ac"}>
-                            <CurrencyLogo currency={feeValueUpper?.currency as WrappedCurrency} size={"24px"} />
-                            <span className={"ml-05 c-w"}>{feeValueUpper ? formatCurrencyAmount(feeValueUpper, 4) : "-"}</span>
-                        </div>
-                        <span className={"c-w"}>{feeValueUpper?.currency?.symbol}</span>
-                    </div>
-                    <div className={"flex-s-between"}>
-                        <div className={"f f-ac"}>
-                            <CurrencyLogo currency={feeValueLower?.currency as WrappedCurrency} size={"24px"} />
-                            <span className={"c-w ml-05"}>{feeValueLower ? formatCurrencyAmount(feeValueLower, 4) : "-"}</span>
-                        </div>
-                        <span className={"c-w"}>{feeValueLower?.currency?.symbol}</span>
-                    </div>
-                </Card>
-                <div className={"c-p mv-05 fs-075"}>
-                    <Trans>Collecting fees will withdraw currently available fees for you.</Trans>
-                </div>
-                <button className={"btn primary pv-05 br-8 b w-100"} onClick={collect}>
-                    <Trans>Collect</Trans>
-                </button>
-            </>
-        );
-    }
 
     const showCollectAsWeth = Boolean(
         (ownsNFT || isOnFarming) && (feeValue0?.greaterThan(0) || feeValue1?.greaterThan(0)) && currency0 && currency1 && (currency0.isNative || currency1.isNative) && !collectMigrationHash

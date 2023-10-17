@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { SUPPORTED_WALLETS } from "../../constants/wallet";
 import { useActiveWeb3React } from "../../hooks/web3";
 import { clearAllTransactions } from "../../state/transactions/actions";
@@ -77,7 +77,7 @@ export default function AccountDetails({ toggleWalletModal, pendingTransactions,
             deactivate();
         }
         (connector as any).close();
-    }, []);
+    }, [connector, deactivate]);
 
     return (
         <>

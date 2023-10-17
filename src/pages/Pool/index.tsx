@@ -19,7 +19,7 @@ import usePrevious, { usePreviousNonEmptyArray } from "../../hooks/usePrevious";
 import { EthereumWindow } from "models/types";
 
 export default function Pool() {
-    const { account, chainId } = useActiveWeb3React();
+    const { account } = useActiveWeb3React();
     const toggleWalletModal = useWalletModalToggle();
 
     const [userHideClosedPositions, setUserHideClosedPositions] = useUserHideClosedPositions();
@@ -43,11 +43,6 @@ export default function Pool() {
             method: setUserHideClosedPositions,
             checkValue: userHideClosedPositions,
         },
-        // {
-        //     title: t`Farming`,
-        //     method: setHideFarmingPositions,
-        //     checkValue: hideFarmingPositions,
-        // },
     ];
 
     const farmingPositions = useMemo(() => positions?.filter((el) => el.onFarming), [positions, account, prevAccount]);
@@ -55,7 +50,7 @@ export default function Pool() {
 
     const filteredPositions = useMemo(
         () => [...(hideFarmingPositions || !farmingPositions ? [] : farmingPositions), ...inRangeWithOutFarmingPositions, ...(userHideClosedPositions ? [] : closedPositions)],
-        [inRangeWithOutFarmingPositions, userHideClosedPositions, hideFarmingPositions, account, prevAccount]
+        [hideFarmingPositions, farmingPositions, inRangeWithOutFarmingPositions, userHideClosedPositions, closedPositions]
     );
 
     const prevFilteredPositions = usePreviousNonEmptyArray(filteredPositions);

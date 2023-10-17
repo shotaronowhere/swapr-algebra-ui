@@ -5,7 +5,6 @@ import { useAppSelector } from "state/hooks";
 import sortByListPriority from "utils/listSort";
 import { AppState } from "../index";
 import { WrappedTokenInfo } from "./wrappedTokenInfo";
-import { DEFAULT_ACTIVE_LIST_URLS } from "../../constants/lists";
 
 export type TokenAddressMap = Readonly<{
     [chainId: number]: Readonly<{ [tokenAddress: string]: { token: WrappedTokenInfo; list: TokenList } }>;
@@ -37,8 +36,6 @@ function listToTokenMap(list: TokenList): TokenAddressMap {
     listCache?.set(list, map);
     return map;
 }
-
-const TRANSFORMED_DEFAULT_TOKEN_LIST = listToTokenMap(DEFAULT_TOKEN_LIST);
 
 export function useAllLists(): AppState["lists"]["byUrl"] {
     return useAppSelector((state) => state.lists.byUrl);
@@ -108,7 +105,6 @@ export function useInactiveListUrls(): string[] {
 export function useCombinedActiveList(): TokenAddressMap {
     const activeListUrls = useActiveListUrls();
     return useCombinedTokenMapFromUrls(activeListUrls);
-    // combineMaps(activeTokens, TRANSFORMED_DEFAULT_TOKEN_LIST)
 }
 
 // list of tokens not supported on interface, used to show warnings and prevent swaps and add
