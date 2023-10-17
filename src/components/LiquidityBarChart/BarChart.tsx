@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from "react";
 import { axisBottom, create, max, scaleBand, scaleLinear, select } from "d3";
 import { ProcessedData } from "../../models/interfaces";
-import { t, Trans } from "@lingui/macro";
+import { t } from "@lingui/macro";
 
 interface BarChartProps {
     data: ProcessedData[] | undefined;
@@ -177,7 +177,7 @@ export default function BarChart({ data, activeTickIdx, dimensions }: BarChartPr
             });
 
         svg.append(() => InfoRectGroup.node());
-    }, [data, activeTickIdxInRange]);
+    }, [data, activeTickIdxInRange, width, height, margin.left, margin.top, dimensions.width, token0, token1]);
 
     return <svg ref={svgRef} width={svgWidth} height={svgHeight} />;
 }

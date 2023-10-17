@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Loader from "../Loader";
 import Table from "../Table";
 import { formatDollarAmount, formatPercent } from "../../utils/numbers";
@@ -65,12 +65,12 @@ export function InfoPools({ data, fetchHandler, blocksFetched }: InfoPoolsProps)
         if (blocksFetched) {
             fetchHandler();
         }
-    }, [blocksFetched]);
+    }, [blocksFetched, fetchHandler]);
 
     const _data = useMemo(() => {
         return (
             data &&
-            data.map((el: any, i: any) => {
+            data.map((el: any) => {
                 const pool = Pool({ token0: el.token0, token1: el.token1, fee: el.fee, address: el.address });
                 const apr = el.apr > 0 ? <span style={{ color: "var(--green)" }}>{formatPercent(el.apr)}</span> : <span>-</span>;
                 const farming =

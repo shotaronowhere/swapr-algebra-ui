@@ -131,7 +131,7 @@ export default function PoolInfoPage({
         }
 
         // fetchPriceRangePositionsFn(id);
-    }, [span, type, account]);
+    }, [span, type, account, id, fetchFeePoolFn, startTimestamp, fetchTicksSurroundingPriceFn, fetchChartPoolDataFn]);
 
     useEffect(() => {
         if (!id) return;
@@ -147,7 +147,7 @@ export default function PoolInfoPage({
         } else {
             return chartPoolData;
         }
-    }, [feesResult, chartPoolData, ticksResult, account]);
+    }, [type, feesResult, ticksResult, chartPoolData]);
 
     const refreshing = useMemo(() => {
         if (!feesLoading && !chartPoolDataLoading && !ticksLoading) return false;

@@ -2,7 +2,7 @@ import { useCurrency } from "hooks/Tokens";
 import usePrevious from "hooks/usePrevious";
 import { useActiveWeb3React } from "hooks/web3";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { NavLink, RouteComponentProps, Switch, useRouteMatch } from "react-router-dom";
+import { NavLink, RouteComponentProps, Switch } from "react-router-dom";
 import { useV3DerivedMintInfo, useV3MintState, useV3MintActionHandlers, useInitialUSDPrices, useCurrentStep } from "state/mint/v3/hooks";
 import { currencyId } from "utils/currencyId";
 import { Stepper } from "./components/Stepper";
@@ -17,7 +17,7 @@ import { WXDAI_EXTENDED } from "constants/tokens";
 import { setInitialTokenPrice, setInitialUSDPrices, updateCurrentStep, updateSelectedPreset } from "state/mint/v3/actions";
 import { Field } from "state/mint/actions";
 import useUSDCPrice from "hooks/useUSDCPrice";
-import { PriceFormats, PriceFormatToggler } from "./components/PriceFomatToggler";
+import { PriceFormats } from "./components/PriceFomatToggler";
 import { AddLiquidityButton } from "./containers/AddLiquidityButton";
 import { ArrowLeft, ChevronLeft, ChevronRight } from "react-feather";
 import { PoolState } from "hooks/usePools";
@@ -255,14 +255,14 @@ export function NewAddLiquidityPage({
         }
 
         return Boolean((mintInfo.noLiquidity ? stepInitialPrice : stepPair) && !initialUSDPrices.CURRENCY_A && !initialUSDPrices.CURRENCY_B && !usdPriceA && !usdPriceB);
-    }, [mintInfo, currentStep, stepRange, stepInitialPrice, usdPriceA, usdPriceB, initialUSDPrices]);
+    }, [stepInitialPrice, currentStep, mintInfo.noLiquidity, stepPair, initialUSDPrices.CURRENCY_A, initialUSDPrices.CURRENCY_B, usdPriceA, usdPriceB]);
 
     useEffect(() => {
         if (hidePriceFormatter) {
             handlePriceFormat(PriceFormats.TOKEN);
             setPriceFormat(PriceFormats.TOKEN);
         }
-    }, [hidePriceFormatter]);
+    }, [handlePriceFormat, hidePriceFormatter]);
 
     useEffect(() => {
         return () => {

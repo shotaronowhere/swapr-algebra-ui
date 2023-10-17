@@ -3,7 +3,6 @@ import { SupportedLocale } from "constants/locales";
 import JSBI from "jsbi";
 import flatMap from "lodash.flatmap";
 import { useCallback, useMemo } from "react";
-import { shallowEqual } from "react-redux";
 import { useAppDispatch, useAppSelector } from "state/hooks";
 import { V2_FACTORY_ADDRESSES } from "../../constants/addresses";
 import { BASES_TO_TRACK_LIQUIDITY_FOR, PINNED_PAIRS } from "../../constants/routing";
@@ -42,14 +41,6 @@ function deserializeToken(serializedToken: SerializedToken): Token {
 }
 
 export function useIsDarkMode(): boolean {
-    const { userDarkMode, matchesDarkMode } = useAppSelector(
-        ({ user: { matchesDarkMode, userDarkMode } }) => ({
-            userDarkMode,
-            matchesDarkMode,
-        }),
-        shallowEqual
-    );
-
     return true;
 }
 

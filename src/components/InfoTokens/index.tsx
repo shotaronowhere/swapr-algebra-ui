@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Loader from "../Loader";
 import { useHandleSort } from "../../hooks/useHandleSort";
 import { formatDollarAmount } from "../../utils/numbers";
@@ -52,7 +52,7 @@ export function InfoTokens({ data, fetchHandler, blocksFetched }: InfoTokensProp
         if (blocksFetched) {
             fetchHandler();
         }
-    }, [blocksFetched]);
+    }, [blocksFetched, fetchHandler]);
 
     const _data = useMemo(() => {
         return (
@@ -96,7 +96,7 @@ export function InfoTokens({ data, fetchHandler, blocksFetched }: InfoTokensProp
         <div style={{ overflow: "overlay" }}>
             <div className={"tokens-table-wrapper"}>
                 <Table gridClass={"grid-tokens-table"} sortIndex={sortIndex} sortField={sortField} sortDirection={sortDirection} data={_data}>
-                <TableHeader gridClass={"grid-tokens-table"} sortFields={sortFields} handleSort={handleSort} arrow={arrow}>
+                    <TableHeader gridClass={"grid-tokens-table"} sortFields={sortFields} handleSort={handleSort} arrow={arrow}>
                         <span className={"table-header__item"}>
                             <Trans>Name</Trans>
                         </span>

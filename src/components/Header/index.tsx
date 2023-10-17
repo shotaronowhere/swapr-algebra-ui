@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useMemo } from "react";
 import { useETHBalances } from "state/wallet/hooks";
 // @ts-ignore
 import Logo from "../../assets/images/swapr-logo.svg";
@@ -28,7 +28,7 @@ export default function Header() {
         }
 
         return userEthBalance;
-    }, [userEthBalance]);
+    }, [prevEthBalance, userEthBalance]);
 
     const networkFailed = useIsNetworkFailed();
 
@@ -37,14 +37,6 @@ export default function Header() {
     if (chainId === AlgebraConfig.CHAIN_PARAMS.chainId) {
         chainValue = AlgebraConfig.CHAIN_PARAMS.nativeCurrency.symbol;
     }
-
-    const handleBlur = useCallback((e: React.ChangeEvent<HTMLLabelElement>) => {
-        const target = e.target.control as HTMLInputElement;
-
-        if (!target) return;
-
-        setTimeout(() => (target.checked = false), 100);
-    }, []);
 
     return (
         <div className={"header__wrapper flex-s-between w-100 pv-1 pl-2"}>

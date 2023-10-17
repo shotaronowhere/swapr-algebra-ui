@@ -45,7 +45,7 @@ export default function Pool() {
         },
     ];
 
-    const farmingPositions = useMemo(() => positions?.filter((el) => el.onFarming), [positions, account, prevAccount]);
+    const farmingPositions = useMemo(() => positions?.filter((el) => el.onFarming), [positions]);
     const inRangeWithOutFarmingPositions = useMemo(() => openPositions.filter((el) => !el.onFarming), [openPositions, account, prevAccount]);
 
     const filteredPositions = useMemo(

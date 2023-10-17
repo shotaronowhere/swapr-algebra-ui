@@ -101,12 +101,12 @@ export function Chart({
 
                 <g transform={`translate(${margins.left},${margins.top})`}>
                     <g clipPath={`url(#${id}-chart-clip)`}>
-                        <Area priceFormat={priceFormat} series={series} xScale={xScale} yScale={yScale} xValue={xAccessor} yValue={yAccessor} />
+                        <Area series={series} xScale={xScale} yScale={yScale} xValue={xAccessor} yValue={yAccessor} />
 
                         {brushDomain && (
                             // duplicate area chart with mask for selected area
                             <g mask={`url(#${id}-chart-area-mask)`}>
-                                <Area priceFormat={priceFormat} series={series} xScale={xScale} yScale={yScale} xValue={xAccessor} yValue={yAccessor} fill={styles.area.selection} />
+                                <Area series={series} xScale={xScale} yScale={yScale} xValue={xAccessor} yValue={yAccessor} fill={styles.area.selection} />
                             </g>
                         )}
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BrushBehavior, brushX, D3BrushEvent, ScaleLinear, select } from "d3";
 import usePrevious from "hooks/usePrevious";
 import { LabelGroup, Tooltip, TooltipBackground } from "./styled";

@@ -1,9 +1,8 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import BarChart from "./BarChart";
 import { isMobile } from "react-device-detect";
 import Loader from "../Loader";
 import { TickMath } from "@uniswap/v3-sdk";
-import { computePoolAddress } from "../../hooks/computePoolAddress";
 import JSBI from "jsbi";
 import { isAddress } from "../../utils";
 import { CurrencyAmount, Token } from "@uniswap/sdk-core";
@@ -38,7 +37,7 @@ export default function LiquidityBarChart({ data, token0, token1, refreshing, zo
 
     const _token1 = useMemo(() => {
         return data && formattedAddress0 && formattedAddress1 ? new Token(AlgebraConfig.CHAIN_PARAMS.chainId, formattedAddress1, +data.token1.decimals) : undefined;
-    }, [formattedAddress1, data]);
+    }, [data, formattedAddress0, formattedAddress1]);
 
     useEffect(() => {
         if (!data || !data.ticksProcessed) return;
@@ -88,7 +87,7 @@ export default function LiquidityBarChart({ data, token0, token1, refreshing, zo
         }
 
         processTicks();
-    }, [data, token0, token1]);
+    }, [MAX_UINT128, _token0, _token1, data, token0, token1]);
 
     const formattedData = useMemo(() => {
         if (!processedData) return undefined;
@@ -113,7 +112,7 @@ export default function LiquidityBarChart({ data, token0, token1, refreshing, zo
         }
 
         return idx;
-    }, [formattedData, zoom]);
+    }, [formattedData]);
 
     return (
         <div className={"w-100 liquidity-chart"} ref={ref}>

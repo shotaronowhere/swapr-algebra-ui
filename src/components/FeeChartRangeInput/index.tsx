@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import { useMemo, useRef } from "react";
 import Chart from "./Chart";
 import Loader from "../Loader";
 import { ChartType } from "../../models/enums";
@@ -128,7 +128,7 @@ export default function FeeChartRangeInput({ fetchedData, refreshing, span, type
                 }),
             };
         }
-    }, [fetchedData, token, account]);
+    }, [fetchedData, type, token]);
 
     return (
         <div className={"w-100 fee-chart pt-1 mxs_p-0"} ref={ref}>

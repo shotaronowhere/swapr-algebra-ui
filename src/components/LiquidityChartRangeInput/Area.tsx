@@ -1,9 +1,8 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { area, curveStepAfter, ScaleLinear } from "d3";
 import { Path } from "./styled";
 import { ChartEntry } from "./types";
 import inRange from "lodash/inRange";
-import { PriceFormats } from "pages/NewAddLiquidity/components/PriceFomatToggler";
 
 export const Area = ({
     series,
@@ -12,7 +11,6 @@ export const Area = ({
     xValue,
     yValue,
     fill,
-    priceFormat
 }: {
     series: ChartEntry[];
     xScale: ScaleLinear<number, number>;
@@ -20,7 +18,6 @@ export const Area = ({
     xValue: (d: ChartEntry) => number;
     yValue: (d: ChartEntry) => number;
     fill?: string | undefined;
-    priceFormat: PriceFormats
 }) =>
     useMemo(
         () => (
@@ -35,5 +32,5 @@ export const Area = ({
                 }
             />
         ),
-        [fill, series, xScale, xValue, yScale, yValue, priceFormat]
+        [fill, series, xScale, xValue, yScale, yValue]
     );
