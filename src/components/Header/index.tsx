@@ -54,9 +54,9 @@ export default function Header() {
                 <img src={Logo} alt="logo" />
             </a>
             <div className={"header__links"}>
-                {/* <NavLink className={"header__links__link hover-op"} activeClassName={"header__links__link--active"} id={`swap-nav-link`} to={"/swap"}>
+                <NavLink className={"header__links__link hover-op"} activeClassName={"header__links__link--active"} id={`swap-nav-link`} to={"/swap"}>
                     <Trans>Swap</Trans>
-                </NavLink> */}
+                </NavLink>
                 <NavLink
                     className={"header__links__link hover-op trans-op"}
                     id={`pool-nav-link`}

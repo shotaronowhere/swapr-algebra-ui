@@ -99,8 +99,8 @@ export default function App() {
                                     <Route strict path="/farming" component={FarmingPage} />
 
                                     <Route exact strict path="/send" component={RedirectPathToPoolOnly} />
-                                    {/* <Route exact strict path="/swap/:outputCurrency" component={RedirectToSwap} />
-                                    <Route exact strict path="/swap" component={Swap} /> */}
+                                    {/* <Route exact strict path="/swap/:outputCurrency" component={RedirectToSwap} /> */}
+                                    <Route exact strict path="/swap" component={Swap} />
 
                                     <Route exact strict path="/pool" component={PoolPage} />
                                     <Route exact strict path="/pool/:tokenId" component={PositionPage} />
@@ -110,7 +110,7 @@ export default function App() {
                                     <Route exact strict path="/increase/:currencyIdA?/:currencyIdB?/:tokenId?" component={AddLiquidity} />
                                     <Route exact strict path="/remove/:tokenId" component={RemoveLiquidityV3} />
 
-                                    <Route component={RedirectPathToPoolOnly} />
+                                    {/* <Route component={RedirectPathToPoolOnly} /> */}
                                 </Switch>
                             </React.Suspense>
                             <Marginer />
