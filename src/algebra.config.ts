@@ -65,6 +65,21 @@ export default {
                 symbol: "USDC",
                 decimals: 6,
             },
+            ["0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"]: {
+                name: "Wrapped XDAI",
+                symbol: "XDAI",
+                decimals: 18,
+            },
+            ["0x532801ED6f82FFfD2DAB70A19fC2d7B2772C4f4b"]: {
+                name: "Swapr on Gnosis chain",
+                symbol: "SWPR",
+                decimals: 18,
+            },
+            ["0xaf204776c7245bf4147c2612bf6e5972ee483701"]: {
+                name: "Savings xDAI",
+                symbol: "sDAI",
+                decimals: 18,
+            },
         },
         tokensLogos: {
             ["0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"]: WXDAI_LOGO,
@@ -76,6 +91,11 @@ export default {
         },
         stableTokens: {
             ["0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83"]: { name: "USD//C on Gnosis", symbol: "USDC", decimals: 6 },
+            ["0xe91D153E0b41518A2Ce8Dd3D7944Fa863463a97d"]: {
+                name: "Wrapped XDAI",
+                symbol: "XDAI",
+                decimals: 18,
+            },
         },
         stableTokenForUSDPrice: { address: "0xDDAfbb505ad214D7b80b1f830fcCc89B60fb7A83", name: "USD//C on Gnosis", symbol: "USDC", decimals: 6 },
         // Real tokens and their possible fake names. Used for token launch safety
