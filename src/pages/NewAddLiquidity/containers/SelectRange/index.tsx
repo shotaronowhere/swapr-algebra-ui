@@ -18,6 +18,7 @@ import { tryParseAmount } from "state/swap/hooks";
 import { useHistory } from "react-router-dom";
 import { t, Trans } from "@lingui/macro";
 import { Helmet } from "react-helmet";
+import { useWeb3React } from "@web3-react/core";
 
 interface IRangeSelector {
     currencyA: Currency | null | undefined;
@@ -33,6 +34,7 @@ interface IRangeSelector {
 export function SelectRange({ currencyA, currencyB, mintInfo, isCompleted, additionalStep, priceFormat, backStep, disabled }: IRangeSelector) {
     const { startPriceTypedValue } = useV3MintState();
     const history = useHistory();
+    const { chainId } = useWeb3React();
 
     const dispatch = useAppDispatch();
     const activePreset = useActivePreset();
@@ -48,7 +50,7 @@ export function SelectRange({ currencyA, currencyB, mintInfo, isCompleted, addit
     const isStablecoinPair = useMemo(() => {
         if (!currencyA || !currencyB) return false;
 
-        const stablecoins = [STABLE_TOKEN_FOR_USD_PRICE.address];
+        const stablecoins = [STABLE_TOKEN_FOR_USD_PRICE[chainId || 100].address];
 
         return stablecoins.includes(currencyA.wrapped.address) && stablecoins.includes(currencyB.wrapped.address);
     }, [currencyA, currencyB]);

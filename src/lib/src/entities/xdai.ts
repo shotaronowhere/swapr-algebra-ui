@@ -10,7 +10,7 @@ export class Xdai extends NativeCurrency {
     private static _etherCache: { [chainId: number]: Xdai } = {};
 
     protected constructor(chainId: number) {
-        super(chainId, AlgebraConfig.CHAIN_PARAMS.nativeCurrency.decimals, AlgebraConfig.CHAIN_PARAMS.nativeCurrency.symbol, AlgebraConfig.CHAIN_PARAMS.nativeCurrency.name);
+        super(chainId, AlgebraConfig.CHAIN_PARAMS[chainId].nativeCurrency.decimals, AlgebraConfig.CHAIN_PARAMS[chainId].nativeCurrency.symbol, AlgebraConfig.CHAIN_PARAMS[chainId].nativeCurrency.name);
     }
 
     public get wrapped(): Token {

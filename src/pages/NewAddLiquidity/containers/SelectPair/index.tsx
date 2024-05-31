@@ -18,6 +18,7 @@ import { useHistory } from "react-router-dom";
 import { t } from "@lingui/macro";
 
 import AlgebraConfig from "algebra.config";
+import { useWeb3React } from "@web3-react/core";
 
 interface ISelectPair {
     baseCurrency: Currency | null | undefined;
@@ -43,6 +44,7 @@ export function SelectPair({
     handlePopularPairSelection,
 }: ISelectPair) {
     const history = useHistory();
+    const { chainId } = useWeb3React();
 
     const [aprs, setAprs] = useState<undefined | { [key: string]: number }>();
 
@@ -67,7 +69,7 @@ export function SelectPair({
         if (!aprs || !baseCurrency || !quoteCurrency) return <Loader stroke="#22dc22" />;
 
         const poolAddress = computePoolAddress({
-            poolDeployer: POOL_DEPLOYER_ADDRESS[AlgebraConfig.CHAIN_PARAMS.chainId],
+            poolDeployer: POOL_DEPLOYER_ADDRESS[AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId],
             tokenA: baseCurrency.wrapped,
             tokenB: quoteCurrency.wrapped,
         }).toLowerCase();

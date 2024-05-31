@@ -13,6 +13,7 @@ import { LiquidityChartData, ProcessedData } from "../../models/interfaces";
 import "./index.scss";
 
 import AlgebraConfig from "algebra.config";
+import { useWeb3React } from "@web3-react/core";
 
 interface LiquidityBarChartProps {
     data: LiquidityChartData;
@@ -23,6 +24,8 @@ interface LiquidityBarChartProps {
 }
 
 export default function LiquidityBarChart({ data, token0, token1, refreshing, zoom }: LiquidityBarChartProps) {
+    const { chainId } = useWeb3React();
+
     const MAX_UINT128 = BigNumber.from(2).pow(128).sub(1);
 
     const [processedData, setProcessedData] = useState<ProcessedData[] | null>(null);
@@ -33,11 +36,11 @@ export default function LiquidityBarChart({ data, token0, token1, refreshing, zo
 
     // parsed tokens
     const _token0 = useMemo(() => {
-        return data && formattedAddress0 && formattedAddress1 ? new Token(AlgebraConfig.CHAIN_PARAMS.chainId, formattedAddress0, +data.token0.decimals) : undefined;
+        return data && formattedAddress0 && formattedAddress1 ? new Token(AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId, formattedAddress0, +data.token0.decimals) : undefined;
     }, [formattedAddress0, formattedAddress1, data]);
 
     const _token1 = useMemo(() => {
-        return data && formattedAddress0 && formattedAddress1 ? new Token(AlgebraConfig.CHAIN_PARAMS.chainId, formattedAddress1, +data.token1.decimals) : undefined;
+        return data && formattedAddress0 && formattedAddress1 ? new Token(AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId, formattedAddress1, +data.token1.decimals) : undefined;
     }, [formattedAddress1, data]);
 
     useEffect(() => {

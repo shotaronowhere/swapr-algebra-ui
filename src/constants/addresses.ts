@@ -1,59 +1,66 @@
-import AlgebraConfig from "algebra.config"
+import AlgebraConfig from "algebra.config";
 
-type AddressMap = { [chainId: number]: string }
+type AddressMap = { [chainId: number]: string };
 
-export const V3_CORE_FACTORY_ADDRESSES: AddressMap = {
-    [AlgebraConfig.CHAIN_PARAMS.chainId]: AlgebraConfig.V3_CONTRACTS.FACTORY_ADDRESS
-}
+export const V3_CORE_FACTORY_ADDRESSES: AddressMap = { [100]: AlgebraConfig.V3_CONTRACTS[100].FACTORY_ADDRESS, [10200]: AlgebraConfig.V3_CONTRACTS[10200].FACTORY_ADDRESS };
 
 export const POOL_DEPLOYER_ADDRESS: AddressMap = {
-    [AlgebraConfig.CHAIN_PARAMS.chainId]: AlgebraConfig.V3_CONTRACTS.POOL_DEPLOYER_ADDRESS
-}
+    [100]: AlgebraConfig.V3_CONTRACTS[100].POOL_DEPLOYER_ADDRESS,
+    [10200]: AlgebraConfig.V3_CONTRACTS[10200].POOL_DEPLOYER_ADDRESS,
+};
 
 export const QUOTER_ADDRESSES: AddressMap = {
-    [AlgebraConfig.CHAIN_PARAMS.chainId]: AlgebraConfig.V3_CONTRACTS.QUOTER_ADDRESS
-}
+    [100]: AlgebraConfig.V3_CONTRACTS[100].QUOTER_ADDRESS,
+    [10200]: AlgebraConfig.V3_CONTRACTS[10200].QUOTER_ADDRESS,
+};
 
 export const SWAP_ROUTER_ADDRESSES: AddressMap = {
-    [AlgebraConfig.CHAIN_PARAMS.chainId]: AlgebraConfig.V3_CONTRACTS.SWAP_ROUTER_ADDRESS
-}
+    [100]: AlgebraConfig.V3_CONTRACTS[100].SWAP_ROUTER_ADDRESS,
+    [10200]: AlgebraConfig.V3_CONTRACTS[10200].SWAP_ROUTER_ADDRESS,
+};
 
 export const NONFUNGIBLE_POSITION_MANAGER_ADDRESSES: AddressMap = {
-    [AlgebraConfig.CHAIN_PARAMS.chainId]: AlgebraConfig.V3_CONTRACTS.NONFUNGIBLE_POSITION_MANAGER_ADDRESS
-}
+    [100]: AlgebraConfig.V3_CONTRACTS[100].NONFUNGIBLE_POSITION_MANAGER_ADDRESS,
+    [10200]: AlgebraConfig.V3_CONTRACTS[10200].NONFUNGIBLE_POSITION_MANAGER_ADDRESS,
+};
 
 export const MULTICALL_ADDRESS: AddressMap = {
-    [AlgebraConfig.CHAIN_PARAMS.chainId]: AlgebraConfig.V3_CONTRACTS.MULTICALL_ADDRESS
-}
+    [100]: AlgebraConfig.V3_CONTRACTS[100].MULTICALL_ADDRESS,
+    [10200]: AlgebraConfig.V3_CONTRACTS[10200].MULTICALL_ADDRESS,
+};
 
 export const V3_MIGRATOR_ADDRESSES: AddressMap = {
-    [AlgebraConfig.CHAIN_PARAMS.chainId]: AlgebraConfig.V3_CONTRACTS.MIGRATOR_ADDRESS
-}
+    [100]: AlgebraConfig.V3_CONTRACTS[100].MIGRATOR_ADDRESS,
+    [10200]: AlgebraConfig.V3_CONTRACTS[10200].MIGRATOR_ADDRESS,
+};
 
 export const FINITE_FARMING: AddressMap = {
-    [AlgebraConfig.CHAIN_PARAMS.chainId]: AlgebraConfig.V3_CONTRACTS.LIMIT_FARMING_ADDRESS
-}
+    [100]: AlgebraConfig.V3_CONTRACTS[100].LIMIT_FARMING_ADDRESS,
+    [10200]: AlgebraConfig.V3_CONTRACTS[10200].LIMIT_FARMING_ADDRESS,
+};
 
 export const INFINITE_FARMING_ADDRESS: AddressMap = {
-    [AlgebraConfig.CHAIN_PARAMS.chainId]: AlgebraConfig.V3_CONTRACTS.ETERNAL_FARMING_ADDRESS
-}
+    [100]: AlgebraConfig.V3_CONTRACTS[100].ETERNAL_FARMING_ADDRESS,
+    [10200]: AlgebraConfig.V3_CONTRACTS[10200].ETERNAL_FARMING_ADDRESS,
+};
 
 export const FARMING_CENTER: AddressMap = {
-    [AlgebraConfig.CHAIN_PARAMS.chainId]: AlgebraConfig.V3_CONTRACTS.FARMING_CENTER_ADDRESS
-}
+    [100]: AlgebraConfig.V3_CONTRACTS[100].FARMING_CENTER_ADDRESS,
+    [10200]: AlgebraConfig.V3_CONTRACTS[10200].FARMING_CENTER_ADDRESS,
+};
 
 export const V2_FACTORY_ADDRESSES: AddressMap = {
-    [AlgebraConfig.CHAIN_PARAMS.chainId]: '0x5757371414417b8C6CAad45bAeF941aBc7d3Ab32'
-}
+    [100]: "0x5757371414417b8C6CAad45bAeF941aBc7d3Ab32",
+};
 
 export const V2_ROUTER_ADDRESS: AddressMap = {
-    [AlgebraConfig.CHAIN_PARAMS.chainId]: '0x1b02da8cb0d097eb8d57a175b88c7d8b47997506'
-}
+    [100]: "0x1b02da8cb0d097eb8d57a175b88c7d8b47997506",
+};
 
 export const ENS_REGISTRAR_ADDRESSES: AddressMap = {
-    [AlgebraConfig.CHAIN_PARAMS.chainId]: '0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e'
-}
+    [100]: "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+};
 
 export const SOCKS_CONTROLLER_ADDRESSES: AddressMap = {
-    [AlgebraConfig.CHAIN_PARAMS.chainId]: '0x65770b5283117639760beA3F867b69b3697a91dd'
-}
+    [100]: "0x65770b5283117639760beA3F867b69b3697a91dd",
+};

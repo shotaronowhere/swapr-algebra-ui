@@ -1,7 +1,8 @@
 import AlgebraConfig from "algebra.config";
 
 const ETHERSCAN_PREFIXES: { [chainId: number]: string } = {
-    [AlgebraConfig.CHAIN_PARAMS.chainId]: "",
+    [100]: "",
+    [10200]: "",
 };
 
 export enum ExplorerDataType {
@@ -18,7 +19,7 @@ export enum ExplorerDataType {
  * @param type the type of the data
  */
 export function getExplorerLink(chainId: number, data: string, type: ExplorerDataType): string {
-    const prefix = `https://${ETHERSCAN_PREFIXES[chainId] ?? ""}${AlgebraConfig.CHAIN_PARAMS.blockExplorerDomain}`;
+    const prefix = `https://${ETHERSCAN_PREFIXES[chainId] ?? ""}${AlgebraConfig.CHAIN_PARAMS[chainId || 100].blockExplorerDomain}`;
 
     switch (type) {
         case ExplorerDataType.TRANSACTION:

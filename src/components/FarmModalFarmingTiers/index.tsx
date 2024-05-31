@@ -32,13 +32,13 @@ interface StakeModalFarmingTiersProps {
 }
 
 export default function StakeModalFarmingTiers({ tiersLimits, tiersMultipliers, selectTier, multiplierToken }: StakeModalFarmingTiersProps) {
-    const { account } = useWeb3React();
+    const { account, chainId } = useWeb3React();
 
     const [selectedTier, setSelectedTier] = useState<number | undefined>(0);
 
     const balance = useCurrencyBalance(
         account ?? undefined,
-        new Token(AlgebraConfig.CHAIN_PARAMS.chainId, multiplierToken.id, +multiplierToken.decimals, multiplierToken.symbol, multiplierToken.name) ?? undefined
+        new Token(AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId, multiplierToken.id, +multiplierToken.decimals, multiplierToken.symbol, multiplierToken.name) ?? undefined
     );
     const _balance = useMemo(() => (!balance ? "" : balance.toSignificant(4)), [balance]);
 
@@ -75,7 +75,15 @@ export default function StakeModalFarmingTiers({ tiersLimits, tiersMultipliers, 
                 <div>
                     <div className="f">
                         <CurrencyLogo
-                            currency={new Token(AlgebraConfig.CHAIN_PARAMS.chainId, multiplierToken.id, +multiplierToken.decimals, multiplierToken.symbol, multiplierToken.name) as WrappedCurrency}
+                            currency={
+                                new Token(
+                                    AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId,
+                                    multiplierToken.id,
+                                    +multiplierToken.decimals,
+                                    multiplierToken.symbol,
+                                    multiplierToken.name
+                                ) as WrappedCurrency
+                            }
                         />
                         <div className="ml-05" style={{ lineHeight: "24px" }}>{`${_balance} ${multiplierToken.symbol}`}</div>
                     </div>

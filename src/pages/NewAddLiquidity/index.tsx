@@ -102,12 +102,11 @@ export function NewAddLiquidityPage({
 
     const handleCurrencySelect = useCallback(
         (currencyNew: Currency, currencyIdOther?: string): (string | undefined)[] => {
-            const currencyIdNew = currencyId(currencyNew, chainId || AlgebraConfig.CHAIN_PARAMS.chainId);
-
+            const currencyIdNew = currencyId(currencyNew, chainId || AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId);
             let chainSymbol;
 
-            if (chainId === AlgebraConfig.CHAIN_PARAMS.chainId) {
-                chainSymbol = AlgebraConfig.CHAIN_PARAMS.nativeCurrency.symbol;
+            if (chainId === AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId) {
+                chainSymbol = AlgebraConfig.CHAIN_PARAMS[chainId || 100].nativeCurrency.symbol;
             }
 
             resetState();

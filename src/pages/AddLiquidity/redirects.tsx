@@ -17,8 +17,8 @@ export function RedirectDuplicateTokenIdsNew(props: RouteComponentProps<{ curren
     // prevent weth + eth
     let symbol;
 
-    if (chainId === AlgebraConfig.CHAIN_PARAMS.chainId) {
-        symbol = AlgebraConfig.CHAIN_PARAMS.nativeCurrency.symbol;
+    if (chainId === AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId) {
+        symbol = AlgebraConfig.CHAIN_PARAMS[chainId || 100].nativeCurrency.symbol;
     }
 
     const isETHOrWETHA = currencyIdA === symbol || (chainId !== undefined && currencyIdA === WXDAI_EXTENDED[chainId]?.address);

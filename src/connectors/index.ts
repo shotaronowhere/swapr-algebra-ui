@@ -72,9 +72,9 @@ function getHooksForWallet(wallet: Wallet) {
     }
 }
 
-const rpcUrlMap = { [algebraConfig.CHAIN_PARAMS.chainId]: algebraConfig.CHAIN_PARAMS.rpcURL };
+const rpcUrlMap = { [100]: algebraConfig.CHAIN_PARAMS[100].rpcURL, [10200]: algebraConfig.CHAIN_PARAMS[10200].rpcURL };
 
-export const [network, networkHooks] = initializeConnector<Network>((actions) => new Network({ actions, urlMap: rpcUrlMap, defaultChainId: algebraConfig.CHAIN_PARAMS.chainId }));
+export const [network, networkHooks] = initializeConnector<Network>((actions) => new Network({ actions, urlMap: rpcUrlMap, defaultChainId: algebraConfig.CHAIN_PARAMS[100].chainId }));
 
 export const [injected, injectedHooks] = initializeConnector<MetaMask>((actions) => new MetaMask({ actions, onError }));
 
@@ -86,7 +86,7 @@ export const [walletConnect, walletConnectHooks] = initializeConnector<WalletCon
             actions,
             options: {
                 projectId: process.env.REACT_APP_WALLET_CONNECT_PROJECT_ID as string,
-                chains: [algebraConfig.CHAIN_PARAMS.chainId],
+                chains: [algebraConfig.CHAIN_PARAMS[100].chainId, algebraConfig.CHAIN_PARAMS[10200].chainId],
                 rpcMap: rpcUrlMap,
                 showQrModal: true,
                 optionalMethods: ["eth_signTypedData", "eth_signTypedData_v4", "eth_sign", "eth_sendTransaction"],
@@ -105,7 +105,7 @@ export const [coinbaseWallet, coinbaseWalletHooks] = initializeConnector<Coinbas
         new CoinbaseWallet({
             actions,
             options: {
-                url: algebraConfig.CHAIN_PARAMS.rpcURL,
+                url: algebraConfig.CHAIN_PARAMS[100].rpcURL,
                 appName: "Swapr Liquidity",
                 appLogoUrl: SWAPR_LOGO_URL,
             },

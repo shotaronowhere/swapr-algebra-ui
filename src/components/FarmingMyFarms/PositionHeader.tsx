@@ -10,6 +10,7 @@ import { Deposit, UnstakingInterface } from "../../models/interfaces";
 import { t } from "@lingui/macro";
 
 import AlgebraConfig from "algebra.config";
+import { useWeb3React } from "@web3-react/core";
 
 interface PositionHeaderProps {
     el: Deposit;
@@ -20,6 +21,7 @@ interface PositionHeaderProps {
 }
 
 export default function PositionHeader({ el, unstaking, setUnstaking, withdrawHandler, setSendModal }: PositionHeaderProps) {
+    const { chainId } = useWeb3React();
     return (
         <div className={"my-farms__position-card__header flex-s-between mb-1 br-8 p-1"}>
             <div className={"my-farms__position-card__header__row"}>
@@ -41,8 +43,12 @@ export default function PositionHeader({ el, unstaking, setUnstaking, withdrawHa
                     </div>
                 </div>
                 <div className={"f f-ac ml-2 mxs_ml-0 mxs_mv-1"}>
-                    <CurrencyLogo currency={new Token(AlgebraConfig.CHAIN_PARAMS.chainId, el.token0, 18, el.pool.token0.symbol) as WrappedCurrency} size={"35px"} />
-                    <CurrencyLogo currency={new Token(AlgebraConfig.CHAIN_PARAMS.chainId, el.token1, 18, el.pool.token1.symbol) as WrappedCurrency} size={"35px"} style={{ marginLeft: "-1rem" }} />
+                    <CurrencyLogo currency={new Token(AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId, el.token0, 18, el.pool.token0.symbol) as WrappedCurrency} size={"35px"} />
+                    <CurrencyLogo
+                        currency={new Token(AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId, el.token1, 18, el.pool.token1.symbol) as WrappedCurrency}
+                        size={"35px"}
+                        style={{ marginLeft: "-1rem" }}
+                    />
                     <div className={"ml-05"}>
                         <div className={"b fs-075"} style={{ marginBottom: "2px" }}>
                             POOL

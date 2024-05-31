@@ -100,7 +100,7 @@ export function useEthPrices(): EthPrices | undefined {
 
     // index on active network
     const { chainId } = useWeb3React();
-    const indexedPrices = prices?.[chainId ?? AlgebraConfig.CHAIN_PARAMS.chainId];
+    const indexedPrices = prices?.[chainId ?? AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId];
 
     const formattedBlocks = useMemo(() => {
         if (blocks) {
@@ -119,7 +119,7 @@ export function useEthPrices(): EthPrices | undefined {
                 setError(true);
             } else if (data) {
                 setPrices({
-                    [chainId ?? AlgebraConfig.CHAIN_PARAMS.chainId]: data,
+                    [chainId ?? AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId]: data,
                 });
             }
         }
@@ -129,5 +129,5 @@ export function useEthPrices(): EthPrices | undefined {
         }
     }, [error, prices, formattedBlocks, blockError, dataClient, indexedPrices, chainId]);
 
-    return prices?.[chainId ?? AlgebraConfig.CHAIN_PARAMS.chainId];
+    return prices?.[chainId ?? AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId];
 }

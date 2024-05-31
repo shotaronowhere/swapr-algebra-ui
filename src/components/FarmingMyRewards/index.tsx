@@ -12,10 +12,12 @@ import { WrappedCurrency } from "../../models/types";
 import { Trans } from "@lingui/macro";
 
 import AlgebraConfig from "algebra.config";
+import { useWeb3React } from "@web3-react/core";
 
 export function FarmingMyRewards({ data, refreshing, fetchHandler }: { data: Reward[]; refreshing: boolean; fetchHandler: () => any }) {
     const allTransactions = useAllTransactions();
     const sortedRecentTransactions = useSortedRecentTransactions();
+    const { chainId } = useWeb3React();
 
     const confirmed = useMemo(() => sortedRecentTransactions.filter((tx) => tx.receipt).map((tx) => tx.hash), [sortedRecentTransactions, allTransactions]);
 
@@ -78,7 +80,7 @@ export function FarmingMyRewards({ data, refreshing, fetchHandler }: { data: Rew
                                 </LoadingShim>
                             )}
                             <CurrencyLogo
-                                currency={new Token(AlgebraConfig.CHAIN_PARAMS.chainId, rew.rewardAddress, 18, rew.symbol) as WrappedCurrency}
+                                currency={new Token(AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId, rew.rewardAddress, 18, rew.symbol) as WrappedCurrency}
                                 size={"35px"}
                                 style={{ marginRight: "10px" }}
                             />

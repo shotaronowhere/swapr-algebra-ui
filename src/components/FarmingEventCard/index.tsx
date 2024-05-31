@@ -54,7 +54,7 @@ export function FarmingEventCard({
     event: { pool, createdAtTimestamp, rewardToken, bonusRewardToken, reward, bonusReward, startTime, endTime, apr, locked, enterStartTime, tvl, dailyRewardRate, dailyBonusRewardRate } = {},
     eternal,
 }: FarmingEventCardProps) {
-    const { account } = useWeb3React();
+    const { account, chainId } = useWeb3React();
     const toggleWalletModal = useWalletModalToggle();
 
     const _startTime = useMemo(() => {
@@ -128,8 +128,8 @@ export function FarmingEventCard({
             )}
             <div className={"f mb-1"}>
                 <div className={"f mr-1"}>
-                    <CurrencyLogo currency={new Token(AlgebraConfig.CHAIN_PARAMS.chainId, pool.token0.id, 18, pool.token0.symbol) as WrappedCurrency} size={"30px"} />
-                    <CurrencyLogo currency={new Token(AlgebraConfig.CHAIN_PARAMS.chainId, pool.token1.id, 18, pool.token1.symbol) as WrappedCurrency} size={"30px"} />
+                    <CurrencyLogo currency={new Token(AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId, pool.token0.id, 18, pool.token0.symbol) as WrappedCurrency} size={"30px"} />
+                    <CurrencyLogo currency={new Token(AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId, pool.token1.id, 18, pool.token1.symbol) as WrappedCurrency} size={"30px"} />
                 </div>
                 <div>
                     <h3 className={"fs-075 b"}>
@@ -152,7 +152,7 @@ export function FarmingEventCard({
                     {rewardList?.map((reward: any, i) =>
                         reward.rewardRate ? (
                             <li key={i} className="farming-event-card__reward-list-item f">
-                                <CurrencyLogo currency={new Token(AlgebraConfig.CHAIN_PARAMS.chainId, reward.token.id, 18, reward.token.symbol) as WrappedCurrency} size={"30px"} />
+                                <CurrencyLogo currency={new Token(AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId, reward.token.id, 18, reward.token.symbol) as WrappedCurrency} size={"30px"} />
                                 <span className="farming-event-card__reward-list-item__symbol ml-05">{reward.token.symbol}</span>
                                 <div className={"m-a mr-0 fs-085"} title={reward.amount.toString()}>
                                     {eternal ? <span>{formatAmountTokens(reward.rewardRate, false)} per day</span> : <span>{formatAmountTokens(reward.amount, false)}</span>}

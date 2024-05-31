@@ -67,7 +67,7 @@ function parseTokensData(tokenData: TokenInSubgraph[] | string) {
 }
 
 export function useInfoSubgraph() {
-    const { account } = useWeb3React();
+    const { chainId } = useWeb3React();
     const { dataClient } = useClients();
     const [t24, t48, tWeek] = useDeltaTimestamps();
 
@@ -99,9 +99,9 @@ export function useInfoSubgraph() {
 
     const [positionsRange, setPositionsRange] = useState<{ closed: PriceRangeChart | null; opened: PriceRangeChart | null }>({ closed: null, opened: null });
 
-    const addressForCheck = AlgebraConfig.DEFAULT_TOKEN_LIST.filterForScamTokens.tokensForCheck;
+    const addressForCheck = AlgebraConfig.DEFAULT_TOKEN_LIST[chainId || 100].filterForScamTokens.tokensForCheck;
 
-    const possibleNames = AlgebraConfig.DEFAULT_TOKEN_LIST.filterForScamTokens.possibleFakeNames;
+    const possibleNames = AlgebraConfig.DEFAULT_TOKEN_LIST[chainId || 100].filterForScamTokens.possibleFakeNames;
 
     async function fetchInfoPools() {
         if (!blocks || blockError || !ethPrices) return;

@@ -38,7 +38,7 @@ function listToTokenMap(list: TokenList): TokenAddressMap {
     return map;
 }
 
-const TRANSFORMED_DEFAULT_TOKEN_LIST = listToTokenMap(DEFAULT_TOKEN_LIST);
+// const TRANSFORMED_DEFAULT_TOKEN_LIST = listToTokenMap(DEFAULT_TOKEN_LIST);
 
 export function useAllLists(): AppState["lists"]["byUrl"] {
     return useAppSelector((state) => state.lists.byUrl);

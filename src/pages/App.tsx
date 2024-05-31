@@ -33,7 +33,7 @@ export default function App() {
             return 60;
         },
     });
-    const { account } = useWeb3React();
+    const { account, chainId } = useWeb3React();
     const networkFailed = useIsNetworkFailed();
 
     useEffect(() => {
@@ -66,7 +66,7 @@ export default function App() {
                                 }}
                                 stroke={"white"}
                             />
-                            <span>{t`Connecting to ${AlgebraConfig.CHAIN_PARAMS.chainName}`}</span>
+                            <span>{t`Connecting to ${AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainName}`}</span>
                         </div>
                     </NetworkFailedCard>
                 )}

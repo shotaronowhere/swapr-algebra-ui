@@ -40,8 +40,8 @@ export default function Header() {
 
     let chainValue;
 
-    if (chainId === AlgebraConfig.CHAIN_PARAMS.chainId) {
-        chainValue = AlgebraConfig.CHAIN_PARAMS.nativeCurrency.symbol;
+    if (chainId === AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId) {
+        chainValue = AlgebraConfig.CHAIN_PARAMS[chainId || 100].nativeCurrency.symbol;
     }
 
     const handleBlur = useCallback((e: React.ChangeEvent<HTMLLabelElement>) => {
@@ -139,7 +139,7 @@ export default function Header() {
                     {account && (
                         <>
                             <NetworkCard />
-                            {(chainId === AlgebraConfig.CHAIN_PARAMS.chainId && account && userEthBalance) || networkFailed ? (
+                            {(chainId === AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId && account && userEthBalance) || networkFailed ? (
                                 <BalanceText style={{ flexShrink: 0 }} px="0.85rem" fontWeight={500}>
                                     {_userEthBalance?.toFixed(5)} {!isMobile && chainValue}
                                 </BalanceText>

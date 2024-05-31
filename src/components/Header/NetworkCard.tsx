@@ -33,7 +33,7 @@ export default function NetworkCard() {
         return null;
     }
 
-    if (chainId == AlgebraConfig.CHAIN_PARAMS.chainId) {
+    if (chainId == AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId) {
         return (
             <div className="f" style={{ display: "flex", alignItems: "center" }}>
                 <img src={GnosisLogo} width="20" height="20" style={{ borderRadius: "50%" }} />

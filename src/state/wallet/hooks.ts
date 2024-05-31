@@ -36,7 +36,6 @@ export function useETHBalances(uncheckedAddresses?: (string | undefined)[]): {
         "getEthBalance",
         addresses.map((address) => [address])
     );
-
     const balances = useMemo(
         () =>
             addresses.reduce<{ [address: string]: CurrencyAmount<Currency> }>((memo, address, i) => {

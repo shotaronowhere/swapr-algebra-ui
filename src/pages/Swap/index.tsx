@@ -93,7 +93,7 @@ export default function Swap({ history }: RouteComponentProps) {
         currencies,
         inputError: swapInputError,
     } = useDerivedSwapInfo();
-
+    console.log("userDerivedSwap:", { v3TradeState, trade, allowedSlippage, currencyBalances, parsedAmount, currencies, swapInputError });
     const { wrapType, execute: onWrap, inputError: wrapInputError } = useWrapCallback(currencies[Field.INPUT], currencies[Field.OUTPUT], typedValue);
 
     const showWrap: boolean = wrapType !== WrapType.NOT_APPLICABLE;

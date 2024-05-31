@@ -53,7 +53,7 @@ export function TokenAmountCard({
     priceFormat,
     isBase,
 }: ITokenAmountCard) {
-    const { account } = useWeb3React();
+    const { account, chainId } = useWeb3React();
 
     const balance = useCurrencyBalance(account ?? undefined, currency ?? undefined);
     const balanceUSD = useUSDCPrice(currency ?? undefined);
@@ -62,7 +62,7 @@ export function TokenAmountCard({
     const [localTokenValue, setLocalTokenValue] = useState("");
 
     const valueUSD = useUSDCValue(tryParseAmount(value, currency ? (currency.isNative ? currency.wrapped : currency) : undefined), true);
-    const tokenValue = useBestV3TradeExactIn(tryParseAmount("1", STABLE_TOKEN_FOR_USD_PRICE), currency ?? undefined);
+    const tokenValue = useBestV3TradeExactIn(tryParseAmount("1", STABLE_TOKEN_FOR_USD_PRICE[chainId || 100]), currency ?? undefined);
 
     const currencyPrice = useUSDCPrice(currency ?? undefined);
     const otherCurrencyPrice = useUSDCPrice(otherCurrency ?? undefined);
@@ -75,7 +75,7 @@ export function TokenAmountCard({
     }, [priceFormat]);
 
     const handleOnBlur = useCallback(() => {
-        if (currency?.wrapped.address === STABLE_TOKEN_FOR_USD_PRICE.address) {
+        if (currency?.wrapped.address === STABLE_TOKEN_FOR_USD_PRICE[chainId || 100].address) {
             handleInput(localUSDValue);
             return;
         }

@@ -1,8 +1,8 @@
-import AlgebraConfig from "algebra.config"
+import AlgebraConfig from "algebra.config";
 
-export const ADDRESS_ZERO = '0x0000000000000000000000000000000000000000'
+export const ADDRESS_ZERO = "0x0000000000000000000000000000000000000000";
 
-export const POOL_INIT_CODE_HASH = AlgebraConfig.V3_CONTRACTS.POOL_INIT_CODE_HASH
+export const POOL_INIT_CODE_HASH = AlgebraConfig.V3_CONTRACTS[100].POOL_INIT_CODE_HASH;
 
 /**
  * The default factory enabled fee amounts, denominated in hundredths of bips.
@@ -10,7 +10,7 @@ export const POOL_INIT_CODE_HASH = AlgebraConfig.V3_CONTRACTS.POOL_INIT_CODE_HAS
 export enum FeeAmount {
     LOW = 500,
     MEDIUM = 500,
-    HIGH = 500
+    HIGH = 500,
 }
 
 /**
@@ -19,5 +19,5 @@ export enum FeeAmount {
 export const TICK_SPACINGS: { [amount in FeeAmount]: number } = {
     [FeeAmount.LOW]: 60,
     [FeeAmount.MEDIUM]: 60,
-    [FeeAmount.HIGH]: 60
-}
+    [FeeAmount.HIGH]: 60,
+};

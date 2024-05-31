@@ -14,7 +14,7 @@ export default function Popups() {
 
     // need extra padding if network is not L1 Ethereum
     const { chainId } = useWeb3React();
-    const isNotOnMainnet = Boolean(chainId && chainId !== AlgebraConfig.CHAIN_PARAMS.chainId);
+    const isNotOnMainnet = Boolean(chainId && chainId !== AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId);
 
     return (
         <>

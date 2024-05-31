@@ -32,7 +32,7 @@ export function useBestV3TradeExactIn(amountIn?: CurrencyAmount<Currency>, curre
     const quoteExactInInputs = useMemo(() => {
         return routes.map((route) => [encodeRouteToPath(route, false), amountIn ? `0x${amountIn.quotient.toString(16)}` : undefined]);
     }, [amountIn, routes]);
-
+    console.log("quoteExactInInputs:", quoteExactInInputs);
     const quotesResults = useSingleContractMultipleData(quoter, "quoteExactInput", quoteExactInInputs, {
         gasRequired: chainId ? DEFAULT_GAS_QUOTE : undefined,
     });

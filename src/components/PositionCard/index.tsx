@@ -321,7 +321,10 @@ export default function FullPositionCard({ pair, border, stakedBalance }: Positi
                                     padding="8px"
                                     $borderRadius="8px"
                                     as={Link}
-                                    to={`/add/${currencyId(currency0, chainId || AlgebraConfig.CHAIN_PARAMS.chainId)}/${currencyId(currency1, chainId || AlgebraConfig.CHAIN_PARAMS.chainId)}`}
+                                    to={`/add/${currencyId(currency0, chainId || AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId)}/${currencyId(
+                                        currency1,
+                                        chainId || AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId
+                                    )}`}
                                     width="32%"
                                 >
                                     <Trans>Add</Trans>
@@ -333,7 +336,10 @@ export default function FullPositionCard({ pair, border, stakedBalance }: Positi
                                 padding="8px"
                                 $borderRadius="8px"
                                 as={Link}
-                                to={`/uni/${currencyId(currency0, chainId || AlgebraConfig.CHAIN_PARAMS.chainId)}/${currencyId(currency1, chainId || AlgebraConfig.CHAIN_PARAMS.chainId)}`}
+                                to={`/uni/${currencyId(currency0, chainId || AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId)}/${currencyId(
+                                    currency1,
+                                    chainId || AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId
+                                )}`}
                                 width="100%"
                             >
                                 <Trans>Manage Liquidity in Rewards Pool</Trans>

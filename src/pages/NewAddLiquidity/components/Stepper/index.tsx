@@ -10,6 +10,7 @@ import { Presets } from "state/mint/v3/reducer";
 import { PriceFormats } from "../PriceFomatToggler";
 
 import "./index.scss";
+import { useWeb3React } from "@web3-react/core";
 
 interface IStepperNavigation {
     isEnabled: boolean;
@@ -31,6 +32,7 @@ interface IStepper {
 export function Stepper({ completedSteps, stepLinks, currencyA, currencyB, mintInfo, end, handleNavigation, priceFormat }: IStepper) {
     const baseTokenUSD = useUSDCPrice(currencyA);
     const rangeTokenUSD = useUSDCPrice(currencyB);
+    const { chainId } = useWeb3React();
 
     const initialUSDPrices = useInitialUSDPrices();
 
@@ -39,11 +41,11 @@ export function Stepper({ completedSteps, stepLinks, currencyA, currencyB, mintI
     }, [priceFormat]);
 
     const isUSDCB = useMemo(() => {
-        return currencyB && currencyB.wrapped.address === STABLE_TOKEN_FOR_USD_PRICE.address;
+        return currencyB && currencyB.wrapped.address === STABLE_TOKEN_FOR_USD_PRICE[chainId || 100].address;
     }, [currencyB]);
 
     const isUSDCA = useMemo(() => {
-        return currencyA && currencyA.wrapped.address === STABLE_TOKEN_FOR_USD_PRICE.address;
+        return currencyA && currencyA.wrapped.address === STABLE_TOKEN_FOR_USD_PRICE[chainId || 100].address;
     }, [currencyA]);
 
     const { [Bound.LOWER]: priceLower, [Bound.UPPER]: priceUpper } = mintInfo.pricesAtTicks;

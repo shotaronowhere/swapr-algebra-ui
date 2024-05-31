@@ -15,8 +15,8 @@ export default function CurrencyLogo({ currency, size = "24px", style, ...rest }
 
     let logo;
 
-    if (chainId === AlgebraConfig.CHAIN_PARAMS.chainId) {
-        logo = AlgebraConfig.CHAIN_PARAMS.nativeCurrency.logo;
+    if (chainId === AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId) {
+        logo = AlgebraConfig.CHAIN_PARAMS[chainId || 100].nativeCurrency.logo;
     }
 
     if (!currency) return <div />;

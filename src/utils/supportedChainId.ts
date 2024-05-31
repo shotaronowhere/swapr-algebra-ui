@@ -1,12 +1,12 @@
-import AlgebraConfig from "algebra.config"
+import AlgebraConfig from "algebra.config";
 
 /**
  * Returns the input chain ID if chain is supported. If not, return undefined
  * @param chainId a chain ID, which will be returned if it is a supported chain ID
  */
 export function supportedChainId(chainId: number): number | undefined {
-    if (chainId === AlgebraConfig.CHAIN_PARAMS.chainId) {
-        return chainId
+    if (chainId === AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId) {
+        return chainId;
     }
-    return undefined
+    return undefined;
 }

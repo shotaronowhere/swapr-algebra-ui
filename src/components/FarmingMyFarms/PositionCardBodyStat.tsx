@@ -9,6 +9,7 @@ import "./position-card-body-stat.scss";
 
 import AlgebraConfig from "algebra.config";
 import { ZERO_ADDRESS } from "../../constants/misc";
+import { useWeb3React } from "@web3-react/core";
 
 interface PositionCardBodyStatProps {
     rewardToken: any;
@@ -18,6 +19,7 @@ interface PositionCardBodyStatProps {
 }
 
 export default function PositionCardBodyStat({ rewardToken, earned, bonusRewardToken, bonusEarned }: PositionCardBodyStatProps) {
+    const { chainId } = useWeb3React();
     const rewardList = useMemo(() => {
         if (rewardToken.id === bonusRewardToken.id) return [{ token: rewardToken, amount: +earned + +bonusEarned }];
         if (bonusRewardToken.id === ZERO_ADDRESS) return [{ token: rewardToken, amount: earned }];
@@ -36,7 +38,7 @@ export default function PositionCardBodyStat({ rewardToken, earned, bonusRewardT
             <div className="f ms_fd-c mxs_fd-c">
                 {rewardList.map((reward: any, i) => (
                     <div key={i} className={"f f-ac mr-1 mxs_mr-0 mxs_mt-1 mxs_mb-0 ms_mr-0 ms_mt-1 ms_mb-0 position-card-body-stat"}>
-                        <CurrencyLogo size={"30px"} currency={new Token(AlgebraConfig.CHAIN_PARAMS.chainId, reward.token.id, 18, reward.token.symbol) as WrappedCurrency} />
+                        <CurrencyLogo size={"30px"} currency={new Token(AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId, reward.token.id, 18, reward.token.symbol) as WrappedCurrency} />
                         <div className="ml-05" title={reward.amount.toString()}>{`${formatReward(reward.amount)} ${reward.token.symbol}`}</div>
                     </div>
                 ))}

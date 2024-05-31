@@ -9,25 +9,30 @@ import { ExternalLink } from "react-feather";
 import React from "react";
 
 import AlgebraConfig from "algebra.config";
+import { useWeb3React } from "@web3-react/core";
 
-export const TokenRow = ({ address, symbol, name }: any) => (
-    <a className={"link"} href={`${AlgebraConfig.CHAIN_PARAMS.blockExplorerURL}/address/${address}`} rel="noopener noreferrer" target="_blank">
-        <span className={"currency-wrapper hover-op trans-op"}>
-            <span className={"currency-wrapper__row"}>
-                <CurrencyLogo currency={new Token(AlgebraConfig.CHAIN_PARAMS.chainId, address, 18, symbol) as WrappedCurrency} size={"20px"} />
+export const TokenRow = ({ address, symbol, name }: any) => {
+    const { chainId } = useWeb3React();
+
+    return (
+        <a className={"link"} href={`${AlgebraConfig.CHAIN_PARAMS[chainId || 100].blockExplorerURL}/address/${address}`} rel="noopener noreferrer" target="_blank">
+            <span className={"currency-wrapper hover-op trans-op"}>
+                <span className={"currency-wrapper__row"}>
+                    <CurrencyLogo currency={new Token(AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId, address, 18, symbol) as WrappedCurrency} size={"20px"} />
+                </span>
+                <MediumOnly>
+                    <Label>{symbol}</Label>
+                </MediumOnly>
+                <HideMedium>
+                    <RowFixed>
+                        <HoverInlineText text={name} maxCharacters={18} />
+                        <Label ml="8px" color={"white"}>
+                            ({symbol})
+                        </Label>
+                    </RowFixed>
+                </HideMedium>
+                <ExternalLink size={16} color={"white"} />
             </span>
-            <MediumOnly>
-                <Label>{symbol}</Label>
-            </MediumOnly>
-            <HideMedium>
-                <RowFixed>
-                    <HoverInlineText text={name} maxCharacters={18} />
-                    <Label ml="8px" color={"white"}>
-                        ({symbol})
-                    </Label>
-                </RowFixed>
-            </HideMedium>
-            <ExternalLink size={16} color={"white"} />
-        </span>
-    </a>
-);
+        </a>
+    );
+};

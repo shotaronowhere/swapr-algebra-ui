@@ -12,7 +12,7 @@ export default function GasUpdater(): null {
     const { chainId } = useWeb3React();
 
     const block = useAppSelector((state) => {
-        return state.application.blockNumber[chainId ?? AlgebraConfig.CHAIN_PARAMS.chainId];
+        return state.application.blockNumber[chainId ?? AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId];
     });
 
     const { fetchGasPrice, gasPrice, gasPriceLoading } = useGasPrice();

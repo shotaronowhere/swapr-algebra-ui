@@ -15,7 +15,7 @@ import { isMobile } from "react-device-detect";
 
 import AlgebraConfig from "algebra.config";
 
-export async function addPolygonNetwork() {
+export async function addNetwork(chainId) {
     const _window = window as EthereumWindow;
 
     try {
@@ -23,7 +23,7 @@ export async function addPolygonNetwork() {
             method: "wallet_switchEthereumChain",
             params: [
                 {
-                    chainId: AlgebraConfig.CHAIN_PARAMS.chainIdHex,
+                    chainId: AlgebraConfig.CHAIN_PARAMS[chainId].chainIdHex,
                 },
             ],
         });
@@ -36,15 +36,15 @@ export async function addPolygonNetwork() {
                     method: "wallet_addEthereumChain",
                     params: [
                         {
-                            chainId: AlgebraConfig.CHAIN_PARAMS.chainIdHex,
-                            chainName: AlgebraConfig.CHAIN_PARAMS.chainName,
+                            chainId: AlgebraConfig.CHAIN_PARAMS[chainId].chainIdHex,
+                            chainName: AlgebraConfig.CHAIN_PARAMS[chainId].chainName,
                             nativeCurrency: {
-                                name: AlgebraConfig.CHAIN_PARAMS.nativeCurrency.name,
-                                symbol: AlgebraConfig.CHAIN_PARAMS.nativeCurrency.symbol,
-                                decimals: AlgebraConfig.CHAIN_PARAMS.nativeCurrency.decimals,
+                                name: AlgebraConfig.CHAIN_PARAMS[chainId].nativeCurrency.name,
+                                symbol: AlgebraConfig.CHAIN_PARAMS[chainId].nativeCurrency.symbol,
+                                decimals: AlgebraConfig.CHAIN_PARAMS[chainId].nativeCurrency.decimals,
                             },
-                            blockExplorerUrls: [AlgebraConfig.CHAIN_PARAMS.blockExplorerURL],
-                            rpcUrls: [AlgebraConfig.CHAIN_PARAMS.rpcURL],
+                            blockExplorerUrls: [AlgebraConfig.CHAIN_PARAMS[chainId].blockExplorerURL],
+                            rpcUrls: [AlgebraConfig.CHAIN_PARAMS[chainId].rpcURL],
                         },
                     ],
                 });
@@ -70,13 +70,13 @@ export function Web3StatusInner() {
     //TODO: hanlde errors
     const error = false;
 
-    const chainAllowed = chainId && AlgebraConfig.CHAIN_PARAMS.chainId == chainId;
+    const chainAllowed = chainId && AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId == chainId;
 
     if (!chainAllowed) {
         return (
             <>
-                <Web3StatusConnect style={{ marginRight: "4px" }} onClick={() => connector.activate(AlgebraConfig.CHAIN_PARAMS.chainId)}>
-                    <Text style={{ overflow: "unset" }}>Switch to {AlgebraConfig.CHAIN_PARAMS.chainName}</Text>
+                <Web3StatusConnect style={{ marginRight: "4px" }} onClick={() => connector.activate(AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId)}>
+                    <Text style={{ overflow: "unset" }}>Switch to {AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainName}</Text>
                 </Web3StatusConnect>
                 {!isMobile && (
                     <Web3StatusError onClick={toggleWalletModal}>
@@ -109,7 +109,11 @@ export function Web3StatusInner() {
         );
     } else if (error) {
         return (
-            <Web3StatusError onClick={addPolygonNetwork}>
+            <Web3StatusError
+                onClick={() => {
+                    if (chainId === 100 || chainId === 10200) addNetwork(chainId);
+                }}
+            >
                 <NetworkIcon />
                 <Text>
                     <Trans>Error</Trans>

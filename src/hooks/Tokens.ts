@@ -145,13 +145,13 @@ export function useToken(tokenAddress?: string): Token | undefined | null {
     return useMemo(() => {
         if (token) return token;
         if (!chainId || !address || !_lowkeyAddress) return undefined;
-        if (_lowkeyAddress in AlgebraConfig.DEFAULT_TOKEN_LIST.defaultTokens)
+        if (_lowkeyAddress in AlgebraConfig.DEFAULT_TOKEN_LIST[chainId || 100].defaultTokens)
             return new Token(
                 chainId,
                 address,
-                AlgebraConfig.DEFAULT_TOKEN_LIST.defaultTokens[_lowkeyAddress].decimals,
-                AlgebraConfig.DEFAULT_TOKEN_LIST.defaultTokens[_lowkeyAddress].symbol,
-                AlgebraConfig.DEFAULT_TOKEN_LIST.defaultTokens[_lowkeyAddress].name
+                AlgebraConfig.DEFAULT_TOKEN_LIST[chainId || 100].defaultTokens[_lowkeyAddress].decimals,
+                AlgebraConfig.DEFAULT_TOKEN_LIST[chainId || 100].defaultTokens[_lowkeyAddress].symbol,
+                AlgebraConfig.DEFAULT_TOKEN_LIST[chainId || 100].defaultTokens[_lowkeyAddress].name
             );
         if (decimals.loading || symbol.loading || tokenName.loading) return null;
         if (decimals.result) {
@@ -170,8 +170,8 @@ export function useToken(tokenAddress?: string): Token | undefined | null {
 export function useCurrency(currencyId: string | undefined): Currency | null | undefined {
     const { chainId } = useWeb3React();
     let isETH;
-    if (chainId === AlgebraConfig.CHAIN_PARAMS.chainId) {
-        isETH = currencyId?.toUpperCase() === AlgebraConfig.CHAIN_PARAMS.nativeCurrency.symbol;
+    if (chainId === AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId) {
+        isETH = currencyId?.toUpperCase() === AlgebraConfig.CHAIN_PARAMS[chainId || 100].nativeCurrency.symbol;
     }
 
     const token = useToken(isETH ? undefined : currencyId);

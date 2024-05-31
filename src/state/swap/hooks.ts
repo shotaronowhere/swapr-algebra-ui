@@ -32,13 +32,14 @@ export function useSwapActionHandlers(): {
     onChangeRecipient: (recipient: string | null) => void;
 } {
     const dispatch = useAppDispatch();
+    const { chainId } = useWeb3React();
 
     const onCurrencySelection = useCallback(
         (field: Field, currency: Currency) => {
             dispatch(
                 selectCurrency({
                     field,
-                    currencyId: currency.isToken ? currency.address : currency.isNative ? AlgebraConfig.CHAIN_PARAMS.nativeCurrency.symbol : "",
+                    currencyId: currency.isToken ? currency.address : currency.isNative ? AlgebraConfig.CHAIN_PARAMS[chainId || 100].nativeCurrency.symbol : "",
                 })
             );
         },
@@ -201,8 +202,8 @@ export function useDerivedSwapInfo(): {
 function parseCurrencyFromURLParameter(urlParam: any, chainId: number): string {
     let chainSymbol;
 
-    if (chainId === AlgebraConfig.CHAIN_PARAMS.chainId) {
-        chainSymbol = AlgebraConfig.CHAIN_PARAMS.nativeCurrency.symbol;
+    if (chainId === AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId) {
+        chainSymbol = AlgebraConfig.CHAIN_PARAMS[chainId || 100].nativeCurrency.symbol;
     }
 
     if (typeof urlParam === "string") {
@@ -238,8 +239,8 @@ export function queryParametersToSwapState(parsedQs: ParsedQs, chainId: number):
     let outputCurrency = parseCurrencyFromURLParameter(parsedQs.outputCurrency, chainId);
     if (inputCurrency === "" && outputCurrency === "") {
         // default to ETH input
-        if (chainId === AlgebraConfig.CHAIN_PARAMS.chainId) {
-            inputCurrency = AlgebraConfig.CHAIN_PARAMS.nativeCurrency.symbol;
+        if (chainId === AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId) {
+            inputCurrency = AlgebraConfig.CHAIN_PARAMS[chainId || 100].nativeCurrency.symbol;
         }
     } else if (inputCurrency === outputCurrency) {
         // clear output if identical

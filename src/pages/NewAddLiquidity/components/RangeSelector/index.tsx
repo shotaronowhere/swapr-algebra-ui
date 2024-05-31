@@ -12,6 +12,7 @@ import { tryParseAmount } from "state/swap/hooks";
 import { PriceFormats } from "../PriceFomatToggler";
 
 import "./index.scss";
+import { useWeb3React } from "@web3-react/core";
 
 interface IRangeSelector {
     priceLower: Price<Token, Token> | undefined;
@@ -204,6 +205,7 @@ function RangePart({
 }: IRangePart) {
     const [localUSDValue, setLocalUSDValue] = useState("");
     const [localTokenValue, setLocalTokenValue] = useState("");
+    const { chainId } = useWeb3React();
 
     const dispatch = useAppDispatch();
 
@@ -212,7 +214,7 @@ function RangePart({
     }, [priceFormat]);
 
     const valueUSD = useUSDCValue(tryParseAmount(value === "∞" || value === "0" ? undefined : Number(value).toFixed(5), tokenB), true);
-    const tokenValue = useBestV3TradeExactIn(tryParseAmount("1", STABLE_TOKEN_FOR_USD_PRICE), tokenB);
+    const tokenValue = useBestV3TradeExactIn(tryParseAmount("1", STABLE_TOKEN_FOR_USD_PRICE[chainId || 100]), tokenB);
     const usdPriceA = useUSDCPrice(tokenA ?? undefined);
     const usdPriceB = useUSDCPrice(tokenB ?? undefined);
 
@@ -221,7 +223,7 @@ function RangePart({
 
     const handleOnBlur = useCallback(() => {
         if (isUSD && usdPriceB) {
-            if (tokenB?.wrapped.address === STABLE_TOKEN_FOR_USD_PRICE.address) {
+            if (tokenB?.wrapped.address === STABLE_TOKEN_FOR_USD_PRICE[chainId || 100].address) {
                 onUserInput(localUSDValue);
             } else {
                 if (tokenValue && tokenValue.trade) {
@@ -233,14 +235,14 @@ function RangePart({
                 }
             }
         } else if (isUSD && initialUSDPrices.CURRENCY_B) {
-            if (tokenB?.wrapped.address === STABLE_TOKEN_FOR_USD_PRICE.address) {
+            if (tokenB?.wrapped.address === STABLE_TOKEN_FOR_USD_PRICE[chainId || 100].address) {
                 onUserInput(localUSDValue);
             } else {
                 onUserInput(String(+localUSDValue / +initialUSDPrices.CURRENCY_B));
                 setLocalTokenValue(String(+localUSDValue / +initialUSDPrices.CURRENCY_B));
             }
         } else if (isUSD && initialTokenPrice && usdPriceA) {
-            if (tokenB?.wrapped.address === STABLE_TOKEN_FOR_USD_PRICE.address) {
+            if (tokenB?.wrapped.address === STABLE_TOKEN_FOR_USD_PRICE[chainId || 100].address) {
                 onUserInput(localUSDValue);
             } else {
                 onUserInput(String(+localUSDValue * +initialTokenPrice * +usdPriceA.toSignificant(5)));

@@ -6,6 +6,7 @@ import { Trans } from "@lingui/macro";
 
 import AlgebraConfig from "algebra.config";
 import { NavLink } from "react-router-dom";
+import { useWeb3React } from "@web3-react/core";
 
 interface PoolInfoHeaderProps {
     token0: Token | undefined;
@@ -15,6 +16,8 @@ interface PoolInfoHeaderProps {
 }
 
 export function PoolInfoHeader({ token0, token1, fee, collectedFees }: PoolInfoHeaderProps) {
+    const { chainId } = useWeb3React();
+
     const poolTitle = useMemo(() => {
         if (!token1 || !token0) return [];
         if (token0.symbol === "USDC") {
@@ -30,8 +33,8 @@ export function PoolInfoHeader({ token0, token1, fee, collectedFees }: PoolInfoH
                     <span className={"fs-15 flex-s-between ml-15"}>
                         <span className={"mr-05"}>
                             <DoubleCurrencyLogo
-                                currency0={token0 && new Token(AlgebraConfig.CHAIN_PARAMS.chainId, token0.address, 18, token0?.symbol)}
-                                currency1={token1 && new Token(AlgebraConfig.CHAIN_PARAMS.chainId, token1.address, 18, token1?.symbol)}
+                                currency0={token0 && new Token(AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId, token0.address, 18, token0?.symbol)}
+                                currency1={token1 && new Token(AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId, token1.address, 18, token1?.symbol)}
                                 size={30}
                             />
                         </span>

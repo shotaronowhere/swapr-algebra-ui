@@ -71,7 +71,7 @@ export function FarmModal({
     closeHandler,
     farmingType,
 }: FarmModalProps) {
-    const { account } = useWeb3React();
+    const { account, chainId } = useWeb3React();
 
     const isTierFarming = useMemo(
         () => Boolean((+tier1Multiplier || +tier2Multiplier || +tier3Multiplier) && (+tokenAmountForTier1 || +tokenAmountForTier2 || +tokenAmountForTier3)),
@@ -226,7 +226,7 @@ export function FarmModal({
 
     const balance = useCurrencyBalance(
         account ?? undefined,
-        multiplierToken ? new Token(AlgebraConfig.CHAIN_PARAMS.chainId, multiplierToken.id, +multiplierToken.decimals, multiplierToken.symbol, multiplierToken.name) : undefined
+        multiplierToken ? new Token(AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId, multiplierToken.id, +multiplierToken.decimals, multiplierToken.symbol, multiplierToken.name) : undefined
     );
 
     const isEnoughTokenForLock = useMemo(() => {
@@ -273,10 +273,13 @@ export function FarmModal({
     const _amountForApprove = useMemo(() => {
         if (!selectedTier || !multiplierToken) return undefined;
 
-        return CurrencyAmount.fromRawAmount(new Token(AlgebraConfig.CHAIN_PARAMS.chainId, multiplierToken.id, +multiplierToken.decimals, multiplierToken.symbol, multiplierToken.name), selectedTier);
+        return CurrencyAmount.fromRawAmount(
+            new Token(AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId, multiplierToken.id, +multiplierToken.decimals, multiplierToken.symbol, multiplierToken.name),
+            selectedTier
+        );
     }, [selectedTier, multiplierToken]);
 
-    const [approval, approveCallback] = useApproveCallback(_amountForApprove, AlgebraConfig.V3_CONTRACTS.FARMING_CENTER_ADDRESS);
+    const [approval, approveCallback] = useApproveCallback(_amountForApprove, AlgebraConfig.V3_CONTRACTS[chainId || 100].FARMING_CENTER_ADDRESS);
 
     const showApproval = approval !== ApprovalState.APPROVED && !!_amountForApprove;
 

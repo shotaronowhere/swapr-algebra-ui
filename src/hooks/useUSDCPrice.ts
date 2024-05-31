@@ -10,8 +10,8 @@ import { STABLE_TOKEN_FOR_USD_PRICE } from "constants/tokens";
 
 // Two different consts used as a hack for allLiquidity flag in useUSDCPrice fn.
 // Doing another way makes amounts in EnterAmount stuck somehow.
-const STABLECOIN_AMOUNT_OUT_ALL: CurrencyAmount<Token> = CurrencyAmount.fromRawAmount(STABLE_TOKEN_FOR_USD_PRICE, 1);
-const STABLECOIN_AMOUNT_OUT_FILTERED: CurrencyAmount<Token> = CurrencyAmount.fromRawAmount(STABLE_TOKEN_FOR_USD_PRICE, 100_000e1);
+const STABLECOIN_AMOUNT_OUT_ALL = (chainId: number): CurrencyAmount<Token> => CurrencyAmount.fromRawAmount(STABLE_TOKEN_FOR_USD_PRICE[chainId], 1);
+const STABLECOIN_AMOUNT_OUT_FILTERED = (chainId: number): CurrencyAmount<Token> => CurrencyAmount.fromRawAmount(STABLE_TOKEN_FOR_USD_PRICE[chainId], 100_000e1);
 
 /**
  * Returns the price in USDC of the input currency
@@ -20,7 +20,7 @@ const STABLECOIN_AMOUNT_OUT_FILTERED: CurrencyAmount<Token> = CurrencyAmount.fro
 export default function useUSDCPrice(currency?: Currency, allLiquidity?: boolean): Price<Currency, Token> | undefined {
     const { chainId } = useWeb3React();
 
-    const amountOut = chainId ? (allLiquidity ? STABLECOIN_AMOUNT_OUT_ALL : STABLECOIN_AMOUNT_OUT_FILTERED) : undefined;
+    const amountOut = chainId ? (allLiquidity ? STABLECOIN_AMOUNT_OUT_ALL(chainId) : STABLECOIN_AMOUNT_OUT_FILTERED(chainId)) : undefined;
     const stablecoin = amountOut?.currency;
 
     const v3USDCTrade = useBestV3TradeExactOut(currency, amountOut);

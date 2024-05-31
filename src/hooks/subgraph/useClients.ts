@@ -7,7 +7,7 @@ import AlgebraConfig from "algebra.config";
 export function useBlockClient(): ApolloClient<NormalizedCacheObject> {
     const { chainId } = useWeb3React();
     switch (chainId) {
-        case AlgebraConfig.CHAIN_PARAMS.chainId:
+        case AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId:
             return blockClient;
         default:
             return blockClient;
@@ -17,7 +17,7 @@ export function useBlockClient(): ApolloClient<NormalizedCacheObject> {
 export function useDataClient(): ApolloClient<NormalizedCacheObject> {
     const { chainId } = useWeb3React();
     switch (chainId) {
-        case AlgebraConfig.CHAIN_PARAMS.chainId:
+        case AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId:
             return client;
         default:
             return client;
@@ -27,7 +27,7 @@ export function useDataClient(): ApolloClient<NormalizedCacheObject> {
 export function useFarmingClient(): ApolloClient<NormalizedCacheObject> {
     const { chainId } = useWeb3React();
     switch (chainId) {
-        case AlgebraConfig.CHAIN_PARAMS.chainId:
+        case AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId:
             return farmingClient;
         default:
             return farmingClient;

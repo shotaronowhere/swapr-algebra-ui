@@ -37,8 +37,8 @@ export default function useWrapCallback(
 
     let chainSymbol: string;
 
-    if (chainId === AlgebraConfig.CHAIN_PARAMS.chainId) {
-        chainSymbol = AlgebraConfig.CHAIN_PARAMS.nativeCurrency.symbol;
+    if (chainId === AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId) {
+        chainSymbol = AlgebraConfig.CHAIN_PARAMS[chainId || 100].nativeCurrency.symbol;
     }
 
     return useMemo(() => {

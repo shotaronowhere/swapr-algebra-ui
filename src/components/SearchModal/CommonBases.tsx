@@ -16,9 +16,9 @@ interface CommonBasesProps {
 }
 
 export default function CommonBases({ onSelect, selectedCurrency }: CommonBasesProps) {
-    const bases = COMMON_BASES[AlgebraConfig.CHAIN_PARAMS.chainId] as WrappedCurrency[];
-
     const { chainId } = useWeb3React();
+
+    const bases = COMMON_BASES[AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId] as WrappedCurrency[];
 
     return bases.length > 0 ? (
         <div className={"mv-1 common-bases"}>
@@ -30,7 +30,7 @@ export default function CommonBases({ onSelect, selectedCurrency }: CommonBasesP
                             className={"br-8 bg-t f f-ac c-w p-05 hover-op trans-op"}
                             onClick={() => !isSelected && onSelect(currency)}
                             disabled={isSelected}
-                            key={currencyId(currency, chainId || AlgebraConfig.CHAIN_PARAMS.chainId)}
+                            key={currencyId(currency, chainId || AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId)}
                         >
                             <CurrencyLogo currency={currency} style={{ marginRight: 8 }} />
                             <span>{currency.symbol}</span>

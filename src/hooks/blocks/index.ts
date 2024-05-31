@@ -27,13 +27,13 @@ export function useBlocksFromTimestamps(
     const activeBlockClient = blockClientOverride ?? blockClient;
 
     // derive blocks based on active network
-    const networkBlocks = blocks?.[chainId ?? AlgebraConfig.CHAIN_PARAMS.chainId];
+    const networkBlocks = blocks?.[chainId ?? AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId];
 
     useEffect(() => {
         async function fetchData() {
             const results = await splitQuery(GET_BLOCKS, activeBlockClient, [], timestamps);
             if (results) {
-                setBlocks({ ...(blocks ?? {}), [chainId ?? AlgebraConfig.CHAIN_PARAMS.chainId]: results });
+                setBlocks({ ...(blocks ?? {}), [chainId ?? AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId]: results });
             } else {
                 setError(true);
             }
@@ -45,8 +45,8 @@ export function useBlocksFromTimestamps(
     });
 
     const blocksFormatted = useMemo(() => {
-        if (blocks?.[chainId ?? AlgebraConfig.CHAIN_PARAMS.chainId]) {
-            const networkBlocks = blocks?.[chainId ?? AlgebraConfig.CHAIN_PARAMS.chainId];
+        if (blocks?.[chainId ?? AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId]) {
+            const networkBlocks = blocks?.[chainId ?? AlgebraConfig.CHAIN_PARAMS[chainId || 100].chainId];
             const formatted: any[] = [];
             for (const t in networkBlocks) {
                 if (networkBlocks[t].length > 0) {
