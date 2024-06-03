@@ -14,15 +14,10 @@ import { NavLink } from "react-router-dom";
 import { Trans } from "@lingui/macro";
 
 import AlgebraConfig from "algebra.config";
-import { ArrowUpRight, Link } from "react-feather";
 import { ThemeContext } from "styled-components/macro";
-import { ReactComponent as Close } from "../../assets/images/x.svg";
 
 export default function Header() {
-    const [showBanner, setShowBanner] = useState(true);
-
     const { account, chainId } = useWeb3React();
-    const theme = useContext(ThemeContext);
 
     const userEthBalance = useETHBalances(account ? [account] : [])?.[account ?? ""];
 
@@ -44,63 +39,8 @@ export default function Header() {
         chainValue = AlgebraConfig.CHAIN_PARAMS[chainId || 100].nativeCurrency.symbol;
     }
 
-    const handleBlur = useCallback((e: React.ChangeEvent<HTMLLabelElement>) => {
-        const target = e.target.control as HTMLInputElement;
-
-        if (!target) return;
-
-        setTimeout(() => (target.checked = false), 100);
-    }, []);
-
     return (
         <>
-            {showBanner && (
-                <div
-                    style={{
-                        width: "100%",
-                        minHeight: "45px",
-                        background: theme.winterMainButton,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        textAlign: "center",
-                        padding: "0.75rem",
-                        gap: "10px",
-                        fontSize: "14px",
-                    }}
-                >
-                    <div
-                        style={{
-                            width: "100%",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                            textAlign: "center",
-                            flexWrap: "wrap",
-                            gap: "10px",
-                        }}
-                    >
-                        <p>This product is still in beta phase, launching soon in Q1 2024.</p>
-                        <p>
-                            Make sure you are on <span style={{ fontWeight: "bold" }}>v3.swapr.eth.limo</span>
-                        </p>
-                    </div>
-                    <button
-                        style={{
-                            background: "none",
-                            color: "inherit",
-                            border: "none",
-                            padding: "0",
-                            font: "inherit",
-                            cursor: "pointer",
-                            outline: "inherit",
-                        }}
-                        onClick={() => setShowBanner(false)}
-                    >
-                        <Close />
-                    </button>
-                </div>
-            )}
             <div className={"header__wrapper flex-s-between w-100 pv-1 pl-2"}>
                 <a className={"header__logo hover-op trans-op mxs_mr-1"} href=".">
                     <img src={Logo} alt="logo" />
@@ -126,9 +66,9 @@ export default function Header() {
                         </span>
                         <span className={"header__farming-circle"} />
                     </NavLink>
-                    <NavLink className={"header__links__link hover-op"} activeClassName={"header__links__link--active"} id={`info-nav-link`} to={"/info"}>
+                    {/* <NavLink className={"header__links__link hover-op"} activeClassName={"header__links__link--active"} id={`info-nav-link`} to={"/info"}>
                         <Trans>Pools</Trans>
-                    </NavLink>
+                    </NavLink> */}
                     {/* <a className={"header__links__link hover-op"} id={`info-nav-link`} href="https://swapr.eth.limo" target="_blank" style={{ display: "flex", alignItems: "center" }}>
                     <Trans>Swap</Trans>
                     <ArrowUpRight width={18} style={{ marginLeft: "4px" }} />
