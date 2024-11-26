@@ -1,9 +1,9 @@
 overrideExisting: true
 schema:
   [
-    "https://swaprhq.io/subgraphs/name/swapr/dogechain-info",
-    "https://swaprhq.io/subgraphs/name/swapr/dogechain-farming",
-    "https://swaprhq.io/subgraphs/name/swapr/dogechain-blocklytics",
+    "https://api.studio.thegraph.com/query/63508/algebra-v19/version/latest",
+    "https://api.studio.thegraph.com/query/63508/algebrafarming-v19/version/latest",
+    "https://api.studio.thegraph.com/query/63508/algebrablocks-v19/version/latest",
   ]
 documents: "src/**/!(*.d).{ts,tsx}"
 generates:
