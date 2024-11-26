@@ -54,7 +54,7 @@ export async function fetchPoolsAPR() {
     const apiURL = AlgebraConfig.API.poolsAPR;
 
     try {
-        return await fetch(apiURL).then((v) => v.json());
+        return await fetch(apiURL, { signal: AbortSignal.timeout(5000) }).then((v) => v.json());
     } catch (error: any) {
         return {};
     }
