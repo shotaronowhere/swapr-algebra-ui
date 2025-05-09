@@ -150,7 +150,7 @@ export default {
 
     SUBGRAPH: {
         // Deployed on https://thegraph.com/studio/subgraph/swapr-v3/
-        infoURL: `https://gateway.thegraph.com/api/${SUBGRAPH_API_KEY}/subgraphs/id/YwkNWffc8UTH77wDqGWgMShMq1uXdiQsD5wrD5MzKwJ`,
+        infoURL: `https://api.studio.thegraph.com/query/63508/algebra-v19/version/latest`,
         farmingURL: `https://gateway-arbitrum.network.thegraph.com/api/${SUBGRAPH_API_KEY}/subgraphs/id/4WysHZ1gFJcv1HLAobLMx3dS9B6aovExzyG3n7kRjwKT`,
         blocklyticsURL: `https://gateway-arbitrum.network.thegraph.com/api/${SUBGRAPH_API_KEY}/subgraphs/id/FSFGfeobVFdtoWnGkULtLQ5vYu38tc9BxYR1e1yXjVPZ`,
     },
